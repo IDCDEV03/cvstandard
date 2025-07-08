@@ -14,11 +14,30 @@
                     </div>
                 </div>
             </div>
+
+
+               <div class="row">
+                        <div class="col-md-6">
+                            <a href="{{ route('agency.veh_regis') }}" class="text-decoration-none">
+                                <div class="card card-md border-2 card-bordered card-default text-center"
+                                    style=" border-color: #a071ff;background-color: #f8f4ff;">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                           <img src="{{asset('bus.png')}}" alt="" width="120px">
+                                        </div>
+                                        <span class="fs-24 fw-bold text-dark mb-1">ลงทะเบียนรถ</span>
+                                        <p class="fs-20 text-muted mt-1">คลิกเพื่อกรอกข้อมูลทะเบียนรถ</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+ <div class="border-top border-light my-4"></div>
+
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-
+                   
                              <div class="row">
                 <div class="col-md-6">
                     <div class="card card-default mb-4 border border-primary">
@@ -153,8 +172,7 @@
             </div>
 
 
-                        </div>
-                    </div>
+                      
                 </div>
             </div>
         </div>

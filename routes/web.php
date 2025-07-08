@@ -103,6 +103,11 @@ Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () 
     Route::get('/index', [PageController::class, 'home'])->name('agency.index');
     Route::get('/main', [AgencyMainController::class, 'main_page'])->name('agency.main');
 
+    //เพิ่มรถ
+    Route::get('/veh-regis', [VehiclesController::class, 'veh_regis'])->name('agency.veh_regis');
+    Route::get('/veh-list/{id}', [VehiclesController::class, 'veh_list'])->name('agency.veh_list');
+    Route::POST('/veh-create', [VehiclesController::class, 'veh_insert'])->name('agency.veh_create');
+
     //สร้างuserหัวหน้า-เจ้าหน้าที่
     Route::get('/managerlist', [ManageAccountController::class, 'ManagerList'])->name('agency.manager_list');
     Route::get('/userlist', [ManageAccountController::class, 'UserList'])->name('agency.user_list');

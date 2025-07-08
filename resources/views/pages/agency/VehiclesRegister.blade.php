@@ -1,11 +1,9 @@
-@section('title', 'ระบบปฏิบัติการพนักงานขับรถราชการ')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
     <div class="container-fluid">
-   
-
-            <div class="row">
+               <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb-main">
                         <span class="fs-24 fw-bold breadcrumb-title">ลงทะเบียนรถ</span>
@@ -15,7 +13,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card mb-25">
+                    <div class="card shadow-sm mb-25">
                         <div class="card-body">
                             @if (session('error'))
                                 <div class="alert alert-danger">{{ session('error') }}</div>

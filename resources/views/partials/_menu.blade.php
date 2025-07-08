@@ -8,7 +8,7 @@
 
          <li class="menu-title mt-30">
              @if ($role === Role::Agency)
-                 <span>ระบบปฏิบัติการพนักงานขับรถราชการ</span>
+                 <span>ระบบตรวจมาตรฐานรถ</span>
                  <div class="border-top my-3"></div>
                    <span>เมนูสำหรับหน่วยงาน</span>
              @elseif ($role === Role::User)
@@ -19,7 +19,7 @@
                 ->where('id','=',$agent_id)
                 ->first();             
              @endphp
-                 <span>ระบบปฏิบัติการพนักงานขับรถราชการ</span>
+                 <span>ระบบตรวจมาตรฐานรถ</span>
                  <span><i class="far fa-building"></i> {{$agent->name}} </span>
                  <div class="border-top my-3"></div>
                  <span><i class="fas fa-bars"></i> เมนูสำหรับผู้ใช้งาน</span>
@@ -38,6 +38,15 @@
          </li>
 
           <li>
+                 <a href="{{ route('agency.main') }}" class="">
+                     <span class="nav-icon uil uil-megaphone"></span>
+                     <span class="menu-text">ประกาศ</span>
+                     <span class="badge badge-success menuItem rounded-circle">3</span>
+                 </a>
+             </li>
+
+
+          <li>
              <a href="{{route('agency.manager_list')}}" class="">
                  <span class="nav-icon uil uil-users-alt"></span>
                  <span class="menu-text">รายชื่อหัวหน้า</span>                
@@ -51,16 +60,16 @@
              </a>           
          </li>
 
+           <li>
+             <a href="{{route('agency.veh_list',['id'=>Auth::id()])}}" class="">
+                 <span class="nav-icon uil uil-truck"></span>
+                 <span class="menu-text">รายการทะเบียนรถ</span>                
+             </a>           
+         </li>
 
 
-             <li>
-                 <a href="{{ route('agency.main') }}" class="">
-                     <span class="nav-icon uil uil-megaphone"></span>
-                     <span class="menu-text">ประกาศ</span>
-                     <span class="badge badge-success menuItem rounded-circle">3</span>
-                 </a>
-             </li>
 
+            
                  <li class="has-child">
              <a href="#" class="">
                  <span class="nav-icon far fa-list-alt"></span>

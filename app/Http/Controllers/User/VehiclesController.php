@@ -15,6 +15,17 @@ use Illuminate\Support\Facades\File;
 class VehiclesController extends Controller
 {
 
+  public function veh_list($id)
+  {
+            
+            $data = DB::table('vehicles')
+            ->where('agency_id', '=', $id)
+            ->orderBy('id', 'ASC')
+            ->get();
+
+              return view('pages.agency.VehiclesList', ['id' => $id], compact('data'));
+  }
+
     public function veh_regis()
     {
 
@@ -36,7 +47,51 @@ class VehiclesController extends Controller
             ->orderBy('brand_name','ASC')
             ->get();
 
-        return view('pages.user.VehiclesRegister', compact('car_type', 'province','car_brand'));
+        return view('pages.agency.VehiclesRegister', compact('car_type', 'province','car_brand'));
+    }
+
+      public function veh_insert(Request $request)
+    {
+
+        $agent = Auth::id();
+
+        if (empty($request->province)) {
+            return redirect()->back()->with('error', 'กรุณาเลือกทะเบียนจังหวัด');
+        }
+
+        if (empty($request->veh_brand)) {
+            return redirect()->back()->with('error', 'กรุณาเลือกยี่ห้อรถ');
+        }
+
+
+        $veh_id = 'VEH-' . Str::upper(Str::random(9));
+
+        $rawInput = $request->input('plate');
+        $cleanPlate = str_replace(' ', '', $rawInput); //ตัดช่องว่างออก
+
+        // upload image
+        $upload_location = 'upload/';
+        $file = $request->file('vehicle_image');
+        $extension = $file->getClientOriginalExtension();
+        $newName = $cleanPlate . '_' . Carbon::now()->format('Ymd_His') . '.' . $extension;
+        $file->move($upload_location, $newName);
+        $fileName = $upload_location . $newName;
+
+        DB::table('vehicles')->insert([
+            'veh_id' => $veh_id,
+            'veh_brand' => $request->veh_brand,
+            'plate' => $cleanPlate,
+            'province' => $request->province,
+            'user_id' => Auth::id(),
+            'veh_status' => '1',
+            'veh_type' => $request->vehicle_type,
+            'veh_image' => $fileName,
+            'agency_id' => $agent,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('agency.veh_list', ['id' => Auth::id()])->with('success', 'บันทึกสำเร็จ');
     }
 
   public function veh_detail($id)
