@@ -23,7 +23,7 @@ class RedirectController extends Controller
                 return redirect()->route('admin.dashboard');
 
             case Role::Manager:
-                return redirect()->route('manager.dashboard');
+                return redirect()->route('manager.index');
 
             case Role::Agency:
                 return redirect()->route('agency.index');

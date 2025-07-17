@@ -9,12 +9,14 @@ use App\Http\Controllers\User\UserMainController;
 use App\Http\Controllers\User\RepairController;
 use App\Http\Controllers\User\VehiclesController;
 use App\Http\Controllers\Admin\ManageUserController;
+use App\Http\Controllers\Admin\ManageCompanyController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\User\ManageAccountController;
 use Database\Seeders\VehicleTypeSeeder;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Role;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\User\ManagerController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,9 +34,12 @@ Route::get('/comingsoon', [PageController::class, 'coming_soon'])->name('coming_
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
+    //CRUD บริษัทฯว่าจ้าง
+Route::get('/cp_list', [AdminDashboardController::class, 'CompanyList'])->name('admin.cp_list');
+Route::get('/cp_new', [AdminDashboardController::class, 'CompanyCreate'])->name('admin.cp_create');
     // CRUD หน่วยงาน
     Route::get('/agencies/create', [ManageUserController::class, 'createAgency'])->name('admin.agency.create');
-    Route::post('agencies/insert', [ManageUserController::class, 'insert_agency'])->name('admin.agency.insert');
+    Route::post('/agencies/insert', [ManageUserController::class, 'insert_agency'])->name('admin.agency.insert');
     Route::get('/agency', [ManageUserController::class, 'Agency_list'])->name('admin.agency_list');
 
     Route::get('/agencies/{id}/edit', [ManageUserController::class, 'EditAgency'])->name('admin.agency.edit');
@@ -136,14 +141,35 @@ Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () 
     Route::get('/item-delete/{id}/image', [AgencyMainController::class, 'item_delete_image'])->name('agency.item_delete_image');
 });
 
+Route::prefix('manager')->middleware(['auth', 'role:manager'])->group(function () {
+    // สำหรับผจก.BU
+    Route::get('/index', [PageController::class, 'home'])->name('manager.index');
+
+    //ทะเบียนบริษัท
+    Route::get('/company-regis', [ManagerController::class, 'company_register'])->name('manager.company_regis');
+    Route::get('/company-list/{id}', [ManagerController::class, 'company_list'])->name('manager.company_list');
+    Route::POST('/company-insert', [ManagerController::class, 'company_insert'])->name('manager.company_insert');
+});
+
+
+Route::prefix('company')->middleware(['auth', 'role:company'])->group(function () {
+    // สำหรับบริษัทว่าจ้างฯ
+});
+
 Route::middleware('guest')->group(function () {
-      Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.attempt');
     Route::get('/register', [LoginController::class, 'showregisterForm'])->name('register');
     Route::post('/register', [LoginController::class, 'register_store'])->name('register.store');
     Route::post('/check_username', [LoginController::class, 'check_username'])->name('username.check');
 });
 
+
+Route::get('/check-username', function () {
+    $username = request('company_user'); 
+    $exists = \App\Models\User::where('username', $username)->exists();
+    return response()->json(['exists' => $exists]);
+});
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 

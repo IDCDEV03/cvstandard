@@ -15,7 +15,7 @@ class PageController extends Controller
 {
     public function home()
     {
-        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin])) {
+        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager])) {
             abort(403);
         }
 
@@ -24,7 +24,7 @@ class PageController extends Controller
 
         $layout = match ($role) {
             Role::Admin => 'layout.LayoutAdmin',
-            Role::Manager => 'layout.manager',
+            Role::Manager => 'layout.app',
             Role::Agency => 'layout.app',
             Role::User => 'layout.app',
         };
@@ -66,7 +66,15 @@ class PageController extends Controller
                 ->where('role', 'user')
                 ->get();
             return view('pages.agency.index', compact('agency', 'managers', 'users'));
-        } else {
+        }
+        elseif ($role === Role::Manager) {
+            $id = Auth::id();
+            $manager = DB::table('users')->where('id', Auth::id())->first();
+
+           
+            return view('pages.manager.index', compact('manager'));
+        }
+        else {
             return view('pages.local.home', compact('layout', 'title', 'description'));
         }
     }

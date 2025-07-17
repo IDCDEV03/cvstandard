@@ -24,6 +24,27 @@ class AdminDashboardController extends Controller
         return view('pages.admin.index');
     }
 
+
+    public function CompanyList()
+    {
+        $company_list = DB::table('users')           
+            ->where('role', '=', 'company')
+            ->orderBy('updated_at', 'DESC')
+            ->get();
+
+         return view('pages.admin.CompanyList',compact('company_list'));
+    }
+
+    public function CompanyCreate()
+    {
+        $province = DB::table('provinces')
+            ->select('id', 'name_th')
+            ->orderBy('name_th', 'ASC')
+            ->get();
+
+        return view('pages.admin.CompanyCreate', compact('province'));
+    }
+
     public function AnnouncementPage()
     {
         $list_post = DB::table('announcements')

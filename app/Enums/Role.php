@@ -8,4 +8,5 @@ enum Role: string
     case Agency = 'agency';
     case Manager = 'manager';
     case User = 'user';
+    case Company = 'company';
 }
