@@ -35,8 +35,17 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     //CRUD บริษัทฯว่าจ้าง
-Route::get('/cp_list', [AdminDashboardController::class, 'CompanyList'])->name('admin.cp_list');
-Route::get('/cp_new', [AdminDashboardController::class, 'CompanyCreate'])->name('admin.cp_create');
+    Route::get('/cp_list', [AdminDashboardController::class, 'CompanyList'])->name('admin.cp_list');
+    Route::get('/cp_new', [AdminDashboardController::class, 'CompanyCreate'])->name('admin.cp_create');
+    Route::get('/cp_edit/{id}', [AdminDashboardController::class, 'CompanyEdit'])->name('admin.cp_edit');
+
+    Route::POST('/cp_update/{id}/{tab}', [ManageCompanyController::class, 'CompanyUpdate'])->name('admin.cp_update');
+
+    Route::get('/cp_status/{id}/{status}', [ManageCompanyController::class, 'UpdateStatus'])->name('admin.cp_updatestatus');
+
+    //CRUD Supply
+    Route::get('/sup_list/{id}', [ManageCompanyController::class, 'SupList'])->name('admin.sup_list');
+
     // CRUD หน่วยงาน
     Route::get('/agencies/create', [ManageUserController::class, 'createAgency'])->name('admin.agency.create');
     Route::post('/agencies/insert', [ManageUserController::class, 'insert_agency'])->name('admin.agency.insert');
@@ -156,6 +165,16 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
     // สำหรับบริษัทว่าจ้างฯ
 });
 
+Route::prefix('sup')->middleware(['auth', 'role:supply'])->group(function () {
+    // Route สำหรับ supply
+});
+
+Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
+    // Route สำหรับ staff
+     Route::get('/index', [PageController::class, 'home'])->name('staff.index');
+});
+
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.attempt');
@@ -166,7 +185,7 @@ Route::middleware('guest')->group(function () {
 
 
 Route::get('/check-username', function () {
-    $username = request('company_user'); 
+    $username = request('company_user');
     $exists = \App\Models\User::where('username', $username)->exists();
     return response()->json(['exists' => $exists]);
 });

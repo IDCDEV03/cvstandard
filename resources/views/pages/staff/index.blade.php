@@ -27,10 +27,10 @@
                         <div class="card shadow-sm h-100" style="border: 2px solid 	#ffd6b5; background-color: #fff1e6;">
                             <div class="card-body text-center">
                                 <div class="mb-3">
-                                    <img src="{{ asset('company.png') }}" alt="" width="120px">
+                                    <img src="{{ asset('truck.png') }}" alt="" width="120px">
                                 </div>
-                                <h5 class="card-title">รายการบริษัทฯ</h5>
-                                <p class="card-text text-muted">สร้างและจัดการข้อมูลบริษัทฯว่าจ้าง</p>
+                                <h5 class="card-title">รายการรถ</h5>
+                                <p class="card-text text-muted">สร้างและจัดการข้อมูลทะเบียนรถ</p>
                             </div>
                         </div>
                     </a>

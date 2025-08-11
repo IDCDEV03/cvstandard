@@ -42,7 +42,24 @@ class AdminDashboardController extends Controller
             ->orderBy('name_th', 'ASC')
             ->get();
 
+          
+
         return view('pages.admin.CompanyCreate', compact('province'));
+    }
+
+        public function CompanyEdit($id)
+    {
+        $province = DB::table('provinces')
+            ->select('id', 'name_th')
+            ->orderBy('name_th', 'ASC')
+            ->get();
+
+            $company_detail = DB::table('users')
+            ->join('company_details','users.company_code','=','company_details.company_id')
+            ->where('users.id','=',$id) 
+            ->get();
+
+        return view('pages.admin.CompanyEdit', compact('province','company_detail'));
     }
 
     public function AnnouncementPage()

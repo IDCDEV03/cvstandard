@@ -68,6 +68,8 @@ class LoginController extends Controller
                 Role::Manager => redirect()->route('manager.dashboard'),
                 Role::Agency => redirect()->route('agency.index'),
                 Role::User => redirect()->route('local.home'),
+                Role::Company => redirect()->route('company.index'),
+                Role::Staff => redirect()->route('staff.index'),
                 default => redirect('/home'),
             };
         }

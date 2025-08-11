@@ -29,6 +29,10 @@
                  <span><i class="far fa-building"></i> {{ $agent->name }} </span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับผู้จัดการ BU</span>
+             @elseif ($role === Role::Staff)
+                 <span>ระบบตรวจมาตรฐานรถ</span>
+                 <div class="border-top my-3"></div>
+                 <span>เมนูสำหรับบุคลากร</span>
              @endif
          </li>
 
@@ -38,11 +42,9 @@
                  <a href="{{ route('agency.index') }}" class="">
                      <span class="nav-icon uil uil-create-dashboard"></span>
                      <span class="menu-text">หน้าหลัก</span>
-
                  </a>
 
              </li>
-
              <li>
                  <a href="{{ route('agency.main') }}" class="">
                      <span class="nav-icon uil uil-megaphone"></span>
@@ -50,32 +52,24 @@
                      <span class="badge badge-success menuItem rounded-circle">3</span>
                  </a>
              </li>
-
-
              <li>
                  <a href="{{ route('agency.manager_list') }}" class="">
                      <span class="nav-icon uil uil-users-alt"></span>
                      <span class="menu-text">รายชื่อหัวหน้า</span>
                  </a>
              </li>
-
              <li>
                  <a href="{{ route('agency.user_list') }}" class="">
                      <span class="nav-icon uil uil-users-alt"></span>
                      <span class="menu-text">รายชื่อเจ้าหน้าที่</span>
                  </a>
              </li>
-
              <li>
                  <a href="{{ route('agency.veh_list', ['id' => Auth::id()]) }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการทะเบียนรถ</span>
                  </a>
              </li>
-
-
-
-
              <li class="has-child">
                  <a href="#" class="">
                      <span class="nav-icon far fa-list-alt"></span>
@@ -163,10 +157,39 @@
              </li>
 
              <li>
-                 <a href="{{route('manager.company_list',['id'=>$agent_id])}}" class="">
+                 <a href="{{ route('manager.company_list', ['id' => $agent_id]) }}" class="">
                      <span class="nav-icon uil uil-building"></span>
                      <span class="menu-text">รายการบริษัทฯ</span>
                  </a>
+             </li>
+         @elseif ($role === Role::Staff)
+           <li>
+                 <a href="{{route('staff.index')}}" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">หน้าหลัก</span>
+                 </a>
+             </li>
+             <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">รายการทะเบียนรถ</span>
+                 </a>
+             </li>
+             <li class="has-child">
+                 <a href="#" class="">
+                     <span class="nav-icon far fa-list-alt"></span>
+                     <span class="menu-text">แบบฟอร์ม</span>
+                     <span class="toggle-icon"></span>
+                 </a>
+                 <ul>
+                     <li>
+                         <a href="#">รายการฟอร์ม</a>
+                     </li>
+                     <li>
+                         <a href="#">สร้างฟอร์ม</a>
+                     </li>
+
+                 </ul>
              </li>
          @endif
 

@@ -15,7 +15,7 @@ class PageController extends Controller
 {
     public function home()
     {
-        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager])) {
+        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager,Role::Staff,Role::Company])) {
             abort(403);
         }
 
@@ -27,6 +27,7 @@ class PageController extends Controller
             Role::Manager => 'layout.app',
             Role::Agency => 'layout.app',
             Role::User => 'layout.app',
+            Role::Staff => 'layout.app',
         };
 
         $title = match ($role) {
@@ -34,6 +35,7 @@ class PageController extends Controller
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'หน้าหลักหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
+            Role::Staff => 'หน้าหลักเจ้าหน้าที่',
         };
 
         $description = match ($role) {
@@ -41,6 +43,7 @@ class PageController extends Controller
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'สำหรับหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
+            Role::Staff => 'หน้าหลักเจ้าหน้าที่',
         };
 
         if ($role === Role::User) {
@@ -73,6 +76,13 @@ class PageController extends Controller
 
            
             return view('pages.manager.index', compact('manager'));
+        }
+          elseif ($role === Role::Staff) {
+            $id = Auth::id();
+            $staff = DB::table('users')->where('id', Auth::id())->first();
+
+           
+            return view('pages.staff.index', compact('staff'));
         }
         else {
             return view('pages.local.home', compact('layout', 'title', 'description'));

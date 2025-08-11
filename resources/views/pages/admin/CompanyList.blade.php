@@ -12,8 +12,8 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fw-bold fs-20 ">
                                 รายการบริษัท
-                            </div>                          
-                            <a href="{{route('admin.cp_create')}}" class="btn btn-sm btn-secondary">
+                            </div>
+                            <a href="{{ route('admin.cp_create') }}" class="btn btn-sm btn-secondary">
                                 <i class="fas fa-building me-1"></i> + ลงทะเบียนบริษัทใหม่
                             </a>
                         </div>
@@ -36,29 +36,42 @@
                             </thead>
                             <tbody>
                                 @foreach ($company_list as $item)
-                                     <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                 <td> {{$item->name}} </td>
-                                 <td>           
-                                @if ($item->user_status == '1')
-                                    <label class="badge badge-round badge-success">ใช้งาน</label>
-                                @elseif ($item->user_status == '0')
-                                <label class="badge badge-round badge-warning">รอยืนยัน</label>
-                                  @elseif ($item->user_status == '2')
-                                <label class="badge badge-round badge-danger">ปิด</label>
-                                @endif
-                                </td>
-                                  <td>
-                                    {{thai_date($item->created_at)}}
-                                  </td>
-                                   <td></td>
-                              </tr>
-                              
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td> 
+                                            <a href="{{route('admin.sup_list',['id'=>$item->company_code])}}">
+                                            {{ $item->name }} </a>
+                                        </td>
+                                        <td>
+                                            @if ($item->user_status == '1')
+                                                <label class="badge badge-round badge-success">ใช้งาน</label>
+                                            @elseif ($item->user_status == '0')
+                                                <label class="badge badge-round badge-warning">รอยืนยัน</label>
+                                            @elseif ($item->user_status == '2')
+                                                <label class="badge badge-round badge-danger">ปิด</label>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ thai_date($item->created_at) }}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group dm-button-group btn-group-normal my-2" role="group">
+                                                <a href="{{ route('admin.cp_edit', [$item->id]) }}"
+                                                    class="btn  btn-xs btn-warning">แก้ไข</a>
+
+                                                @if ($item->user_status == '1')
+                                                    <a href="{{ route('admin.cp_updatestatus', ['id' => $item->id, 'status' => '2']) }}"
+                                                        class="btn  btn-xs btn-danger">ปิดการใช้</a>
+                                                @elseif ($item->user_status == '0' or $item->user_status == '2')
+                                       <a href="{{ route('admin.cp_updatestatus', ['id' => $item->id, 'status' => '1']) }}"
+                                                class="btn  btn-xs btn-success">เปิดการใช้</a>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @endforeach
-                             
                             </tbody>
                         </table>
-
 
 
                     </div>
@@ -70,12 +83,12 @@
 @endsection
 
 @push('scripts')
-  <!-- DataTables  -->
+    <!-- DataTables  -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-   
+
 
     <script>
         $(document).ready(function() {

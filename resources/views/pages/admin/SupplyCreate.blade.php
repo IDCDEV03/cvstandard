@@ -62,7 +62,7 @@
 
                             <div class="mb-3">
                                 <label>กำหนด Username สำหรับเข้าใช้งาน<span class="text-danger">*</span></label>
-                                <input type="text" name="company_user" id="company_user" class="form-control" required>
+                                <input type="text" name="username" id="username" class="form-control" required>
                                <div id="username-alert" class="alert alert-danger mt-2" style="display: none;"></div>
                             </div>
 
@@ -87,7 +87,7 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
-    $('#company_user').blur(function () {
+    $('#username').blur(function () {
         var username = $(this).val();
         if (!username) {
             $('#username-alert').hide();
@@ -97,7 +97,7 @@ $(document).ready(function () {
         $.ajax({
             url: '/check-username',
             method: 'GET',
-            data: { company_user: username },
+            data: { username: username },
             success: function (data) {
                 if (data.exists) {
                     $('#username-alert')
