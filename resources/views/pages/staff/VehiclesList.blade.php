@@ -1,6 +1,6 @@
 @section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
-@extends('layout.LayoutAdmin')
+@extends('layout.app')
 @section('content')
     <div class="container-fluid">
 
@@ -9,19 +9,14 @@
 
                 <div class="card mt-20 mb-25 shadow-sm">
                     <div class="card-body">
-                           <span class="fs-20 fw-bold">บริษัทว่าจ้าง : {{$company_name->name}} </span>
-                            <div class="border-top my-3"></div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="fw-bold fs-18 ">
-                                รายการบริษัทขนส่ง (Supply)
+                            <div class="fw-bold fs-20 ">
+                                รายการรถ
                             </div>
-                            <a href="#" class="btn btn-sm btn-info">
-                               + ลงทะเบียนบริษัทขนส่ง (Supply)
+                            <a href="{{ route('staff.veh_regis') }}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-truck me-1"></i> + ลงทะเบียนรถ
                             </a>
-                            
                         </div>
-                           
-                        
                     </div>
                 </div>
 
@@ -33,22 +28,40 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>ชื่อ</th>
-                                    <th>สถานะ</th>
+                                    <th>ทะเบียนรถ</th>
+                                    <th>ประเภท</th>
+                                    <th>รุ่นรถ</th>
+                                    <th>บริษัทฯว่าจ้าง</th>
+                                    <th>สถานะรถ</th>
                                     <th>วันที่เพิ่ม</th>
                                     <th>จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody>
-                              <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                              </tr>
+                                @foreach ($veh_list as $item)
+                                    <tr>
+                                        <td>{{ $loop->iteration }} </td>
+                                        <td>{{ $item->car_plate }}</td>
+                                        <td>{{$item->vehicle_type}}</td>
+                                        <td> {{$item->car_brand}} {{$item->car_model}} </td>
+                                        <td>{{ $item->name }} </td>
+                                        <td> 
+                                            @if ($item->status == '1')
+                                                 <label class="badge badge-round badge-success">ปกติ</label>
+                                            @elseif($item->status == '2')
+                                                 <label class="badge badge-round badge-warning">รอซ่อม</label>
+                                                  @elseif($item->status == '0')
+                                                 <label class="badge badge-round badge-danger">งดใช้งาน</label>
+                                            @endif
+
+                                        </td>
+                                        <td> {{thai_date($item->created_at)}} </td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
+
 
 
                     </div>
@@ -65,7 +78,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
 
     <script>
         $(document).ready(function() {

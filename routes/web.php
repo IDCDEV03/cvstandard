@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\Role;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\User\ManagerController;
+use App\Http\Controllers\StaffController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -172,6 +173,11 @@ Route::prefix('sup')->middleware(['auth', 'role:supply'])->group(function () {
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     // Route สำหรับ staff
      Route::get('/index', [PageController::class, 'home'])->name('staff.index');
+
+       //ลงทะเบียนรถ
+    Route::get('/veh-list', [StaffController::class, 'VehiclesList'])->name('staff.veh_list');
+    Route::get('/veh-regis', [StaffController::class, 'VehiclesRegister'])->name('staff.veh_regis');
+    Route::POST('/veh-create', [StaffController::class, 'VehiclesInsert'])->name('staff.veh_create');
 });
 
 

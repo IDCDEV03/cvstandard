@@ -23,7 +23,7 @@
             <div class="row">
                 <!-- รายการบริษัทฯ -->
                 <div class="col-md-4 mb-4">
-                    <a href="#" class="text-decoration-none">
+                    <a href="{{route('staff.veh_list')}}" class="text-decoration-none">
                         <div class="card shadow-sm h-100" style="border: 2px solid 	#ffd6b5; background-color: #fff1e6;">
                             <div class="card-body text-center">
                                 <div class="mb-3">

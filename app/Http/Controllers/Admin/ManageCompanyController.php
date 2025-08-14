@@ -134,8 +134,13 @@ class ManageCompanyController extends Controller
             return redirect()->route('admin.cp_list')->with('success', 'บันทึกการแก้ไขสำเร็จ');
         }
     }
+
     public function SupList($id)
     {
-    return view('pages.admin.SupplyList');
+       $company_name = DB::table('users')
+        ->where('company_code','=',$id)
+        ->first();
+
+    return view('pages.admin.SupplyList', compact('company_name'));
     }
 }

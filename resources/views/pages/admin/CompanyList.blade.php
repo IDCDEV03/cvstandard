@@ -11,7 +11,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fw-bold fs-20 ">
-                                รายการบริษัท
+                                รายการบริษัทฯว่าจ้าง
                             </div>
                             <a href="{{ route('admin.cp_create') }}" class="btn btn-sm btn-secondary">
                                 <i class="fas fa-building me-1"></i> + ลงทะเบียนบริษัทใหม่
