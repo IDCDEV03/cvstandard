@@ -8,15 +8,19 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="breadcrumb-main">
-                    <span class="fs-24 fw-bold breadcrumb-title">ลงทะเบียนบริษัทฯ ว่าจ้างตรวจมาตรฐานรถ</span>
-                </div>
+                    <span class="fs-24 fw-bold breadcrumb-title">ลงทะเบียนบริษัทขนส่ง (Supply)</span>                    
+                </div>              
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-12">
+                  
                 <div class="card mb-25">
                     <div class="card-body">
+                        
+                         <div class="alert alert-info mb-20 fw-bold fs-18">บริษัทฯว่าจ้าง : {{$company_name->name}} </div>
+
                         @if (session('error'))
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
@@ -26,24 +30,16 @@
 
                             
                             <div class="mb-3">
-                                <label>ชื่อบริษัท <span class="text-danger">*</span></label>
+                                <label>ชื่อ Supply <span class="text-danger">*</span></label>
                                 <input type="text" name="company_name" class="form-control" required>
                             </div>
 
                             <div class="mb-3">
-                                <label>ที่อยู่บริษัท <span class="text-danger">*</span></label>
+                                <label>ที่อยู่ Supply <span class="text-danger">*</span></label>
                                 <textarea class="form-control" name="company_address" rows="3"></textarea>
                             </div>
 
-                            <div class="mb-3">
-                                <label>จังหวัด <span class="text-danger">*</span></label>
-                                <select name="company_province" id="select-alerts2" class="form-control ">
-                                    <option value="0" selected disabled>--กรุณาเลือกจังหวัด--</option>
-                                    @foreach ($province as $item)
-                                        <option value="{{ $item->name_th }}">{{ $item->name_th }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                         
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">

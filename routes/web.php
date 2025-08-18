@@ -46,6 +46,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     //CRUD Supply
     Route::get('/sup_list/{id}', [ManageCompanyController::class, 'SupList'])->name('admin.sup_list');
+     Route::get('/sup-create/{id}', [ManageCompanyController::class, 'SupCreate'])->name('admin.sup_create');
 
     // CRUD หน่วยงาน
     Route::get('/agencies/create', [ManageUserController::class, 'createAgency'])->name('admin.agency.create');

@@ -15,7 +15,7 @@
                             <div class="fw-bold fs-18 ">
                                 รายการบริษัทขนส่ง (Supply)
                             </div>
-                            <a href="#" class="btn btn-sm btn-info">
+                            <a href="{{route('admin.sup_create',[$company_name->company_code])}}" class="btn btn-sm btn-info">
                                + ลงทะเบียนบริษัทขนส่ง (Supply)
                             </a>
                             

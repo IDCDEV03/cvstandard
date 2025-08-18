@@ -143,4 +143,12 @@ class ManageCompanyController extends Controller
 
     return view('pages.admin.SupplyList', compact('company_name'));
     }
+
+    public function SupCreate($id)
+    {
+         $company_name = DB::table('users')
+        ->where('company_code','=',$id)
+        ->first();
+         return view('pages.admin.SupplyCreate', compact('company_name'));
+    }
 }
