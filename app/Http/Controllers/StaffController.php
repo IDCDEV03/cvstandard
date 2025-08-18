@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -20,14 +21,17 @@ class StaffController extends Controller
 
     public function VehiclesList()
     {
-        $veh_list = DB::table('vehicles_detail')
-        ->select('vehicles_detail.*', 'users.company_code','users.name','vehicle_types.vehicle_type')
-        ->join('users','users.company_code','=','vehicles_detail.company_code')
-        ->join('vehicle_types','vehicles_detail.car_type','vehicle_types.id')
-        ->orderBy('vehicles_detail.created_at','DESC')
-        ->get();
 
-        return view('pages.staff.VehiclesList',compact('veh_list'));
+
+        $veh_list = DB::table('vehicles_detail')
+            ->select('vehicles_detail.car_id', 'vehicles_detail.car_plate', 'vehicles_detail.car_brand', 'vehicles_detail.car_model', 'users.company_code', 'users.name', 'vehicle_types.vehicle_type', 'vehicles_detail.status', 'vehicles_detail.created_at')
+            ->leftjoin('users', 'users.company_code', '=', 'vehicles_detail.company_code')
+            ->leftjoin('vehicle_types', 'vehicles_detail.car_type', 'vehicle_types.id')
+            ->orderBy('vehicles_detail.created_at', 'DESC')
+            ->groupBy('vehicles_detail.car_id')
+            ->get();
+
+        return view('pages.staff.VehiclesList', compact('veh_list'));
     }
 
     public function VehiclesRegister()
@@ -52,7 +56,23 @@ class StaffController extends Controller
             ->where('user_status', '=', '1')
             ->get();
 
-        return view('pages.staff.VehiclesRegister', compact('car_type', 'province', 'car_brand', 'company_list'));
+        $supply_data = DB::table('supply_datas')
+            ->orderBy('supply_name', 'ASC')
+            ->get();
+
+        return view('pages.staff.VehiclesRegister', compact('car_type', 'province', 'car_brand', 'company_list', 'supply_data'));
+    }
+
+    public function getSupplyByCompany(Request $request)
+    {
+       
+        $supplies = DB::table('supply_datas')
+            ->where('company_code', $request->company_id)
+            ->orderBy('supply_name','ASC')
+            ->pluck('supply_name', 'sup_id');
+            
+
+        return response()->json($supplies);
     }
 
     public function VehiclesInsert(Request $request)
@@ -76,7 +96,8 @@ class StaffController extends Controller
         DB::table('vehicles_detail')
             ->insert([
                 'user_id' => $staff_id,
-                'company_code' => $request->company_code,
+                'company_code' => $request->company_id,
+                'supply_id' => $request->supply_id,
                 'car_id' => $veh_id,
                 'car_plate' => $car_plate,
                 'car_brand' => $request->car_brand,
@@ -92,6 +113,6 @@ class StaffController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
 
-             return redirect()->route('staff.veh_list')->with('success', 'บันทึกสำเร็จ');
+        return redirect()->route('staff.veh_list')->with('success', 'บันทึกสำเร็จ');
     }
 }

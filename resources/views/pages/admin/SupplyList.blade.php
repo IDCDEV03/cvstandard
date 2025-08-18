@@ -3,25 +3,25 @@
 @extends('layout.LayoutAdmin')
 @section('content')
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-12">
 
                 <div class="card mt-20 mb-25 shadow-sm">
                     <div class="card-body">
-                           <span class="fs-20 fw-bold">บริษัทว่าจ้าง : {{$company_name->name}} </span>
-                            <div class="border-top my-3"></div>
+                        <span class="fs-20 fw-bold">บริษัทว่าจ้าง : {{ $company_name->name }} </span>
+                        <div class="border-top my-3"></div>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fw-bold fs-18 ">
                                 รายการบริษัทขนส่ง (Supply)
                             </div>
-                            <a href="{{route('admin.sup_create',[$company_name->company_code])}}" class="btn btn-sm btn-info">
-                               + ลงทะเบียนบริษัทขนส่ง (Supply)
+                            <a href="{{ route('admin.sup_create', [$company_name->company_code]) }}"
+                                class="btn btn-sm btn-info">
+                                + ลงทะเบียนบริษัทขนส่ง (Supply)
                             </a>
-                            
+
                         </div>
-                           
-                        
+
+
                     </div>
                 </div>
 
@@ -40,13 +40,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                              <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                              </tr>
+                                @foreach ($supply_list as $item)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td> {{ $item->supply_name }} </td>
+                                        <td>
+                                            @if ($item->supply_status == '1')
+                                                <label class="badge badge-round badge-success">ใช้งาน</label>
+                                            @elseif ($item->supply_status == '0')
+                                                <label class="badge badge-round badge-warning">ปิด</label>
+                                            @endif
+                                        </td>
+                                        <td> {{ thai_date($item->created_at) }}</td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
 

@@ -22,17 +22,25 @@
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
 
-                        <form action="{{route('staff.veh_create')}}" method="POST" >
+                        <form action="{{ route('staff.veh_create') }}" method="POST">
                             @csrf
 
                             <div class="mb-3">
                                 <label class="il-gray fs-16 fw-500 align-center mb-10">บริษัทฯ ผู้ว่าจ้าง <span
                                         class="text-danger">*</span></label>
-                                <select class="form-control px-15" name="company_code" id="select-option2" required>
-                                    <option value="0" selected disabled>--เลือก--</option>
-                                    @foreach ($company_list as $list)
-                                        <option value="{{ $list->company_code }}">{{ $list->name }}</option>
+                                <select name="company_id" id="company_id" class="form-control">
+                                    <option value="">-- เลือกบริษัทหลัก --</option>
+                                    @foreach ($company_list as $company)
+                                        <option value="{{ $company->company_code }}">{{ $company->name }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="il-gray fs-16 fw-500 align-center mb-10">บริษัทฯ Supply <span
+                                        class="text-danger">*</span></label>
+                                <select name="supply_id" id="supply_id" class="form-control">
+                                    <option value="">-- เลือกบริษัท Supply --</option>
                                 </select>
                             </div>
 
@@ -70,7 +78,7 @@
                                 <label class="il-gray fs-16 fw-500 align-center mb-10">รุ่นรถ <span
                                         class="text-danger">*</span></label>
                                 <input type="text" name="car_model"
-                                    class="form-control ih-medium ip-light radius-xs b-light px-15" >
+                                    class="form-control ih-medium ip-light radius-xs b-light px-15">
                             </div>
 
 
@@ -86,7 +94,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="a9"
-                                            class="il-gray fs-16 fw-500 align-center mb-10">อายุการใช้งานรถ (ระบุเป็นจำนวนปี)</label>
+                                            class="il-gray fs-16 fw-500 align-center mb-10">อายุการใช้งานรถ
+                                            (ระบุเป็นจำนวนปี)</label>
                                         <input type="text" name="car_age"
                                             class="form-control ih-medium ip-light radius-xs b-light px-15" id="a9">
                                     </div>
@@ -144,3 +153,29 @@
 
     </div>
 @endsection
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#company_id').change(function() {
+                var companyID = $(this).val();
+
+                $('#supply_id').empty().append('<option value="">กำลังโหลด...</option>');
+
+                if (companyID) {
+                    $.get("{{ route('get.supply') }}", {
+                        company_id: companyID
+                    }, function(data) {
+                        $('#supply_id').empty().append(
+                            '<option value="">-- เลือกบริษัท Supply --</option>');
+                        $.each(data, function(id, name) {
+                            $('#supply_id').append('<option value="' + id + '">' + name +
+                                '</option>');
+                        });
+                    });
+                } else {
+                    $('#supply_id').empty().append('<option value="">-- เลือกบริษัท Supply --</option>');
+                }
+            });
+        });
+    </script>
+@endpush

@@ -47,6 +47,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     //CRUD Supply
     Route::get('/sup_list/{id}', [ManageCompanyController::class, 'SupList'])->name('admin.sup_list');
      Route::get('/sup-create/{id}', [ManageCompanyController::class, 'SupCreate'])->name('admin.sup_create');
+      Route::post('/supply/insert', [ManageCompanyController::class, 'SupInsert'])->name('admin.sup_insert');
 
     // CRUD หน่วยงาน
     Route::get('/agencies/create', [ManageUserController::class, 'createAgency'])->name('admin.agency.create');
@@ -179,6 +180,7 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/veh-list', [StaffController::class, 'VehiclesList'])->name('staff.veh_list');
     Route::get('/veh-regis', [StaffController::class, 'VehiclesRegister'])->name('staff.veh_regis');
     Route::POST('/veh-create', [StaffController::class, 'VehiclesInsert'])->name('staff.veh_create');
+    Route::get('/get-supply', [StaffController::class, 'getSupplyByCompany'])->name('get.supply');
 });
 
 

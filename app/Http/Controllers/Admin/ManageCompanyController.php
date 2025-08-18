@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use PhpParser\Node\Expr\FuncCall;
 
 class ManageCompanyController extends Controller
 {
@@ -28,7 +29,7 @@ class ManageCompanyController extends Controller
         if ($usernameExists) {
             return back()
                 ->withInput()
-                ->withErrors(['company_username' => 'Username นี้มีอยู่แล้ว กรุณาเลือกชื่ออื่น']);
+                ->with('error', 'Username นี้มีอยู่แล้ว กรุณาเลือกชื่ออื่น');
         }
 
         $comp_id = 'CP-' . Str::upper(Str::random(9));
@@ -141,7 +142,11 @@ class ManageCompanyController extends Controller
         ->where('company_code','=',$id)
         ->first();
 
-    return view('pages.admin.SupplyList', compact('company_name'));
+        $supply_list = DB::table('supply_datas')
+        ->where('company_code','=',$id)
+        ->get();
+
+    return view('pages.admin.SupplyList', compact('company_name','supply_list'));
     }
 
     public function SupCreate($id)
@@ -151,4 +156,52 @@ class ManageCompanyController extends Controller
         ->first();
          return view('pages.admin.SupplyCreate', compact('company_name'));
     }
+
+    public function SupInsert(Request $request)
+    {
+
+        //เช็ค username ซ้ำ 
+        $usernameExists = DB::table('users')->where('username', $request->company_user)->exists();
+
+        if ($usernameExists) {
+            return back()
+                ->withInput()
+                ->with('error', 'Username นี้มีอยู่แล้ว กรุณาเลือกชื่ออื่น');
+        }
+
+        $sup_id = 'SUP-' . Str::upper(Str::random(10));
+
+        DB::table('supply_datas')->insert([
+            'company_code' => $request->company_code,
+            'sup_id' => $sup_id,
+            'supply_name' => $request->supply_name,
+            'supply_address' => $request->supply_address,
+            'supply_phone' => $request->supply_phone,
+            'supply_email' => $request->supply_email,
+            'supply_status' => '1',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+
+        DB::table('users')->insert([
+            'username' => $request->company_user,
+            'prefix' => '-',
+            'name' => $request->supply_name,
+            'lastname' => '-',
+            'user_status' => '1',
+            'email' => $request->supply_email,
+            'password' => Hash::make($request->password),
+            'user_phone' => $request->supply_phone,
+            'role' => 'supply',
+            'company_code' => $request->company_code,
+            'agency_id' => '5',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('admin.sup_list',['id'=>$request->company_code])->with('success', 'บันทึกสำเร็จ');
+
+    }
+
 }
