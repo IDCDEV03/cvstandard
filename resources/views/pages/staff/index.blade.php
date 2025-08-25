@@ -21,7 +21,38 @@
                 </div>
             </div>
             <div class="row">
-                <!-- รายการบริษัทฯ -->
+
+                   <!-- รายการบริษัทฯ -->
+                <div class="col-md-4 mb-4">
+                    <a href="{{route('staff.comp_list')}}" class="text-decoration-none">
+                        <div class="card shadow-sm h-100" style="border: 2px solid 	#BFD7ED; background-color: #EEF6FB;">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img src="{{ asset('company.png') }}" alt="" width="120px">
+                                </div>
+                                <h5 class="card-title">รายการบริษัทฯว่าจ้าง</h5>
+                                <p class="card-text text-muted">สร้างและจัดการข้อมูลบริษัทฯว่าจ้าง</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                        <!-- รายการบริษัทฯSup -->
+                <div class="col-md-4 mb-4">
+                    <a href="{{route('staff.supply_list')}}" class="text-decoration-none">
+                        <div class="card shadow-sm h-100" style="border: 2px solid 	#C2B9F0; background-color: #F0EDFF;">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img src="{{ asset('supply.png') }}" alt="" width="120px">
+                                </div>
+                                <h5 class="card-title">รายการบริษัทฯ Supply</h5>
+                                <p class="card-text text-muted">สร้างและจัดการข้อมูล Supply</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- รายการรถ -->
                 <div class="col-md-4 mb-4">
                     <a href="{{route('staff.veh_list')}}" class="text-decoration-none">
                         <div class="card shadow-sm h-100" style="border: 2px solid 	#ffd6b5; background-color: #fff1e6;">
@@ -53,7 +84,7 @@
 
                 <!-- รายการช่างตรวจรถ -->
                 <div class="col-md-4 mb-4">
-                    <a href="#" class="text-decoration-none">
+                    <a href="{{route('staff.vehins_list')}}" class="text-decoration-none">
                         <div class="card shadow-sm h-100" style="border: 2px solid #b8e1c2; background-color: #ebfdf3;">
                             <div class="card-body text-center">
                                    <div class="mb-3">

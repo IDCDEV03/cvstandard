@@ -181,6 +181,13 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/veh-regis', [StaffController::class, 'VehiclesRegister'])->name('staff.veh_regis');
     Route::POST('/veh-create', [StaffController::class, 'VehiclesInsert'])->name('staff.veh_create');
     Route::get('/get-supply', [StaffController::class, 'getSupplyByCompany'])->name('get.supply');
+
+    //บริษัทแม่
+     Route::get('/cp-list', [StaffController::class, 'CompanyList'])->name('staff.comp_list');
+      Route::get('/supply-list', [StaffController::class, 'SupList'])->name('staff.supply_list');
+
+      //ช่างตรวจ
+       Route::get('/veh_inspector', [StaffController::class, 'VehInsList'])->name('staff.vehins_list');
 });
 
 

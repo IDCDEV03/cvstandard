@@ -38,6 +38,7 @@ class ManageCompanyController extends Controller
             'user_created_id' => Auth::id(),
             'agency_id' => '5',
             'company_id' => $comp_id,
+            'company_name' => $request->company_name,
             'company_address' => $request->company_address,
             'company_province' => $request->company_province,
             'created_at' => Carbon::now(),

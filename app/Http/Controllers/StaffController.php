@@ -115,4 +115,31 @@ class StaffController extends Controller
 
         return redirect()->route('staff.veh_list')->with('success', 'บันทึกสำเร็จ');
     }
+
+     public function CompanyList()
+    {
+        $company_list = DB::table('users')           
+            ->where('role', '=', 'company')
+            ->orderBy('updated_at', 'DESC')
+            ->get();
+
+         return view('pages.staff.CompanyList',compact('company_list'));
+    }
+
+       public function SupList()
+    {
+       $supply_name = DB::table('users')
+       ->join('company_details','users.company_code','=','company_details.company_id')
+        ->where('users.role','=','supply')
+        ->get();
+
+    
+
+    return view('pages.staff.SupplyList', compact('supply_name'));
+    }
+
+    public function VehInsList()
+    {
+        return view('pages.staff.Veh_InspectorList');
+    }
 }
