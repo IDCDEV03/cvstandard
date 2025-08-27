@@ -29,12 +29,21 @@
                                 <tr>
                                     <th>#</th>
                                     <th>ชื่อ</th>
+                                    <th>Supply</th>
                                     <th>สถานะ</th>
                                     <th>วันที่เพิ่ม</th>
                                     <th>จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($inst_list as $data)
+                                    <td></td>
+                                     <td>{{$data->ins_name}} {{$data->ins_lastname}}</td>
+                                       <td>{{$data->supply_name}}</td>
+                                      <td></td>
+                                       <td></td>
+                                        <td></td>
+                                @endforeach
                                 
                             </tbody>
                         </table>

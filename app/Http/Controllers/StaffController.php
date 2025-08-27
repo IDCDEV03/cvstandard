@@ -140,7 +140,12 @@ class StaffController extends Controller
 
     public function InspectorList()
     {
-        return view('pages.staff.InspectorList');
+        $inst_list = DB::table('inspector_datas')
+        ->join('supply_datas','inspector_datas.sup_id','supply_datas.sup_id')
+        ->where('inspector_datas.ins_status','=','1')
+        ->get();
+
+        return view('pages.staff.InspectorList',compact('inst_list'));
     }
 
      public function Inspector_Create()
