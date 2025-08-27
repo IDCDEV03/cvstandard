@@ -84,7 +84,7 @@
 
                 <!-- รายการช่างตรวจรถ -->
                 <div class="col-md-4 mb-4">
-                    <a href="{{route('staff.vehins_list')}}" class="text-decoration-none">
+                    <a href="{{route('staff.inspector_list')}}" class="text-decoration-none">
                         <div class="card shadow-sm h-100" style="border: 2px solid #b8e1c2; background-color: #ebfdf3;">
                             <div class="card-body text-center">
                                    <div class="mb-3">
@@ -96,12 +96,6 @@
                         </div>
                     </a>
                 </div>
-
-
-
-
-
-
             </div>
         </div>
     </div>

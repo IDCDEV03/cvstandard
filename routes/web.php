@@ -187,7 +187,9 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
       Route::get('/supply-list', [StaffController::class, 'SupList'])->name('staff.supply_list');
 
       //ช่างตรวจ
-       Route::get('/veh_inspector', [StaffController::class, 'VehInsList'])->name('staff.vehins_list');
+       Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
+       Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
+        Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
 });
 
 

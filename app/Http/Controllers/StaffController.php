@@ -138,8 +138,62 @@ class StaffController extends Controller
     return view('pages.staff.SupplyList', compact('supply_name'));
     }
 
-    public function VehInsList()
+    public function InspectorList()
     {
-        return view('pages.staff.Veh_InspectorList');
+        return view('pages.staff.InspectorList');
+    }
+
+     public function Inspector_Create()
+    {
+          $supply_list = DB::table('supply_datas')           
+            ->where('supply_status', '=', '1')
+            ->orderBy('updated_at', 'DESC')
+            ->get();
+
+        return view('pages.staff.Inspector_Create',compact('supply_list'));
+    }
+
+    public function Inspector_Store(Request $request)
+    {        
+
+        if ($request->supply_id == '0') {
+            return redirect()->back()->with('error', 'กรุณาเลือก Supply');
+        }
+
+        $username = str_replace(' ', '', $request->company_user);
+        $ins_id = 'INS-' . Str::upper(Str::random(10));
+        
+
+        DB::table('inspector_datas')
+            ->insert([
+                'ins_id'=> $ins_id,
+                'sup_id' => $request->supply_id,
+                'ins_prefix' => $request->prefix,
+                'ins_name'=> $request->name,
+                'ins_lastname' => $request->lastname,
+                'dl_number' => $request->dl_number,
+                'ins_phone'=>$request->ins_phone,
+                'ins_birthyear'=>$request->ins_birthyear,
+                'ins_experience'=>$request->ins_experience,
+                'ins_status' => '1',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+        DB::table('users')
+        ->insert([
+                'user_id'=>$ins_id,
+                'username'=>$request->company_user,
+                'prefix'=>$request->prefix,
+                'name'=>$request->name,
+                'lastname'=> $request->lastname,
+                'user_status'=>'1',
+                'password'=>Hash::make($request->inspector_password),
+                'role'=>'user',
+                 'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('staff.inspector_list')->with('success', 'บันทึกสำเร็จ');
     }
 }

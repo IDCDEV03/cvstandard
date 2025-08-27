@@ -13,7 +13,7 @@
                             <div class="fw-bold fs-20 ">
                                 รายชื่อช่างตรวจ
                             </div>
-                           <a href="#" class="btn btn-sm btn-info">
+                           <a href="{{route('staff.inspector_new')}}" class="btn btn-sm btn-info">
                                 <i class="las la-user me-1"></i> + เพิ่มช่างตรวจ
                             </a>
                         </div>
