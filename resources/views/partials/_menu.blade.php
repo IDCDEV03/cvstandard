@@ -86,6 +86,17 @@
 
                  </ul>
              </li>
+               <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
          @elseif ($role === Role::User)
              <li>
                  <a href="{{ route('local.home') }}" class="">
@@ -139,6 +150,17 @@
                      <span class="menu-text">บัญชีผู้ใช้</span>
                  </a>
              </li>
+               <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
          @elseif ($role === Role::Manager)
              <li>
                  <a href="{{ route('manager.index') }}" class="">
@@ -162,9 +184,20 @@
                      <span class="menu-text">รายการบริษัทฯ</span>
                  </a>
              </li>
+               <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
          @elseif ($role === Role::Staff)
-           <li>
-                 <a href="{{route('staff.index')}}" class="">
+             <li>
+                 <a href="{{ route('staff.index') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">หน้าหลัก</span>
                  </a>
@@ -183,13 +216,25 @@
                  </a>
                  <ul>
                      <li>
-                         <a href="#">รายการฟอร์ม</a>
+                         <a href="{{ route('staff.form_list') }}">รายการฟอร์ม</a>
                      </li>
                      <li>
-                         <a href="#">สร้างฟอร์ม</a>
+                         <a href="{{route('staff.form_new')}}">สร้างฟอร์ม</a>
                      </li>
 
                  </ul>
+             </li>
+
+             <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
              </li>
          @endif
 

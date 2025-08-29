@@ -69,7 +69,7 @@
 
                 <!-- รายการฟอร์มเช็ครถ -->
                 <div class="col-md-4 mb-4">
-                    <a href="#" class="text-decoration-none">
+                    <a href="{{route('staff.form_list')}}" class="text-decoration-none">
                         <div class="card shadow-sm h-100" style="border: 2px solid #ffbcd9; background-color: #fff0f5;">
                             <div class="card-body text-center">
                                    <div class="mb-3">

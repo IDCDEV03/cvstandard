@@ -18,6 +18,7 @@ use App\Enums\Role;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\User\ManagerController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffFormController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -190,6 +191,15 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
        Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
        Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
         Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
+});
+
+Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
+   //จัดการฟอร์มตรวจของ staff
+     Route::get('/list', [StaffFormController::class, 'FormList'])->name('staff.form_list');
+     Route::get('/new-form', [StaffFormController::class, 'FormNew'])->name('staff.form_new');
+ Route::POST('/save-form', [StaffFormController::class, 'FormStore'])->name('staff.form_store');
+
+
 });
 
 

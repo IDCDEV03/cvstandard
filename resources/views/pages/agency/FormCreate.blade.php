@@ -1,4 +1,4 @@
-@section('title', 'ระบบ E-Checker')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')

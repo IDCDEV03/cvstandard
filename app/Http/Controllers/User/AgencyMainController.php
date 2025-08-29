@@ -68,6 +68,7 @@ class AgencyMainController extends Controller
                     'form_name'     => $request->form_name,
                     'form_category' => $request->form_category,
                     'form_status'   => '1',
+                    'form_open'     => 'public',
                     'created_at'    =>  Carbon::now(),
                     'updated_at'    =>  Carbon::now()
                 ]);
