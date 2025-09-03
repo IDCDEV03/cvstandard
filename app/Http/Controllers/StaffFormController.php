@@ -74,7 +74,7 @@ class StaffFormController extends Controller
             foreach ($request->supply_ids as $supId) {
                 DB::table('form_permission')->insert([
                     'form_id' => $form_id,
-                    'supply_id' => $supId,
+                    'sup_id' => $supId,
                     'permission_status' => '1',
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
