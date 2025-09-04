@@ -186,6 +186,7 @@ class ManageCompanyController extends Controller
 
 
         DB::table('users')->insert([
+            'user_id' => $sup_id,
             'username' => $request->company_user,
             'prefix' => '-',
             'name' => $request->supply_name,

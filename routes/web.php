@@ -47,8 +47,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     //CRUD Supply
     Route::get('/sup_list/{id}', [ManageCompanyController::class, 'SupList'])->name('admin.sup_list');
-     Route::get('/sup-create/{id}', [ManageCompanyController::class, 'SupCreate'])->name('admin.sup_create');
-      Route::post('/supply/insert', [ManageCompanyController::class, 'SupInsert'])->name('admin.sup_insert');
+    Route::get('/sup-create/{id}', [ManageCompanyController::class, 'SupCreate'])->name('admin.sup_create');
+    Route::post('/supply/insert', [ManageCompanyController::class, 'SupInsert'])->name('admin.sup_insert');
 
     // CRUD หน่วยงาน
     Route::get('/agencies/create', [ManageUserController::class, 'createAgency'])->name('admin.agency.create');
@@ -67,11 +67,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/members/{id}', [ManageUserController::class, 'updateMember'])->name('admin.member.update');
     Route::delete('/members/{id}', [ManageUserController::class, 'destroyMember'])->name('admin.member.destroy');
 
-
     //module ประกาศ
     Route::get('/announcement', [AdminDashboardController::class, 'AnnouncementPage'])->name('admin.announce');
     Route::get('/create_post', [AdminDashboardController::class, 'create_announce'])->name('admin.create_post');
     Route::post('/insert_post', [AdminDashboardController::class, 'insert_post'])->name('admin.insert_post');
+
     //edit-update-delete_post
     Route::get('/announce/{id}/edit', [AdminDashboardController::class, 'edit_post'])->name('admin.edit_post');
     Route::post('/announce-update/{id}', [AdminDashboardController::class, 'update_post'])->name('admin.update_post');
@@ -175,30 +175,42 @@ Route::prefix('sup')->middleware(['auth', 'role:supply'])->group(function () {
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     // Route สำหรับ staff
-     Route::get('/index', [PageController::class, 'home'])->name('staff.index');
+    Route::get('/index', [PageController::class, 'home'])->name('staff.index');
 
-       //ลงทะเบียนรถ
+    //ลงทะเบียนรถ
     Route::get('/veh-list', [StaffController::class, 'VehiclesList'])->name('staff.veh_list');
     Route::get('/veh-regis', [StaffController::class, 'VehiclesRegister'])->name('staff.veh_regis');
     Route::POST('/veh-create', [StaffController::class, 'VehiclesInsert'])->name('staff.veh_create');
     Route::get('/get-supply', [StaffController::class, 'getSupplyByCompany'])->name('get.supply');
 
     //บริษัทแม่
-     Route::get('/cp-list', [StaffController::class, 'CompanyList'])->name('staff.comp_list');
-      Route::get('/supply-list', [StaffController::class, 'SupList'])->name('staff.supply_list');
+    Route::get('/cp-list', [StaffController::class, 'CompanyList'])->name('staff.comp_list');
+    Route::get('/supply-list', [StaffController::class, 'SupList'])->name('staff.supply_list');
 
-      //ช่างตรวจ
-       Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
-       Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
-        Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
+    //ช่างตรวจ
+    Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
+    Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
+    Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
 });
 
 Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
-   //จัดการฟอร์มตรวจของ staff
-     Route::get('/list', [StaffFormController::class, 'FormList'])->name('staff.form_list');
-     Route::get('/new-form', [StaffFormController::class, 'FormNew'])->name('staff.form_new');
- Route::POST('/save-form', [StaffFormController::class, 'FormStore'])->name('staff.form_store');
+    //จัดการฟอร์มตรวจของ staff
+    Route::get('/list', [StaffFormController::class, 'FormList'])->name('staff.form_list');
+    Route::get('/new-form', [StaffFormController::class, 'FormNew'])->name('staff.form_new');
+    Route::POST('/save-form', [StaffFormController::class, 'FormStore'])->name('staff.form_store');
 
+    Route::get('/new-form-2/{id}/{order}', [StaffFormController::class, 'FormNew_Step2'])->name('staff.form_new2');
+    Route::POST('/save-form-step2/{id}', [StaffFormController::class, 'FormStep2_Insert'])->name('staff.form_store2');
+
+    Route::get('/categories/{id}', [StaffFormController::class, 'FormNew_Step3'])->name('staff.form_step3');
+    Route::get('/cate-detail/{cates_id}', [StaffFormController::class, 'categories_detail'])->name('staff.categories_detail');
+
+    Route::get('/item-create/{id}', [StaffFormController::class, 'item_create'])->name('staff.ItemCreate');
+    Route::post('/insert-item', [StaffFormController::class, 'item_insert'])->name('staff.item_insert');
+
+    Route::get('/item-edit/{id}', [StaffFormController::class, 'item_edit'])->name('staff.item_edit');
+    Route::post('/item-update', [StaffFormController::class, 'item_update'])->name('staff.item_update');
+    Route::get('/item-delete/{id}/image', [StaffFormController::class, 'item_delete_image'])->name('staff.item_delete_image');
 
 });
 

@@ -57,12 +57,20 @@ class AgencyMainController extends Controller
 
     public function form_insert(Request $request)
     {
+
+        $uid = Auth::id();
+
+        $user_id = DB::table('users')
+            ->select('users.user_id')
+            ->where('id', '=', $uid)
+            ->first();
+
         $form_id = Str::upper(Str::random(8));
 
         if ($request->form_category != "") {
             DB::table('forms')
                 ->insert([
-                    'user_id'       => Auth::user()->id,
+                    'user_id' => $user_id->user_id,
                     'form_id'       => $form_id,
                     'form_code'     => $request->input('form_code'),
                     'form_name'     => $request->form_name,
@@ -119,11 +127,20 @@ class AgencyMainController extends Controller
 
     public function insert_cates(Request $request, $id)
     {
+
+        $uid = Auth::id();
+
+        $user_id = DB::table('users')
+            ->select('users.user_id')
+            ->where('id', '=', $uid)
+            ->first();
+
+
         foreach ($request->chk_cats_name as $index => $name) {
             $cats_id = Str::upper(Str::random(8));
             $list = $index + 1;
             DB::table('check_categories')->insert([
-                'user_id' => Auth::id(),
+                'user_id' => $user_id->user_id,
                 'form_id' => $id,
                 'cates_no' => $request->order_no[$index] ?? ($index + 1),
                 'category_id' => 'CAT-' . $list . '-' . $cats_id,
@@ -151,6 +168,12 @@ class AgencyMainController extends Controller
     public function item_insert(Request $request)
     {
 
+        $uid = Auth::id();
+
+        $user_id = DB::table('users')
+            ->select('users.user_id')
+            ->where('id', '=', $uid)
+            ->first();
         foreach ($request->item_name as $index => $name) {
             $fileName = null;
 
@@ -168,7 +191,7 @@ class AgencyMainController extends Controller
 
 
             DB::table('check_items')->insert([
-                'user_id' => Auth::id(),
+                'user_id' => $user_id->user_id,
                 'category_id' => $request->cate_id,
                 'item_id' => $item_id,
                 'item_no' => $index + 1,

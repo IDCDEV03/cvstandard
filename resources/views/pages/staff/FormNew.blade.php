@@ -44,20 +44,7 @@
                                             id="form_name" name="form_name" required>
                                     </div>
                                 </div>
-                                <div class="form-group row mb-25">
-                                    <div class="col-sm-3 d-flex aling-items-center">
-                                        <label class="col-form-label  color-dark align-center">ประเภทฟอร์ม<span
-                                                class="text-danger">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select name="form_category" class="form-control ih-medium ip-gray radius-xs">
-                                            <option value="" selected disabled>-- กรุณาเลือกประเภทรถ --</option>
-                                            @foreach ($car_type as $data)
-                                                <option value="{{ $data->id }}">{{ $data->vehicle_type }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
+                           
 
                                 
                                 <div class="form-group row mb-25">

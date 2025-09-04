@@ -37,9 +37,9 @@
                                 <tbody>
                                     @foreach ($form_list as $item)
                                         <tr>
-                                            <td>{{ $item->id }}</td>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $item->form_code }}</td>
-                                            <td><a href="{{route('agency.cates_list',['form_id'=>$item->form_id])}}">{{ $item->form_name }}</a></td>
+                                            <td><a href="{{route('staff.form_step3',['id'=>$item->form_id])}}">{{ $item->form_name }}</a></td>
                                             <td>
                                                **
                                             </td>
