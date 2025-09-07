@@ -21,9 +21,8 @@
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
 
-                        <form action="#" method="POST" >
+                        <form action="{{route('admin.cp_store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
-
                             
                             <div class="mb-3">
                                 <label>ชื่อบริษัท <span class="text-danger">*</span></label>
@@ -58,10 +57,25 @@
                                     </div>
                                 </div>
                             </div>
+
+                                   <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="il-gray fw-bold align-center mb-10">Logo บริษัท (ถ้ามี) </label>
+
+                                            <input type="file" name="company_logo" accept="image/*" class="form-control"
+                                                id="logo-input">
+                                            <div class="mt-2">
+                                                <img id="logo-preview" src="#" class="img-thumbnail d-none"
+                                                    style="max-height: 120px;">
+                                            </div>
+                                        </div>
+                                    </div>
+
                             <div class="border-top my-3"></div>
 
                             <div class="mb-3">
                                 <label>กำหนด Username สำหรับเข้าใช้งาน<span class="text-danger">*</span></label>
+                                   <button type="button" class="btn btn-xs btn-outline-secondary mb-2 mt-2" onclick="generateRandom('company_user')">สุ่ม username</button> 
                                 <input type="text" name="company_user" id="company_user" class="form-control" required>
                                <div id="username-alert" class="alert alert-danger mt-2" style="display: none;"></div>
                             </div>
@@ -85,6 +99,29 @@
     </div>
 @endsection
 @push('scripts')
+<script>
+function generateRandom(fieldId) {
+    const chars = 'abcdefghijklmnpqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 7; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById(fieldId).value = result;
+}
+   
+document.getElementById('logo-input')?.addEventListener('change', function (event) {
+    const input = event.target;
+    const preview = document.getElementById('logo-preview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.classList.remove('d-none');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+});
+</script>
 <script>
 $(document).ready(function () {
     $('#company_user').blur(function () {

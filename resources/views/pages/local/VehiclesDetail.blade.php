@@ -9,28 +9,20 @@
                     <div class="mt-25 card card-default card-md shadow-sm text-center">
                         <div class="card-body">
 
-                            <a href="{{route('local.home')}}" class="btn btn-outline-secondary btn-sm">
+                            <a href="{{route('local.home')}}" class="btn btn-outline-secondary btn-sm mb-3">
                                 <i class="fas fa-arrow-left"></i> กลับไปหน้ารายการ
                             </a>
 
-                            <!-- รูปภาพรถ -->
-                            <div class="mb-4 mt-4">
-                                <img src="{{ asset($vehicle->veh_image) }}" alt="ภาพรถ" class="img-fluid rounded"
-                                    style="max-height: 300px;">
-                            </div>
-
+                           
                             <!-- ตารางข้อมูลรถ -->
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped text-start">
                                     <tbody>
                                         <tr>
                                             <th width="30%">ทะเบียนรถ</th>
-                                            <td>{{ $vehicle->plate }}</td>
+                                            <td>{{ $vehicle->car_plate }}</td>
                                         </tr>
-                                        <tr>
-                                            <th>ทะเบียนจังหวัด</th>
-                                            <td>{{ $vehicle->province }}</td>
-                                        </tr>
+                                     
                                         <tr>
                                             <th>วันที่ลงทะเบียน</th>
                                             <td>
@@ -40,7 +32,7 @@
                                         <tr>
                                             <th>สถานะ</th>
                                             <td>
-                                                @switch($vehicle->veh_status)
+                                                @switch($vehicle->status)
                                                     @case(1)
                                                         <span class="badge badge-round badge-success badge-lg">ใช้งานได้</span>
                                                     @break
@@ -62,7 +54,7 @@
                                 </table>
                                 <div class="border-top my-3"></div>
 
-                                <a href="{{ route('user.chk_start', $vehicle->veh_id) }}"
+                                <a href="{{ route('user.chk_start', $vehicle->car_id) }}"
                                     class="btn btn-block btn-primary fs-18">เริ่มการตรวจรถ <i
                                         class="fas fa-arrow-right"></i></a>
                             </div>

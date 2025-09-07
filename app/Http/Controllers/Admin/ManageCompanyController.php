@@ -23,6 +23,8 @@ class ManageCompanyController extends Controller
     public function CompanyStore(Request $request)
     {
 
+        $user_gen = DB::table('users')->where('id', Auth::id())->first();
+
         //เช็ค username ซ้ำ 
         $usernameExists = DB::table('users')->where('username', $request->company_user)->exists();
 
@@ -32,12 +34,24 @@ class ManageCompanyController extends Controller
                 ->with('error', 'Username นี้มีอยู่แล้ว กรุณาเลือกชื่ออื่น');
         }
 
-        $comp_id = 'CP-' . Str::upper(Str::random(9));
+        $comp_id = 'CP-' . Str::upper(Str::random(9));        
+        $upload_location = 'logo/';
+
+        $fileName = null;
+
+        if ($request->hasFile('company_logo')) {
+            $file = $request->file('company_logo');
+            $extension = $file->getClientOriginalExtension();
+            $newName = Carbon::now()->format('Ymd_His') . '_' . $comp_id . '.' . $extension;
+            $file->move($upload_location, $newName);
+            $fileName = $newName;
+        }
 
         DB::table('company_details')->insert([
-            'user_created_id' => Auth::id(),
+            'user_created_id' => $user_gen->user_id,
             'agency_id' => '5',
             'company_id' => $comp_id,
+            'company_logo' => $fileName,
             'company_name' => $request->company_name,
             'company_address' => $request->company_address,
             'company_province' => $request->company_province,
@@ -47,6 +61,7 @@ class ManageCompanyController extends Controller
 
 
         DB::table('users')->insert([
+            'user_id' => $comp_id,
             'username' => $request->company_user,
             'prefix' => '-',
             'name' => $request->company_name,
@@ -172,10 +187,25 @@ class ManageCompanyController extends Controller
 
         $sup_id = 'SUP-' . Str::upper(Str::random(10));
 
+
+        $upload_location = 'logo/';
+
+        $fileName = null;
+
+        if ($request->hasFile('supply_logo')) {
+            $file = $request->file('supply_logo');
+            $extension = $file->getClientOriginalExtension();
+            $newName = Carbon::now()->format('Ymd_His') . '_' . $sup_id . '.' . $extension;
+            $file->move($upload_location, $newName);
+            $fileName = $newName;
+        }
+
+
         DB::table('supply_datas')->insert([
             'company_code' => $request->company_code,
             'sup_id' => $sup_id,
             'supply_name' => $request->supply_name,
+            'supply_logo' => $fileName,
             'supply_address' => $request->supply_address,
             'supply_phone' => $request->supply_phone,
             'supply_email' => $request->supply_email,

@@ -41,6 +41,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/cp_new', [AdminDashboardController::class, 'CompanyCreate'])->name('admin.cp_create');
     Route::get('/cp_edit/{id}', [AdminDashboardController::class, 'CompanyEdit'])->name('admin.cp_edit');
 
+    Route::POST('/cp_insert', [ManageCompanyController::class, 'CompanyStore'])->name('admin.cp_store');
+
     Route::POST('/cp_update/{id}/{tab}', [ManageCompanyController::class, 'CompanyUpdate'])->name('admin.cp_update');
 
     Route::get('/cp_status/{id}/{status}', [ManageCompanyController::class, 'UpdateStatus'])->name('admin.cp_updatestatus');
@@ -83,6 +85,8 @@ Route::prefix('vehicles')->middleware(['auth', 'role:user,manager,admin,agency']
     Route::get('/page/{id}', [VehiclesController::class, 'veh_detail'])->name('veh.detail');
     Route::get('/result/{rec}', [VehiclesController::class, 'Report_Result'])->name('veh.result');
     Route::get('/repair-notice', [VehiclesController::class, 'repair_notice'])->name('veh.notice');
+
+    Route::get('/form-report/{rec}', [VehiclesController::class, 'Form_report'])->name('form_report');
 });
 
 Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
@@ -211,7 +215,6 @@ Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/item-edit/{id}', [StaffFormController::class, 'item_edit'])->name('staff.item_edit');
     Route::post('/item-update', [StaffFormController::class, 'item_update'])->name('staff.item_update');
     Route::get('/item-delete/{id}/image', [StaffFormController::class, 'item_delete_image'])->name('staff.item_delete_image');
-
 });
 
 

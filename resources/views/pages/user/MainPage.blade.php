@@ -8,25 +8,6 @@
 
             <div class="row">
                 <div class="col-md-12">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <a href="{{ route('user.veh_regis') }}" class="text-decoration-none">
-                                <div class="mt-25 card card-md border-2 card-bordered card-default text-center"
-                                    style=" border-color: #a071ff;background-color: #f8f4ff;">
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                           <img src="{{asset('bus.png')}}" alt="" width="120px">
-                                        </div>
-                                        <span class="fs-24 fw-bold text-dark mb-1">ลงทะเบียนรถ</span>
-                                        <p class="fs-20 text-muted mt-1">คลิกเพื่อกรอกข้อมูลทะเบียนรถ</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card mt-4 mb-25">
@@ -49,8 +30,8 @@
                                                 @foreach ($vehicles as $item)
                                                     <tr>
                                                         <td> {{ $loop->iteration }} </td>
-                                                        <td> <a href="{{route('veh.detail',[$item->veh_id])}}"> {{ $item->plate }} {{ $item->province }}</a></td>
-                                                        <td> {{ $item->veh_type_name }} </td>
+                                                        <td> <a href="{{route('veh.detail',[$item->car_id])}}"> {{ $item->car_plate }} </a></td>
+                                                        <td> {{ $item->vehicle_type }} </td>
                                                         <td> {{ thai_date($item->created_at) }} </td>
                                                     </tr>
                                                 @endforeach

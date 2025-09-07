@@ -35,7 +35,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control radius-xs b-light fs-20"
-                                            value="{{ $veh_detail->plate }} {{ $veh_detail->province }}" readonly>
+                                            value="{{ $veh_detail->car_plate }}" readonly>
                                     </div>
                                 </div>
 

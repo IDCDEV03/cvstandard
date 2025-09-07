@@ -41,8 +41,7 @@ class AdminDashboardController extends Controller
             ->select('id', 'name_th')
             ->orderBy('name_th', 'ASC')
             ->get();
-
-          
+         
 
         return view('pages.admin.CompanyCreate', compact('province'));
     }
@@ -62,6 +61,7 @@ class AdminDashboardController extends Controller
         return view('pages.admin.CompanyEdit', compact('province','company_detail'));
     }
 
+   
     public function AnnouncementPage()
     {
         $list_post = DB::table('announcements')

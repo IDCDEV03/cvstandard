@@ -13,20 +13,20 @@
                  <span>เมนูสำหรับหน่วยงาน</span>
              @elseif ($role === Role::User)
                  @php
-                     $agent_id = Auth::user()->agency_id;
-                     $agent = DB::table('users')->select('name')->where('id', '=', $agent_id)->first();
+                      $agent_id = Auth::user()->company_code;
+                     $agent = DB::table('supply_datas')->select('supply_name')->where('sup_id', '=', $agent_id)->first();
                  @endphp
                  <span>ระบบตรวจมาตรฐานรถ</span>
-                 <span><i class="far fa-building"></i> {{ $agent->name }} </span>
+                 <span><i class="far fa-building"></i> {{ $agent->supply_name }} </span>
                  <div class="border-top my-3"></div>
                  <span><i class="fas fa-bars"></i> เมนูสำหรับผู้ใช้งาน</span>
              @elseif ($role === Role::Manager)
                  @php
-                     $agent_id = Auth::user()->agency_id;
-                     $agent = DB::table('users')->select('name')->where('id', '=', $agent_id)->first();
+                     $agent_id = Auth::user()->company_code;
+                     $agent = DB::table('supply_datas')->select('supply_name')->where('sup_id', '=', $agent_id)->first();
                  @endphp
                  <span>ระบบตรวจมาตรฐานรถ</span>
-                 <span><i class="far fa-building"></i> {{ $agent->name }} </span>
+                 <span><i class="far fa-building"></i> {{ $agent->supply_name }} </span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับผู้จัดการ BU</span>
              @elseif ($role === Role::Staff)
@@ -203,7 +203,7 @@
                  </a>
              </li>
              <li>
-                 <a href="#" class="">
+                 <a href="{{route('staff.veh_list')}}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการทะเบียนรถ</span>
                  </a>

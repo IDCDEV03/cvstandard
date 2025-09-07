@@ -47,12 +47,23 @@ class PageController extends Controller
         };
 
         if ($role === Role::User) {
-            $vehicles = DB::table('vehicles')
-                ->join('vehicle_types', 'vehicles.veh_type', '=', 'vehicle_types.id')
-                ->select('vehicles.*', 'vehicle_types.vehicle_type as veh_type_name')
-                ->where('vehicles.user_id', '=', Auth::id())
-                ->orderBy('vehicles.updated_at', 'DESC')
-                ->get();
+
+            $user_main_id = Auth::id();
+            $user_gen_id = DB::table('users')
+            ->where('id','=',$user_main_id)
+            ->first();
+
+            $user_gen = $user_gen_id->user_id;
+
+            $user_sup = DB::table('inspector_datas')
+            ->where('ins_id',$user_gen)
+            ->first();
+
+            $vehicles = DB::table('vehicles_detail')
+            ->select('vehicles_detail.*','vehicle_types.vehicle_type')
+            ->join('vehicle_types','vehicle_types.id','=','vehicles_detail.car_type')
+            ->where('vehicles_detail.supply_id',$user_sup->sup_id)                
+             ->get();
 
             return view('pages.user.MainPage', compact('vehicles'));
         } elseif ($role === Role::Agency) {

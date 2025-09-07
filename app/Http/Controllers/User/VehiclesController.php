@@ -17,89 +17,89 @@ class VehiclesController extends Controller
 
   public function veh_list($id)
   {
-            
-            $data = DB::table('vehicles')
-            ->where('agency_id', '=', $id)
-            ->orderBy('id', 'ASC')
-            ->get();
 
-              return view('pages.agency.VehiclesList', ['id' => $id], compact('data'));
+    $data = DB::table('vehicles')
+      ->where('agency_id', '=', $id)
+      ->orderBy('id', 'ASC')
+      ->get();
+
+    return view('pages.agency.VehiclesList', ['id' => $id], compact('data'));
   }
 
-    public function veh_regis()
-    {
+  public function veh_regis()
+  {
 
-      if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin])) {
-            abort(403);
-        }
-        
-        $car_type = DB::table('vehicle_types')
-            ->select('id', 'vehicle_type')
-            ->orderBy('id', 'ASC')
-            ->get();
-
-        $province = DB::table('provinces')
-            ->select('id', 'name_th')
-            ->orderBy('name_th', 'ASC')
-            ->get();
-
-            $car_brand = DB::table('car_brands')
-            ->orderBy('brand_name','ASC')
-            ->get();
-
-        return view('pages.agency.VehiclesRegister', compact('car_type', 'province','car_brand'));
+    if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin])) {
+      abort(403);
     }
 
-      public function veh_insert(Request $request)
-    {
+    $car_type = DB::table('vehicle_types')
+      ->select('id', 'vehicle_type')
+      ->orderBy('id', 'ASC')
+      ->get();
 
-        $agent = Auth::id();
+    $province = DB::table('provinces')
+      ->select('id', 'name_th')
+      ->orderBy('name_th', 'ASC')
+      ->get();
 
-        if (empty($request->province)) {
-            return redirect()->back()->with('error', 'กรุณาเลือกทะเบียนจังหวัด');
-        }
+    $car_brand = DB::table('car_brands')
+      ->orderBy('brand_name', 'ASC')
+      ->get();
 
-        if (empty($request->veh_brand)) {
-            return redirect()->back()->with('error', 'กรุณาเลือกยี่ห้อรถ');
-        }
+    return view('pages.agency.VehiclesRegister', compact('car_type', 'province', 'car_brand'));
+  }
 
+  public function veh_insert(Request $request)
+  {
 
-        $veh_id = 'VEH-' . Str::upper(Str::random(9));
+    $agent = Auth::id();
 
-        $rawInput = $request->input('plate');
-        $cleanPlate = str_replace(' ', '', $rawInput); //ตัดช่องว่างออก
-
-        // upload image
-        $upload_location = 'upload/';
-        $file = $request->file('vehicle_image');
-        $extension = $file->getClientOriginalExtension();
-        $newName = $cleanPlate . '_' . Carbon::now()->format('Ymd_His') . '.' . $extension;
-        $file->move($upload_location, $newName);
-        $fileName = $upload_location . $newName;
-
-        DB::table('vehicles')->insert([
-            'veh_id' => $veh_id,
-            'veh_brand' => $request->veh_brand,
-            'plate' => $cleanPlate,
-            'province' => $request->province,
-            'user_id' => Auth::id(),
-            'veh_status' => '1',
-            'veh_type' => $request->vehicle_type,
-            'veh_image' => $fileName,
-            'agency_id' => $agent,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-
-        return redirect()->route('agency.veh_list', ['id' => Auth::id()])->with('success', 'บันทึกสำเร็จ');
+    if (empty($request->province)) {
+      return redirect()->back()->with('error', 'กรุณาเลือกทะเบียนจังหวัด');
     }
+
+    if (empty($request->veh_brand)) {
+      return redirect()->back()->with('error', 'กรุณาเลือกยี่ห้อรถ');
+    }
+
+
+    $veh_id = 'VEH-' . Str::upper(Str::random(9));
+
+    $rawInput = $request->input('plate');
+    $cleanPlate = str_replace(' ', '', $rawInput); //ตัดช่องว่างออก
+
+    // upload image
+    $upload_location = 'upload/';
+    $file = $request->file('vehicle_image');
+    $extension = $file->getClientOriginalExtension();
+    $newName = $cleanPlate . '_' . Carbon::now()->format('Ymd_His') . '.' . $extension;
+    $file->move($upload_location, $newName);
+    $fileName = $upload_location . $newName;
+
+    DB::table('vehicles')->insert([
+      'veh_id' => $veh_id,
+      'veh_brand' => $request->veh_brand,
+      'plate' => $cleanPlate,
+      'province' => $request->province,
+      'user_id' => Auth::id(),
+      'veh_status' => '1',
+      'veh_type' => $request->vehicle_type,
+      'veh_image' => $fileName,
+      'agency_id' => $agent,
+      'created_at' => Carbon::now(),
+      'updated_at' => Carbon::now(),
+    ]);
+
+    return redirect()->route('agency.veh_list', ['id' => Auth::id()])->with('success', 'บันทึกสำเร็จ');
+  }
 
   public function veh_detail($id)
   {
-    $vehicle = DB::table('vehicles')
-      ->join('vehicle_types', 'vehicles.veh_type', '=', 'vehicle_types.id')
-      ->select('vehicles.*', 'vehicle_types.vehicle_type as veh_type_name')
-      ->where('vehicles.veh_id', '=', $id)
+    $vehicle = DB::table('vehicles_detail')
+      ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+      ->select('vehicles_detail.*', 'vehicle_types.vehicle_type as veh_type_name')
+      ->where('vehicles_detail.car_id', '=', $id)
       ->first();
 
     $record = DB::table('chk_records')
@@ -174,6 +174,86 @@ class VehiclesController extends Controller
 
     return view('pages.local.ReportResult', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images'));
   }
+
+  public function Form_report($rec)
+  {
+    // 1. ดึงข้อมูลการตรวจรถ + ยานพาหนะ
+    $record = DB::table('chk_records')
+      ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+      ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+      ->select(
+        'vehicles_detail.*',
+        'vehicle_types.vehicle_type as veh_type_name',
+        'chk_records.created_at as date_check',
+        'chk_records.form_id',
+        'chk_records.record_id',
+        'chk_records.user_id as chk_user',
+        'chk_records.agency_id as chk_agent'
+      )
+      ->where('chk_records.record_id', $rec)
+      ->first();
+
+    if (!$record) {
+      return back()->with('error', 'ไม่พบข้อมูลการตรวจรถที่ต้องการ');
+    }
+
+    // 2. ดึงชื่อหน่วยงานที่ตรวจ 
+    $agent_name = DB::table('users')
+      ->where('user_id', $record->chk_agent)
+      ->first();
+
+    //ดึงข้อมูลช่างตรวจ
+    $inspector_data = DB::table('inspector_datas')
+      ->join('users', 'users.user_id', '=', 'inspector_datas.ins_id')
+      ->select(
+        'inspector_datas.*',
+        'users.user_id'
+      )
+      ->where('users.id', $record->chk_user)
+      ->first();
+
+
+    // 3. ดึงชื่อแบบฟอร์ม
+    $forms = DB::table('forms')
+      ->select('form_name')
+      ->where('form_id', $record->form_id)
+      ->first();
+
+    // 4. ดึงรายการหมวดหมู่ที่เกี่ยวข้องกับแบบฟอร์ม
+    $categories = DB::table('check_categories')
+      ->where('form_id', $record->form_id)
+      ->orderBy('cates_no')
+      ->get();
+
+    // 5. ดึงผลการตรวจแยกตามหมวด
+    $results = DB::table('check_records_result')
+      ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
+      ->where('record_id', $rec)
+      ->select(
+        'check_items.category_id',
+        'check_items.item_name',
+        'check_records_result.item_id',
+        'result_value',
+        'user_comment'
+      )
+      ->get()
+      ->groupBy('category_id');
+
+    // 6. ดึงภาพที่แนบในการตรวจ
+    $images = DB::table('check_result_images')
+      ->where('record_id', $rec)
+      ->get()
+      ->groupBy('item_id');
+
+      $company_datas = DB::table('supply_datas')
+      ->join('company_details','supply_datas.company_code','=','company_details.company_id')
+      ->where('supply_datas.sup_id',$inspector_data->sup_id)
+      ->first();
+
+
+    return view('pages.local.FormReport', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images','inspector_data','company_datas'));
+  }
+
 
   public function repair_notice()
   {

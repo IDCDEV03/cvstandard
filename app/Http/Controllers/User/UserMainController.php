@@ -70,6 +70,8 @@ class UserMainController extends Controller
             return redirect()->back()->with('error', 'กรุณาเลือกยี่ห้อรถ');
         }
 
+        
+
 
         $veh_id = 'VEH-' . Str::upper(Str::random(9));
 
@@ -89,7 +91,7 @@ class UserMainController extends Controller
             'veh_brand' => $request->veh_brand,
             'plate' => $cleanPlate,
             'province' => $request->province,
-            'user_id' => Auth::id(),
+            'user_create_id' => $agent->user_id,
             'veh_status' => '1',
             'veh_type' => $request->vehicle_type,
             'veh_image' => $fileName,
@@ -105,10 +107,10 @@ class UserMainController extends Controller
     {
         $user_id = Auth::user()->id;
         $record = DB::table('chk_records')
-            ->join('vehicles', 'chk_records.veh_id', '=', 'vehicles.veh_id')
-            ->join('vehicle_types', 'vehicles.veh_type', '=', 'vehicle_types.id')
+            ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+            ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
             ->select(
-                'vehicles.*',
+                'vehicles_detail.*',
                 'vehicle_types.vehicle_type as veh_type_name',
                 'chk_records.created_at as date_check',
                 'chk_records.form_id',
@@ -130,9 +132,9 @@ class UserMainController extends Controller
             ->orderBy('form_name', 'ASC')
             ->get();
 
-        $veh_detail = DB::table('vehicles')
-            ->select('plate', 'province')
-            ->where('veh_id', $id)
+        $veh_detail = DB::table('vehicles_detail')
+            ->select('car_plate')
+            ->where('car_id', $id)
             ->first();
 
         return view('pages.user.ChkStart', compact('forms', 'veh_detail'));
@@ -142,7 +144,16 @@ class UserMainController extends Controller
     public function insert_step1(Request $request, $id)
     {
 
-        $agent = DB::table('users')->where('id', Auth::id())->first();
+           $user_main_id = Auth::id();
+           $user_gen_id = DB::table('users')
+            ->where('id','=',$user_main_id)
+            ->first();
+
+            $user_gen = $user_gen_id->user_id;
+
+            $user_sup = DB::table('inspector_datas')
+            ->where('ins_id',$user_gen)
+            ->first();
 
         if (empty($request->form_id)) {
             return redirect()->back()->with('error', 'กรุณาเลือกฟอร์มที่ต้องการใช้');
@@ -156,7 +167,7 @@ class UserMainController extends Controller
             'veh_id' => $id,
             'record_id' => $record_id,
             'form_id' => $request->form_id,
-            'agency_id' => $agent->agency_id,
+            'agency_id' => $user_sup->sup_id,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
@@ -234,13 +245,13 @@ class UserMainController extends Controller
     public function chk_result($record_id)
     {
         $record = DB::table('chk_records')
-            ->join('vehicles', 'chk_records.veh_id', '=', 'vehicles.veh_id')
-            ->join('vehicle_types', 'vehicles.veh_type', '=', 'vehicle_types.id')
-            ->select('vehicles.*', 'vehicle_types.vehicle_type as veh_type_name', 'chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'chk_records.user_id as chk_user', 'chk_records.agency_id as chk_agent')
+            ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+            ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+            ->select('vehicles_detail.*', 'vehicle_types.vehicle_type as veh_type_name', 'chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'chk_records.user_id as chk_user', 'chk_records.agency_id as chk_agent')
             ->where('chk_records.record_id', $record_id)->first();
 
         $agent_name = DB::table('users')
-            ->where('id', $record->chk_agent)
+            ->where('user_id', $record->chk_agent)
             ->first();
 
         $forms = DB::table('forms')

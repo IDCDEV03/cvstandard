@@ -21,21 +21,33 @@
             </ul>
         </li>
 
-        <li>
+       <!-- <li>
             <a href="{{ route('admin.announce') }}" class="">
                 <span class="nav-icon uil uil-megaphone"></span>
                 <span class="menu-text">ประกาศ</span>
                 <span class="badge badge-success menuItem rounded-circle">3</span>
             </a>
-        </li>
+        </li>-->
 
         <li>
-            <a href="{{ route('admin.agency_list') }}" class="">
+            <a href="{{ route('admin.cp_list') }}" class="">
                 <span class="nav-icon uil uil-building"></span>
-                <span class="menu-text">หน่วยงาน</span>
+                <span class="menu-text">รายการบริษัท</span>
 
             </a>
         </li>
+
+         <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
 
 
     </ul>

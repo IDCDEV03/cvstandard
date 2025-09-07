@@ -72,7 +72,7 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <td class="fw-bold">ทะเบียนรถ</td>
-                                    <td>{{ $record->plate }} {{ $record->province }}</td>
+                                    <td>{{ $record->car_plate }} </td>
                                     <td class="fw-bold">แบบฟอร์มตรวจ</td>
                                     <td>{{ $forms->form_name }}</td>
                                 </tr>

@@ -14,15 +14,11 @@
                 </div>
             </div>
 
-              
-
-            
-
             <div class="row">
                 <div class="col-md-12">
                     <div class="card mb-4">
-                        <div class="card-body"> 
-                             <table class="table table-bordered" id="forms-table">
+                        <div class="card-body">
+                            <table class="table table-bordered" id="forms-table">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -33,16 +29,27 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($record as $data)                                       
-                                 
-                                  <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ thai_datetime($data->date_check) }}</td>
-                                    <td><a href="{{route('user.chk_result',[$data->record_id])}}">{{$data->plate}} {{$data->province}}</a></td>
-                                    <td> {{$data->veh_type_name}} </td>
-                                  <td><a href="{{ route('user.create_repair', ['record_id' => $data->record_id]) }}" class="btn btn-xs btn-secondary btn-shadow-secondary">บันทึกแจ้งข้อบกพร่อง</a></td>
-                                  </tr>
-                                     @endforeach
+                                    @foreach ($record as $data)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ thai_datetime($data->date_check) }}</td>
+                                            <td><a href="{{ route('user.chk_result', [$data->record_id]) }}">{{ $data->car_plate }}</a></td>
+                                            <td> {{ $data->veh_type_name }} </td>
+                                            <td>
+                                                <div class="dm-button-list d-flex flex-wrap gap-3">
+
+                                                    <a href="{{route('form_report',['rec'=>$data->record_id])}}" class="btn btn-xs btn-info btn-shadow-info">
+                                                        ฟอร์มรายงาน
+                                                    </a>
+
+                                                    <a href="{{ route('user.create_repair', ['record_id' => $data->record_id]) }}"
+                                                        class="btn btn-xs btn-secondary btn-shadow-secondary">บันทึกแจ้งข้อบกพร่อง</a>
+
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
