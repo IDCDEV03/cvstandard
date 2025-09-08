@@ -190,7 +190,7 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     //บริษัทแม่
     Route::get('/cp-list', [StaffController::class, 'CompanyList'])->name('staff.comp_list');
     Route::get('/supply-list', [StaffController::class, 'SupList'])->name('staff.supply_list');
-     Route::get('/cp_supply/{id}', [StaffController::class, 'Company_SupList'])->name('staff.cp_sup');
+    Route::get('/cp_supply/{id}', [StaffController::class, 'Company_SupList'])->name('staff.cp_sup');
 
     //ช่างตรวจ
     Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');

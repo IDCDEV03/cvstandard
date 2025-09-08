@@ -12,10 +12,8 @@
                     </div>
                 </div>
 
-
                 <div class="card shadow-sm">
                     <div class="card-body">
-
                         <table class="table table-bordered" id="forms-table">
                             <thead>
                                 <tr>

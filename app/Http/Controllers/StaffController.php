@@ -116,7 +116,7 @@ class StaffController extends Controller
         return redirect()->route('staff.veh_list')->with('success', 'บันทึกสำเร็จ');
     }
 
-     public function CompanyList()
+    public function CompanyList()
     {
         $company_list = DB::table('users')           
             ->where('role', '=', 'company')
@@ -126,7 +126,7 @@ class StaffController extends Controller
          return view('pages.staff.CompanyList',compact('company_list'));
     }
 
-       public function SupList()
+    public function SupList()
     {
        $supply_name = DB::table('users')
        ->join('company_details','users.company_code','=','company_details.company_id')
@@ -136,7 +136,7 @@ class StaffController extends Controller
     return view('pages.staff.SupplyList', compact('supply_name'));
     }
 
-     public function Company_SupList($id)
+    public function Company_SupList($id)
     {
        $company_name = DB::table('users')
         ->where('company_code','=',$id)
@@ -159,7 +159,7 @@ class StaffController extends Controller
         return view('pages.staff.InspectorList',compact('inst_list'));
     }
 
-     public function Inspector_Create()
+    public function Inspector_Create()
     {
           $supply_list = DB::table('supply_datas')           
             ->where('supply_status', '=', '1')
