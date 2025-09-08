@@ -39,7 +39,15 @@
                                     <td>{{ $loop->iteration }}</td>
                                      <td>{{$data->ins_name}} {{$data->ins_lastname}}</td>
                                        <td>{{$data->supply_name}}</td>
-                                      <td></td>
+                                      <td>
+                                           @if ($data->ins_status == '1')
+                                                <label class="badge badge-round badge-success">ใช้งาน</label>
+                                            @elseif ($data->ins_status == '0')
+                                                <label class="badge badge-round badge-warning">รอยืนยัน</label>
+                                            @elseif ($data->ins_status == '2')
+                                                <label class="badge badge-round badge-danger">ปิด</label>
+                                            @endif
+                                      </td>
                                         <td></td>
                                 @endforeach
                                 
