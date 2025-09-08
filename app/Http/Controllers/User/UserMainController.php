@@ -105,7 +105,7 @@ class UserMainController extends Controller
 
     public function chk_list()
     {
-        $user_id = Auth::user()->id;
+        $user_id = Auth::user()->user_id;
         $record = DB::table('chk_records')
             ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
             ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
@@ -115,6 +115,9 @@ class UserMainController extends Controller
                 'chk_records.created_at as date_check',
                 'chk_records.form_id',
                 'chk_records.record_id',
+                'chk_records.img_front',
+                'chk_records.img_beside',
+                'chk_records.img_overall',
                 'chk_records.user_id as chk_user',
                 'chk_records.agency_id as chk_agent'
             )
@@ -162,12 +165,36 @@ class UserMainController extends Controller
         $record_id = 'REC-' . Str::upper(Str::random(10));
 
 
+        $upload_location = 'upload/';
+
+        $frontPath = $request->file('front_image');
+        $extension = $frontPath->getClientOriginalExtension();
+        $newName_front = $id.'_'.'front'. '_' . Carbon::now()->format('Ymd') . '.' . $extension;
+        $frontPath->move($upload_location, $newName_front);
+        $fileName_front = $upload_location . $newName_front;
+
+        $sidePath = $request->file('side_image');
+        $extension2 = $sidePath->getClientOriginalExtension();
+        $newName_side = $id.'_'.'side'. '_' . Carbon::now()->format('Ymd') . '.' . $extension2;
+        $sidePath->move($upload_location, $newName_side);
+        $fileName_side = $upload_location . $newName_side;
+
+        $overallPath = $request->file('overall_image');
+        $extension3 = $overallPath->getClientOriginalExtension();
+        $newName_overall = $id.'_'.'overall'. '_' . Carbon::now()->format('Ymd') . '.' . $extension3;
+        $overallPath->move($upload_location, $newName_overall);
+        $fileName_overall = $upload_location . $newName_overall;
+
+
         DB::table('chk_records')->insert([
-            'user_id' => Auth::id(),
+            'user_id' => $user_gen,
             'veh_id' => $id,
             'record_id' => $record_id,
             'form_id' => $request->form_id,
             'agency_id' => $user_sup->sup_id,
+            'img_front' => $fileName_front,
+            'img_beside' => $fileName_side,
+            'img_overall' => $fileName_overall,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

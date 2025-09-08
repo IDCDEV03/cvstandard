@@ -77,7 +77,7 @@
                         $year_en = $ins_birth - 543;
                         $ins_age = date('Y') - $year_en;
                         $userdata = DB::table('users')
-                            ->where('id', $record->chk_user)
+                            ->where('user_id', $record->chk_user)
                             ->select('users.prefix', 'users.name', 'users.lastname', 'users.signature_image')
                             ->first();
 
@@ -86,17 +86,17 @@
 
                     <div class="card mb-2 shadow-sm">
                         <div class="card-body">
-                         
+
                             <div class="d-flex justify-content-between align-items-center">
 
                                 <table class="table table-bordered">
                                     <tr>
                                         <td>
-                                         <img src="{{ asset('logo/'.$company_datas->company_logo) }}"
-                                         width="150px" alt="">                                            
+                                            <img src="{{ asset('logo/' . $company_datas->company_logo) }}" width="150px"
+                                                alt="">
                                         </td>
                                         <td colspan="3">
-                                          <span class="fw-bold fs-20"> {{$company_datas->company_name}}</span> 
+                                            <span class="fw-bold fs-20"> {{ $company_datas->company_name }}</span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -176,7 +176,7 @@
                             </div>
 
                             <!-- print-->
-                              <div id="print-area">
+                            <div id="print-area">
                                 @if (!empty($agent_name->logo_agency))
                                     <table class="table table-borderless">
                                         <tr>
@@ -241,23 +241,35 @@
                                         <td>ส่วนที่ 4 ผลการตรวจสอบ</td>
                                     </tr>
                                     <tr>
+                                        <td>
+                                            <img src="{{ asset($record->img_front) }}" alt="" class="img-thumbnail"
+                                                width="150px">
+                                            <img src="{{ asset($record->img_beside) }}" alt=""
+                                                class="img-thumbnail" width="150px">
+                                            <img src="{{ asset($record->img_overall) }}" alt=""
+                                                class="img-thumbnail" width="150px">
+                                        </td>
+                                        <td>
 
+                                            <!--signature-->
+                                            @if (empty($userdata->signature_image))
+                                                <div class="text-center text-dark mt-40">
+                                                    .................................................</div>
+                                            @else
+                                                <div class="text-center"><img src="{{ asset($userdata->signature_image) }}"
+                                                        width="150px" alt=""></div>
+                                                <div class="text-center">..........................................</div>
+                                            @endif
+                                            <div class="text-center text-dark fs-18 mt-2">({{ $fullname }})</div>
+                                            <div class="text-center text-dark fs-18 mt-2">ผู้ตรวจรถ</div>
+
+
+                                        </td>
                                     </tr>
                                 </table>
 
-
-                                <!--signature-->
-                                @if (empty($userdata->signature_image))
-                                    <div class="text-center text-dark mt-40">
-                                        .................................................</div>
-                                @else
-                                    <div class="text-center"><img src="{{ asset($userdata->signature_image) }}"
-                                            width="150px" alt=""></div>
-                                    <div class="text-center">..........................................</div>
-                                @endif
-                                <div class="text-center text-dark fs-18 mt-2">({{ $fullname }})</div>
-                                <div class="text-center text-dark fs-18 mt-2">ผู้ตรวจรถ</div>
                                 <div class="text-end text-dark fs-14 mt-2">{{ thai_datetime($record->date_check) }}</div>
+
 
                             </div>
                         </div>

@@ -52,7 +52,7 @@
 
                             @php
                                 $userdata = DB::table('users')
-                                    ->where('id', $record->chk_user)
+                                    ->where('user_id', $record->chk_user)
                                     ->select('users.prefix', 'users.name', 'users.lastname')
                                     ->first();
 

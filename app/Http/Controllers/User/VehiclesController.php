@@ -187,6 +187,9 @@ class VehiclesController extends Controller
         'chk_records.created_at as date_check',
         'chk_records.form_id',
         'chk_records.record_id',
+        'chk_records.img_front',
+                'chk_records.img_beside',
+                'chk_records.img_overall',
         'chk_records.user_id as chk_user',
         'chk_records.agency_id as chk_agent'
       )
@@ -209,7 +212,7 @@ class VehiclesController extends Controller
         'inspector_datas.*',
         'users.user_id'
       )
-      ->where('users.id', $record->chk_user)
+      ->where('users.user_id', $record->chk_user)
       ->first();
 
 

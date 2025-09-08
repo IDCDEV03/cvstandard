@@ -25,7 +25,8 @@
                                 <div class="alert alert-danger fs-20 fw-bold">{{ session('error') }}</div>
                             @endif
 
-                            <form action="{{ route('user.insert1',request()->id) }}" method="POST">
+                            <form action="{{ route('user.insert1', request()->id) }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="form-group row">
@@ -42,7 +43,8 @@
                                 <div class="form-group row">
                                     <div class="col-sm-2 d-flex aling-items-center">
                                         <label for="inputName"
-                                            class="col-form-label color-dark fs-18 fw-bold align-center">เลือกแบบฟอร์ม<span class="text-danger">*</span></label>
+                                            class="col-form-label color-dark fs-18 fw-bold align-center">เลือกแบบฟอร์ม<span
+                                                class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <select name="form_id" id="select-alerts2" class="form-control " required>
@@ -54,8 +56,49 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="border-top my-3"></div>
 
-
+                                <div class="form-group row">
+                                    <div class="col-sm-2 d-flex aling-items-center">
+                                        <label for="front_image"
+                                            class="col-form-label color-dark fs-18 fw-bold align-center">ภาพหน้ารถ<span
+                                                class="text-danger">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="file" name="front_image" id="front_image"
+                                            accept="image/*" onchange="previewImage(this, 'preview_front')" required>
+                                        <img id="preview_front" src="#" alt="Preview" class="img-thumbnail mt-2"
+                                            style="display: none; max-width: 200px;">
+                                    </div>
+                                </div>
+ <div class="border-top my-3"></div>
+                                <div class="form-group row">
+                                    <div class="col-sm-2 d-flex aling-items-center">
+                                        <label for="front_image"
+                                            class="col-form-label color-dark fs-18 fw-bold align-center">ภาพข้างรถ<span
+                                                class="text-danger">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="file" name="side_image" id="side_image"
+                                            accept="image/*" onchange="previewImage(this, 'preview_side')" required>
+                                        <img id="preview_side" src="#" alt="Preview" class="img-thumbnail mt-2"
+                                            style="display: none; max-width: 200px;">
+                                    </div>
+                                </div>
+ <div class="border-top my-3"></div>
+                                <div class="form-group row">
+                                    <div class="col-sm-2 d-flex aling-items-center">
+                                        <label for="front_image"
+                                            class="col-form-label color-dark fs-18 fw-bold align-center">สภาพโดยรวม<span
+                                                class="text-danger">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="file" name="overall_image" id="overall_image"
+                                            accept="image/*" onchange="previewImage(this, 'preview_overall')" required>
+                                        <img id="preview_overall" src="#" alt="Preview" class="img-thumbnail mt-2"
+                                            style="display: none; max-width: 200px;">
+                                    </div>
+                                </div>
 
 
 
@@ -75,6 +118,20 @@
 
 @push('scripts')
     <script>
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(previewId);
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+
         function updateClock() {
             const now = new Date();
 
