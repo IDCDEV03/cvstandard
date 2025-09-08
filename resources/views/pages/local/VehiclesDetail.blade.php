@@ -127,7 +127,7 @@
                                         @foreach ($record as $item)
                                             <tr>
                                                 <td> {{ $loop->iteration }} </td>
-                                                <td> <a href="{{ route('veh.result', ['rec' => $item->record_id]) }}">
+                                                <td> <a href="{{ route('form_report', ['rec' => $item->record_id]) }}">
                                                         {{ thai_datetime($item->date_check) }} </a></td>
                                                 <td> {{ $item->form_name }} </td>
                                             </tr>

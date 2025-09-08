@@ -115,10 +115,10 @@ class VehiclesController extends Controller
   {
     // 1. ดึงข้อมูลการตรวจรถ + ยานพาหนะ
     $record = DB::table('chk_records')
-      ->join('vehicles', 'chk_records.veh_id', '=', 'vehicles.veh_id')
-      ->join('vehicle_types', 'vehicles.veh_type', '=', 'vehicle_types.id')
+      ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+      ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
       ->select(
-        'vehicles.*',
+        'vehicles_detail.*',
         'vehicle_types.vehicle_type as veh_type_name',
         'chk_records.created_at as date_check',
         'chk_records.form_id',
@@ -135,7 +135,7 @@ class VehiclesController extends Controller
 
     // 2. ดึงชื่อหน่วยงานที่ตรวจ (agent)
     $agent_name = DB::table('users')
-      ->where('id', $record->chk_agent)
+      ->where('user_id', $record->chk_agent)
       ->first();
 
     // 3. ดึงชื่อแบบฟอร์ม
