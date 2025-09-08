@@ -10,8 +10,7 @@
                 <div class="col-md-12">
                     <div class=" alert alert-primary " role="alert">
                         <div class="alert-content">
-                            <span class="fs-20 fw-bold"> บันทึกแจ้งข้อบกพร่องของยานพาหนะ ทะเบียนรถ : {{ $record->plate }}
-                                {{ $record->province }}</span>
+                            <span class="fs-20 fw-bold"> บันทึกแจ้งข้อบกพร่องของยานพาหนะ ทะเบียนรถ : {{ $record->car_plate }}</span>
                         </div>
                     </div>
 
@@ -77,7 +76,7 @@
                                         <div class="mb-3">
                                             <label for="title" class="form-label fw-bold">เลขทะเบียน </label>
                                             <input type="text" name="plate" id="plate"
-                                                value="{{ $record->plate }} {{ $record->province }}" class="form-control"
+                                                value="{{ $record->car_plate }} " class="form-control"
                                                 readonly>
                                         </div>
                                     </div>
@@ -86,7 +85,7 @@
                                         <div class="mb-3">
                                             <label for="car_brand" class="form-label fw-bold">ยี่ห้อรถ </label>
                                             <input type="text" name="car_brand" id="car_brand" class="form-control"
-                                                value="{{ $record->veh_brand }}" readonly>
+                                                value="{{ $record->car_brand }}" readonly>
                                         </div>
                                     </div>
 
