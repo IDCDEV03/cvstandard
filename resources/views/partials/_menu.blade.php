@@ -13,8 +13,11 @@
                  <span>เมนูสำหรับหน่วยงาน</span>
              @elseif ($role === Role::User)
                  @php
-                      $agent_id = Auth::user()->company_code;
-                     $agent = DB::table('supply_datas')->select('supply_name')->where('sup_id', '=', $agent_id)->first();
+                     $agent_id = Auth::user()->company_code;
+                     $agent = DB::table('supply_datas')
+                         ->select('supply_name')
+                         ->where('sup_id', '=', $agent_id)
+                         ->first();
                  @endphp
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <span><i class="far fa-building"></i> {{ $agent->supply_name }} </span>
@@ -23,13 +26,20 @@
              @elseif ($role === Role::Manager)
                  @php
                      $agent_id = Auth::user()->company_code;
-                     $agent = DB::table('supply_datas')->select('supply_name')->where('sup_id', '=', $agent_id)->first();
+                     $agent = DB::table('supply_datas')
+                         ->select('supply_name')
+                         ->where('sup_id', '=', $agent_id)
+                         ->first();
                  @endphp
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <span><i class="far fa-building"></i> {{ $agent->supply_name }} </span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับผู้จัดการ BU</span>
              @elseif ($role === Role::Staff)
+                 <span>ระบบตรวจมาตรฐานรถ</span>
+                 <div class="border-top my-3"></div>
+                 <span>เมนูสำหรับบุคลากร</span>
+                   @elseif ($role === Role::Supply)
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับบุคลากร</span>
@@ -86,7 +96,7 @@
 
                  </ul>
              </li>
-               <li>
+             <li>
                  <a href="#" class="nav-author__signout"
                      onclick="event.preventDefault(); document.getElementById('logout').submit();">
                      <span class="nav-icon uil uil-sign-out-alt"></span>
@@ -150,7 +160,7 @@
                      <span class="menu-text">บัญชีผู้ใช้</span>
                  </a>
              </li>
-               <li>
+             <li>
                  <a href="#" class="nav-author__signout"
                      onclick="event.preventDefault(); document.getElementById('logout').submit();">
                      <span class="nav-icon uil uil-sign-out-alt"></span>
@@ -184,7 +194,7 @@
                      <span class="menu-text">รายการบริษัทฯ</span>
                  </a>
              </li>
-               <li>
+             <li>
                  <a href="#" class="nav-author__signout"
                      onclick="event.preventDefault(); document.getElementById('logout').submit();">
                      <span class="nav-icon uil uil-sign-out-alt"></span>
@@ -203,7 +213,7 @@
                  </a>
              </li>
              <li>
-                 <a href="{{route('staff.veh_list')}}" class="">
+                 <a href="{{ route('staff.veh_list') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการทะเบียนรถ</span>
                  </a>
@@ -219,10 +229,29 @@
                          <a href="{{ route('staff.form_list') }}">รายการฟอร์ม</a>
                      </li>
                      <li>
-                         <a href="{{route('staff.form_new')}}">สร้างฟอร์ม</a>
+                         <a href="{{ route('staff.form_new') }}">สร้างฟอร์ม</a>
                      </li>
 
                  </ul>
+             </li>
+
+             <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
+         @elseif ($role === Role::Supply)
+             <li>
+                 <a href="{{ route('supply.home') }}" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">หน้าหลัก</span>
+                 </a>
              </li>
 
              <li>

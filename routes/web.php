@@ -173,8 +173,9 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
     // สำหรับบริษัทว่าจ้างฯ
 });
 
-Route::prefix('sup')->middleware(['auth', 'role:supply'])->group(function () {
+Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
     // Route สำหรับ supply
+     Route::get('/home', [PageController::class, 'home'])->name('supply.home');
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {

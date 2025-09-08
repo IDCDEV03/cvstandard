@@ -63,6 +63,8 @@ class LoginController extends Controller
 
             $user = Auth::user();
 
+            dd($user->role);
+
             return match ($user->role) {
                 Role::Admin => redirect()->route('admin.dashboard'),
                 Role::Manager => redirect()->route('manager.dashboard'),
@@ -70,6 +72,7 @@ class LoginController extends Controller
                 Role::User => redirect()->route('local.home'),
                 Role::Company => redirect()->route('company.index'),
                 Role::Staff => redirect()->route('staff.index'),
+                Role::Supply => redirect()->route('supply.home'),
                 default => redirect('/home'),
             };
         }
