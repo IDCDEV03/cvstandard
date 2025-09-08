@@ -36,6 +36,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($inst_list as $data)
+                                <tr>
                                     <td>{{ $loop->iteration }}</td>
                                      <td>{{$data->ins_name}} {{$data->ins_lastname}}</td>
                                        <td>{{$data->supply_name}}</td>
@@ -49,6 +50,7 @@
                                             @endif
                                       </td>
                                         <td></td>
+                                        </tr>
                                 @endforeach
                                 
                             </tbody>
