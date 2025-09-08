@@ -24,7 +24,7 @@
                                     <th>สถานะ</th>
                                     <th>บริษัทว่าจ้าง</th>
                                     <th>วันที่เพิ่ม</th>
-                                    <th>จัดการ</th>
+                                   
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,21 +41,7 @@
                                         </td>
                                         <td>{{$item->company_name}}</td>
                                         <td> {{ thai_date($item->created_at) }}</td>
-                                        <td>
-
- <div class="dropdown">
-                                       <button type="button" class="btn btn-primary btn-default btn-squared btn-transparent-primary dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                          ตัวเลือก
-                                        <i class="las la-angle-down"></i>
-                                       </button>
-                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                          <a class="dropdown-item" href="#">รายละเอียดบริษัท</a>
-                                          <a class="dropdown-item" href="#">จัดการฟอร์ม</a>
-                                          <a class="dropdown-item" href="#">แก้ไขข้อมูล</a>
-                                       </div>
-                                    </div>
-
-                                        </td>
+                               
                                     </tr>
                                 @endforeach
                             </tbody>
