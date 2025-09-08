@@ -37,7 +37,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td> 
-                                            <a href="{{route('admin.sup_list',['id'=>$item->company_code])}}">
+                                            <a href="{{route('staff.supply_list',['id'=>$item->company_code])}}">
                                             {{ $item->name }} </a>
                                         </td>
                                         <td>

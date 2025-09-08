@@ -270,4 +270,17 @@ class StaffFormController extends Controller
 
         return redirect()->route('staff.categories_detail', ['cates_id' => $item->category_id])->with('success', 'อัปเดตข้อมูลสำเร็จ');
     }
+
+     public function SupList($id)
+    {
+       $company_name = DB::table('users')
+        ->where('company_code','=',$id)
+        ->first();
+
+        $supply_list = DB::table('supply_datas')
+        ->where('company_code','=',$id)
+        ->get();
+
+    return view('pages.staff.SupplyList', compact('company_name','supply_list'));
+    }
 }
