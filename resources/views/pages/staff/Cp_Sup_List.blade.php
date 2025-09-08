@@ -3,18 +3,12 @@
 @extends('layout.app')
 @section('content')
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-12">
 
                 <div class="card mt-20 mb-25 shadow-sm">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="fw-bold fs-20 ">
-                                รายการบริษัทฯว่าจ้าง
-                            </div>
-                          
-                        </div>
+                        <span class="fs-20 fw-bold">รายการบริษัทขนส่ง (Supply) สังกัด {{$company_name->name}}</span>
                     </div>
                 </div>
 
@@ -26,36 +20,25 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>ชื่อ</th>
-                                    <th>สถานะ</th>
-                                    <th>วันที่เพิ่ม</th>
-                                    <th>จัดการ</th>
+                                    <th>ชื่อ Supply</th>
+                                    <th>สถานะ</th>                                    
+                                    <th>วันที่เพิ่ม</th>                                   
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($company_list as $item)
+                                @foreach ($supply_name as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td> 
-                                            <a href="{{route('staff.cp_sup',['id'=>$item->company_code])}}">
-                                            {{ $item->name }} </a>
-                                        </td>
+                                        <td> {{ $item->supply_name }} </td>
                                         <td>
-                                            @if ($item->user_status == '1')
+                                          @if ($item->supply_status == '1')
                                                 <label class="badge badge-round badge-success">ใช้งาน</label>
-                                            @elseif ($item->user_status == '0')
-                                                <label class="badge badge-round badge-warning">รอยืนยัน</label>
-                                            @elseif ($item->user_status == '2')
-                                                <label class="badge badge-round badge-danger">ปิด</label>
+                                            @elseif ($item->supply_status == '0')
+                                                <label class="badge badge-round badge-warning">ปิด</label>
                                             @endif
-                                        </td>
-                                        <td>
-                                            {{ thai_date($item->created_at) }}
-                                        </td>
-                                        <td>
-                                          
-                                            </div>
-                                        </td>
+                                        </td>                                        
+                                        <td> {{ thai_date($item->created_at) }}</td>
+                               
                                     </tr>
                                 @endforeach
                             </tbody>

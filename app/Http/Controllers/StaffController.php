@@ -133,9 +133,20 @@ class StaffController extends Controller
         ->where('users.role','=','supply')
         ->get();
 
-    
-
     return view('pages.staff.SupplyList', compact('supply_name'));
+    }
+
+     public function Company_SupList($id)
+    {
+       $company_name = DB::table('users')
+        ->where('company_code','=',$id)
+        ->first();
+
+        $supply_name = DB::table('supply_datas')
+        ->where('company_code','=',$id)
+        ->get();
+
+    return view('pages.staff.Cp_Sup_List', compact('company_name','supply_name'));
     }
 
     public function InspectorList()
