@@ -218,7 +218,7 @@ class VehiclesController extends Controller
 
     // 3. ดึงชื่อแบบฟอร์ม
     $forms = DB::table('forms')
-      ->select('form_name')
+      ->select('form_name','form_code')
       ->where('form_id', $record->form_id)
       ->first();
 

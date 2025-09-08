@@ -8,6 +8,11 @@
                 visibility: hidden;
             }
 
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
             #print-area,
             #print-area * {
                 visibility: visible;
@@ -47,6 +52,16 @@
         .fixed-table td:nth-child(3) {
             width: 30%;
         }
+
+        table.report-table {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        table.report-table th,
+        table.report-table td {
+            padding: 4px 6px;
+        }
     </style>
 
     <div class="container-fluid">
@@ -83,24 +98,27 @@
 
                         $fullname = $userdata->prefix . $userdata->name . ' ' . $userdata->lastname;
                     @endphp
-
-                    <div class="card mb-2 shadow-sm">
-                        <div class="card-body">
-
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <table class="table table-bordered">
+                    <!-- print-->
+                    <div id="print-area">
+                        <div class="card mb-2 ">
+                            <div class="card-body">
+                                <table class="table table-bordered report-table">
                                     <tr>
                                         <td>
                                             <img src="{{ asset('logo/' . $company_datas->company_logo) }}" width="150px"
                                                 alt="">
                                         </td>
-                                        <td colspan="3">
-                                            <span class="fw-bold fs-20"> {{ $company_datas->company_name }}</span>
+                                        <td colspan="2">
+                                            <span class="fw-bold fs-20 "> {{ $company_datas->company_name }}</span>
+                                        </td>
+                                        <td>
+                                            {{ $forms->form_code }}
+                                            <br>
+                                            วันที่ตรวจ {{ thai_datetime($record->date_check) }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="4" class="table-light">บันทึก (Record Form) :
+                                        <td colspan="4" class="table-light"><strong>บันทึก (Record Form) :</strong>
                                             {{ $forms->form_name }}</td>
                                     </tr>
                                     <tr>
@@ -112,11 +130,11 @@
                                             {{ $inspector_data->ins_lastname }}
                                         </td>
                                         <td class="fw-bold">อายุ</td>
-                                        <td>{{ $ins_age }}</td>
+                                        <td>{{ $ins_age }} ปี</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">ประสบการณ์ผู้ขับขี่</td>
-                                        <td>{{ $inspector_data->ins_experience }}</td>
+                                        <td>{{ $inspector_data->ins_experience }} ปี</td>
                                         <td class="fw-bold">หน่วยงาน/สังกัด</td>
                                         <td>{{ $agent_name->name }}</td>
                                     </tr>
@@ -173,33 +191,19 @@
 
                                 </table>
 
-                            </div>
 
-                            <!-- print-->
-                            <div id="print-area">
-                                @if (!empty($agent_name->logo_agency))
-                                    <table class="table table-borderless">
-                                        <tr>
-                                            <td colspan="4" class="text-center">
-                                                <img src="{{ asset($agent_name->logo_agency) }}" alt=""
-                                                    width="100px">
-                                            </td>
-                                        </tr>
-                                    </table>
-                                @endif
-                                <div class="my-4 text-center">
-                                </div>
+
 
                                 @foreach ($categories as $cat)
                                     <span class="fs-18 fw-bold mt-4">{{ $cat->cates_no }}.
                                         {{ $cat->chk_cats_name }}</span>
 
-                                    <table class="table table-bordered fixed-table mt-2 mb-4">
+                                    <table class="table table-bordered fixed-table mt-2 mb-4 report-table">
                                         <thead>
                                             <tr>
-                                                <th>รายการ</th>
-                                                <th>ผลตรวจ</th>
-                                                <th>ความคิดเห็น</th>
+                                                <th>รายการตรวจประเมิน</th>
+                                                <th>ผลการประเมิน</th>
+                                                <th>สิ่งที่ตรวจพบ</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -235,19 +239,21 @@
                                     </table>
                                 @endforeach
 
-                                <table class="table table-bordered">
+                                <table class="table table-bordered report-table">
                                     <tr>
-                                        <td class="table-light">ส่วนที่ 3 สภาพรถปัจจุบัน</td>
-                                        <td>ส่วนที่ 4 ผลการตรวจสอบ</td>
+                                        <td colspan="3" class="table-light" style="width: 50%;"><strong>ส่วนที่
+                                                3</strong> สภาพรถปัจจุบัน</td>
+                                        <td class="table-light"><strong>ส่วนที่ 4</strong> ผลการตรวจสอบ</td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <img src="{{ asset($record->img_front) }}" alt="" class="img-thumbnail"
-                                                width="150px">
-                                            <img src="{{ asset($record->img_beside) }}" alt=""
-                                                class="img-thumbnail" width="150px">
-                                            <img src="{{ asset($record->img_overall) }}" alt=""
-                                                class="img-thumbnail" width="150px">
+                                            <img src="{{ asset($record->img_front) }}" alt="" width="150px">
+                                        </td>
+                                        <td>
+                                            <img src="{{ asset($record->img_beside) }}" alt="" width="150px">
+                                        </td>
+                                        <td>
+                                            <img src="{{ asset($record->img_overall) }}" alt="" width="150px">
                                         </td>
                                         <td>
 
