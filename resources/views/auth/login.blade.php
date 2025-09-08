@@ -80,14 +80,7 @@
                                     </form>
                                 </div>
 
-                                <div class="admin-topbar">
-                                    <p class="mb-0">
-                                        ยังไม่มี Account?
-                                        <a href="{{ route('register') }}" class="color-primary">
-                                            ลงทะเบียนใหม่
-                                        </a>
-                                    </p>
-                                </div>
+                          
                             </div>
                         </div>
                     </div>
