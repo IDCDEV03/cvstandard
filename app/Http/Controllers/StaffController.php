@@ -206,6 +206,7 @@ class StaffController extends Controller
                 'user_status'=>'1',
                 'password'=>Hash::make($request->inspector_password),
                 'role'=>'user',
+                'company_code' => $request->supply_id,
                  'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
         ]);
