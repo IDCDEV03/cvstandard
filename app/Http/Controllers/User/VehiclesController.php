@@ -29,7 +29,7 @@ class VehiclesController extends Controller
   public function veh_regis()
   {
 
-    if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin])) {
+    if (!in_array(auth()->user()->role, [Role::User,Role::Staff,Role::Supply, Role::Manager, Role::Agency, Role::Admin])) {
       abort(403);
     }
 

@@ -24,6 +24,21 @@
                                         </tr>
                                      
                                         <tr>
+                                            <th>ยี่ห้อ</th>
+                                            <td> {{$vehicle->car_brand}} </td>
+                                        </tr>
+
+                                         <tr>
+                                            <th>รุ่น</th>
+                                            <td> {{$vehicle->car_model}} </td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>อายุการใช้งาน</th>
+                                            <td> {{$vehicle->car_age}} ปี</td>
+                                        </tr>
+
+                                        <tr>
                                             <th>วันที่ลงทะเบียน</th>
                                             <td>
                                                 {{ thai_date($vehicle->created_at) }}

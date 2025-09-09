@@ -19,6 +19,7 @@ use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\User\ManagerController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StaffFormController;
+use App\Http\Controllers\SupplyMainController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,6 +49,12 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/cp_status/{id}/{status}', [ManageCompanyController::class, 'UpdateStatus'])->name('admin.cp_updatestatus');
 
     //CRUD Supply
+    Route::get('/supply-all', [ManageCompanyController::class, 'SupplyAll'])->name('admin.supply_all');
+
+    Route::get('/sup_edit/{id}', [ManageCompanyController::class, 'SupplyEdit'])->name('admin.sup_edit');
+
+    Route::POST('/sup_update/{id}/{tab}', [ManageCompanyController::class, 'SupplyUpdate'])->name('admin.sup_update');
+
     Route::get('/sup_list/{id}', [ManageCompanyController::class, 'SupList'])->name('admin.sup_list');
     Route::get('/sup-create/{id}', [ManageCompanyController::class, 'SupCreate'])->name('admin.sup_create');
     Route::post('/supply/insert', [ManageCompanyController::class, 'SupInsert'])->name('admin.sup_insert');
@@ -81,7 +88,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/announce-delete/{id}/post', [AdminDashboardController::class, 'delete_post'])->name('admin.delete_post');
 });
 
-Route::prefix('vehicles')->middleware(['auth', 'role:user,manager,admin,agency'])->group(function () {
+Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,admin,agency'])->group(function () {
     Route::get('/page/{id}', [VehiclesController::class, 'veh_detail'])->name('veh.detail');
     Route::get('/result/{rec}', [VehiclesController::class, 'Report_Result'])->name('veh.result');
     Route::get('/repair-notice', [VehiclesController::class, 'repair_notice'])->name('veh.notice');
@@ -98,6 +105,8 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
     //ลงทะเบียนรถ
     Route::get('/veh-regis', [UserMainController::class, 'veh_regis'])->name('user.veh_regis');
     Route::POST('/veh-create', [UserMainController::class, 'veh_insert'])->name('user.veh_create');
+    //ระเบียนการตรวจ
+    Route::get('/veh/{id}', [UserMainController::class, 'veh_detail'])->name('user.veh_detail');
 
     //เริ่มตรวจ
     Route::get('/check/start/{id}', [UserMainController::class, 'start_check'])->name('user.chk_start');
@@ -176,6 +185,8 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
     // Route สำหรับ supply
      Route::get('/home', [PageController::class, 'home'])->name('supply.home');
+
+
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {

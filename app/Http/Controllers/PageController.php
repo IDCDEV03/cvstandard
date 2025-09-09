@@ -100,9 +100,16 @@ class PageController extends Controller
         }
         elseif ($role === Role::Supply) {
             $id = Auth::id();
+            $user_id = Auth::user()->user_id;
             $supply = DB::table('users')->where('id', Auth::id())->first();
 
-            return view('pages.supply.home', compact('supply'));
+            $chk_list = DB::table('chk_records')
+             ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'vehicles_detail.car_plate','vehicles_detail.car_number_record', 'chk_records.veh_id')
+            ->join('vehicles_detail','chk_records.veh_id','=','vehicles_detail.car_id')
+            ->where('chk_records.agency_id',$user_id)
+            ->groupBy('chk_records.record_id')
+            ->get();
+            return view('pages.supply.home', compact('supply','chk_list','user_id'));
         }
         else {
             return view('pages.local.home', compact('layout', 'title', 'description'));

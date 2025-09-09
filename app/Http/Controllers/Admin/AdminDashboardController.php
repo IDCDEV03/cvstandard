@@ -27,12 +27,12 @@ class AdminDashboardController extends Controller
 
     public function CompanyList()
     {
-        $company_list = DB::table('users')           
+        $company_list = DB::table('users')
             ->where('role', '=', 'company')
             ->orderBy('updated_at', 'DESC')
             ->get();
 
-         return view('pages.admin.CompanyList',compact('company_list'));
+        return view('pages.admin.CompanyList', compact('company_list'));
     }
 
     public function CompanyCreate()
@@ -41,27 +41,27 @@ class AdminDashboardController extends Controller
             ->select('id', 'name_th')
             ->orderBy('name_th', 'ASC')
             ->get();
-         
+
 
         return view('pages.admin.CompanyCreate', compact('province'));
     }
 
-        public function CompanyEdit($id)
+    public function CompanyEdit($id)
     {
         $province = DB::table('provinces')
             ->select('id', 'name_th')
             ->orderBy('name_th', 'ASC')
             ->get();
 
-            $company_detail = DB::table('users')
-            ->join('company_details','users.company_code','=','company_details.company_id')
-            ->where('users.id','=',$id) 
+        $company_detail = DB::table('users')
+            ->join('company_details', 'users.company_code', '=', 'company_details.company_id')
+            ->where('users.id', '=', $id)
             ->get();
 
-        return view('pages.admin.CompanyEdit', compact('province','company_detail'));
+        return view('pages.admin.CompanyEdit', compact('province', 'company_detail'));
     }
 
-   
+
     public function AnnouncementPage()
     {
         $list_post = DB::table('announcements')
@@ -171,7 +171,7 @@ class AdminDashboardController extends Controller
 
             $fileName = $newName;
         }
-      
+
         DB::table('announcements')->where('id', $id)->update([
             'title'      => $request->input('title'),
             'description' => $request->input('detail'),
@@ -179,7 +179,7 @@ class AdminDashboardController extends Controller
             'updated_at' =>  Carbon::now(),
         ]);
 
-       return redirect()->route('admin.announce')->with('success', 'บันทึกการแก้ไขสำเร็จ');
+        return redirect()->route('admin.announce')->with('success', 'บันทึกการแก้ไขสำเร็จ');
     }
 
     public function delete_file($id)
@@ -201,17 +201,19 @@ class AdminDashboardController extends Controller
 
     public function delete_post($id)
     {
-          $post = DB::table('announcements')->where('id', $id)->first();
+        $post = DB::table('announcements')->where('id', $id)->first();
 
-          if($post->file_upload){
-           $file = public_path('upload/' . $post->file_upload);
-                if (File::exists($file)) {
-                    File::delete($file);
-                }
+        if ($post->file_upload) {
+            $file = public_path('upload/' . $post->file_upload);
+            if (File::exists($file)) {
+                File::delete($file);
             }
-
-          $delete_post = DB::table('announcements')->where('id', $id)->delete();
-
-         return redirect()->route('admin.announce')->with('success', 'ลบประกาศเรียบร้อยแล้ว');
         }
+
+        $delete_post = DB::table('announcements')->where('id', $id)->delete();
+
+        return redirect()->route('admin.announce')->with('success', 'ลบประกาศเรียบร้อยแล้ว');
+    }
+
+   
 }

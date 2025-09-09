@@ -36,6 +36,21 @@
                     </a>
                 </div>
 
+                          <!-- รายการบริษัทฯSup -->
+                <div class="col-md-4 mb-4">
+                    <a href="{{route('admin.supply_all')}}" class="text-decoration-none">
+                        <div class="card shadow-sm h-100" style="border: 2px solid 	#C2B9F0; background-color: #F0EDFF;">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img src="{{ asset('supply.png') }}" alt="" width="120px">
+                                </div>
+                                <h5 class="card-title">รายการบริษัทฯ Supply</h5>
+                                <p class="card-text text-muted">สร้างและจัดการข้อมูล Supply</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
                 <!-- รายการฟอร์มเช็ครถ -->
                 <div class="col-md-4 mb-4">
                     <a href="#" class="text-decoration-none">

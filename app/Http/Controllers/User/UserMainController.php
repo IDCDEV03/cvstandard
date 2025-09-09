@@ -57,6 +57,27 @@ class UserMainController extends Controller
         return view('pages.user.VehiclesRegister', compact('car_type', 'province','car_brand'));
     }
 
+    public function veh_detail($id)
+    {
+
+        $user = Auth::user()->user_id;
+
+      $vehicle = DB::table('vehicles_detail')
+      ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+      ->select('vehicles_detail.*', 'vehicle_types.vehicle_type as veh_type_name')
+      ->where('vehicles_detail.car_id', '=', $id)
+      ->first();
+
+    $record = DB::table('chk_records')
+      ->join('forms', 'forms.form_id', '=', 'chk_records.form_id')
+      ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'forms.form_name', 'chk_records.veh_id')
+      ->orderBy('chk_records.created_at', 'DESC')
+      ->where('chk_records.user_id', $user)->get();
+
+    return view('pages.user.VehiclesDetail', ['id' => $id], compact('vehicle', 'record'));
+    }
+    
+
     public function veh_insert(Request $request)
     {
 
@@ -69,10 +90,7 @@ class UserMainController extends Controller
         if (empty($request->veh_brand)) {
             return redirect()->back()->with('error', 'กรุณาเลือกยี่ห้อรถ');
         }
-
-        
-
-
+       
         $veh_id = 'VEH-' . Str::upper(Str::random(9));
 
         $rawInput = $request->input('plate');

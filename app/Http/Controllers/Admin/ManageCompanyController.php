@@ -108,7 +108,7 @@ class ManageCompanyController extends Controller
         if ($tab == 'part1') {
 
             DB::table('company_details')
-                ->where('company_id', $company_id->company_code)
+                ->where('company_id', $company_id->user_id)
                 ->update([
                     'company_address' => $request->company_address,
                     'company_province' => $request->province,
@@ -116,7 +116,7 @@ class ManageCompanyController extends Controller
                 ]);
 
             DB::table('users')
-                ->where('company_code', $company_id->company_code)
+                ->where('user_id', $company_id->user_id)
                 ->update([
                     'name' => $request->company_name,
                     'email' => $request->company_email,
@@ -135,7 +135,7 @@ class ManageCompanyController extends Controller
             }
 
             DB::table('users')
-                ->where('company_code', $company_id->company_code)
+                ->where('user_id', $company_id->user_id)
                 ->update([
                     'username' => $request->company_user,
                     'updated_at' => Carbon::now(),
@@ -143,12 +143,94 @@ class ManageCompanyController extends Controller
             return redirect()->route('admin.cp_list')->with('success', 'บันทึกการแก้ไขสำเร็จ');
         } elseif ($tab == 'part3') {
             DB::table('users')
-                ->where('company_code', $company_id->company_code)
+                ->where('user_id', $company_id->company_code)
                 ->update([
                     'password' => Hash::make($request->password),
                     'updated_at' => Carbon::now(),
                 ]);
             return redirect()->route('admin.cp_list')->with('success', 'บันทึกการแก้ไขสำเร็จ');
+        }
+    }
+
+    public function SupplyAll()
+    {
+        $supply_list = DB::table('users')
+        ->select('users.*','company_details.company_name')
+        ->join('company_details','users.company_code','=','company_details.company_id')
+        ->where('users.role','supply')
+        ->get();
+
+         return view('pages.admin.SupplyAll', compact('supply_list'));
+    }
+
+    public function SupplyEdit($id)
+    {
+        $supply_data = DB::table('users')
+        ->join('supply_datas','users.user_id','=','supply_datas.sup_id')  
+        ->where('supply_datas.sup_id',$id)     
+        ->first();
+
+        $company_list = DB::table('users')
+        ->where('role','company')
+        ->where('user_status','1')
+        ->orderBy('name','ASC')
+        ->get();
+        
+        return view('pages.admin.SupplyEdit',['id'=>$id], compact('supply_data','company_list'));
+    }
+ 
+      public function SupplyUpdate(Request $request, $id, $tab)
+    {
+        $supply_id = DB::table('users')->where('user_id', $id)->first();
+
+        if ($tab == 'part1') {
+
+            DB::table('supply_datas')
+                ->where('sup_id', $supply_id->user_id)
+                ->update([
+                    'supply_name' => $request->supply_name,
+                    'supply_address' => $request->supply_address,
+                    'supply_phone' => $request->supply_phone,
+                    'company_code' => $request->company_code,
+                    'supply_email' => $request->supply_email,
+                    'updated_at' => Carbon::now(),
+                ]);
+
+            DB::table('users')
+                ->where('user_id', $supply_id->user_id)
+                ->update([
+                    'name' => $request->supply_name,
+                    'email' => $request->supply_email,
+                    'user_phone' => $request->supply_phone,
+                    'company_code' => $request->company_code,
+                    'updated_at' => Carbon::now(),
+                ]);
+            return redirect()->route('admin.supply_all')->with('success', 'บันทึกการแก้ไขสำเร็จ');
+        } elseif ($tab == 'part2') {
+
+            $usernameExists = DB::table('users')->where('username', $request->company_user)->exists();
+
+            if ($usernameExists) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['company_username' => 'Username นี้มีอยู่แล้ว กรุณาเลือกชื่ออื่น']);
+            }
+
+            DB::table('users')
+                ->where('user_id', $supply_id->user_id)
+                ->update([
+                    'username' => $request->company_user,
+                    'updated_at' => Carbon::now(),
+                ]);
+            return redirect()->route('admin.supply_all')->with('success', 'บันทึกการแก้ไขสำเร็จ');
+        } elseif ($tab == 'part3') {
+            DB::table('users')
+                ->where('user_id', $supply_id->user_id)
+                ->update([
+                    'password' => Hash::make($request->supply_password),
+                    'updated_at' => Carbon::now(),
+                ]);
+            return redirect()->route('admin.supply_all')->with('success', 'บันทึกการแก้ไขสำเร็จ');
         }
     }
 
@@ -223,7 +305,7 @@ class ManageCompanyController extends Controller
             'lastname' => '-',
             'user_status' => '1',
             'email' => $request->supply_email,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($request->supply_password),
             'user_phone' => $request->supply_phone,
             'role' => 'supply',
             'company_code' => $request->company_code,
@@ -235,5 +317,7 @@ class ManageCompanyController extends Controller
         return redirect()->route('admin.sup_list',['id'=>$request->company_code])->with('success', 'บันทึกสำเร็จ');
 
     }
+
+
 
 }

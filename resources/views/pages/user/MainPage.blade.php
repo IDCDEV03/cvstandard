@@ -1,4 +1,4 @@
-@section('title', 'ระบบปฏิบัติการพนักงานขับรถราชการ')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -30,7 +30,7 @@
                                                 @foreach ($vehicles as $item)
                                                     <tr>
                                                         <td> {{ $loop->iteration }} </td>
-                                                        <td> <a href="{{route('veh.detail',[$item->car_id])}}"> {{ $item->car_plate }} </a></td>
+                                                        <td> <a href="{{route('user.veh_detail',[$item->car_id])}}"> {{ $item->car_plate }} </a></td>
                                                         <td> {{ $item->vehicle_type }} </td>
                                                         <td> {{ thai_date($item->created_at) }} </td>
                                                     </tr>

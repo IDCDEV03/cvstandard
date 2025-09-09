@@ -1,4 +1,4 @@
-@section('title', 'ระบบปฏิบัติการพนักงานขับรถราชการ')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -9,7 +9,8 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb-main">
-                        <span class="fs-24 fw-bold breadcrumb-title">รายการตรวจรถ</span>
+                        <span class="fs-24 fw-bold breadcrumb-title">รายการตรวจรถ
+                        </span>
                     </div>
                 </div>
             </div>
@@ -21,20 +22,31 @@
                             <table class="table table-bordered" id="forms-table">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>ตรวจเมื่อ</th>
+                                        <th>#</th>  
                                         <th>ทะเบียนรถ</th>
-                                        <th>ประเภทรถ</th>
+                                        <th>รายละเอียด</th>
+                                        <th>ตรวจเมื่อ</th>
+                                      
+                                        <th>หมายเลขรถ</th>
                                        
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @foreach ($chk_list as $data)
+                                        
+                                  
                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <td>{{ $loop->iteration }}</td>
+                                     <td> {{$data->car_plate}} </td>
+                                     <td>
+                                        <a href="{{route('form_report',['rec'=>$data->record_id])}}" class="btn btn-xs btn-info btn-shadow-info">
+                                                       ผลการตรวจ
+                                                    </a>
+                                     </td>
+                                     <td>{{ thai_datetime($data->date_check) }}</td>
+                                     <td> {{$data->car_number_record}} </td>
                                     </tr>
+                                      @endforeach
                                 </tbody>
                             </table>
                         </div>

@@ -62,9 +62,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-
-            dd($user->role);
-
+        
             return match ($user->role) {
                 Role::Admin => redirect()->route('admin.dashboard'),
                 Role::Manager => redirect()->route('manager.dashboard'),
