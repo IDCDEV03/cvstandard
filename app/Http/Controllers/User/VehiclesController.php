@@ -29,7 +29,7 @@ class VehiclesController extends Controller
   public function veh_regis()
   {
 
-    if (!in_array(auth()->user()->role, [Role::User,Role::Staff,Role::Supply, Role::Manager, Role::Agency, Role::Admin])) {
+    if (!in_array(auth()->user()->role, [Role::User, Role::Staff, Role::Supply, Role::Manager, Role::Agency, Role::Admin])) {
       abort(403);
     }
 
@@ -187,9 +187,6 @@ class VehiclesController extends Controller
         'chk_records.created_at as date_check',
         'chk_records.form_id',
         'chk_records.record_id',
-        'chk_records.img_front',
-                'chk_records.img_beside',
-                'chk_records.img_overall',
         'chk_records.user_id as chk_user',
         'chk_records.agency_id as chk_agent'
       )
@@ -218,7 +215,7 @@ class VehiclesController extends Controller
 
     // 3. ดึงชื่อแบบฟอร์ม
     $forms = DB::table('forms')
-      ->select('form_name','form_code')
+      ->select('form_name', 'form_code')
       ->where('form_id', $record->form_id)
       ->first();
 
@@ -248,13 +245,150 @@ class VehiclesController extends Controller
       ->get()
       ->groupBy('item_id');
 
-      $company_datas = DB::table('supply_datas')
-      ->join('company_details','supply_datas.company_code','=','company_details.company_id')
-      ->where('supply_datas.sup_id',$inspector_data->sup_id)
+    $company_datas = DB::table('supply_datas')
+      ->join('company_details', 'supply_datas.company_code', '=', 'company_details.company_id')
+      ->where('supply_datas.sup_id', $inspector_data->sup_id)
       ->first();
 
 
-    return view('pages.local.FormReport', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images','inspector_data','company_datas'));
+    return view('pages.local.FormReport', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images', 'inspector_data', 'company_datas'));
+  }
+
+  public function Form_Image8($rec)
+  {
+
+    // 1. ดึงข้อมูลการตรวจรถ + ยานพาหนะ
+    $record = DB::table('chk_records')
+      ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+      ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+      ->select(
+        'vehicles_detail.*',
+        'vehicle_types.vehicle_type as veh_type_name',
+        'chk_records.created_at as date_check',
+        'chk_records.form_id',
+        'chk_records.record_id',
+        'chk_records.user_id as chk_user',
+        'chk_records.agency_id as chk_agent'
+      )
+      ->where('chk_records.record_id', $rec)
+      ->first();
+
+    if (!$record) {
+      return back()->with('error', 'ไม่พบข้อมูลการตรวจรถที่ต้องการ');
+    }
+
+    // 2. ดึงชื่อหน่วยงานที่ตรวจ 
+    $agent_name = DB::table('users')
+      ->where('user_id', $record->chk_agent)
+      ->first();
+
+    //ดึงข้อมูลช่างตรวจ
+    $inspector_data = DB::table('inspector_datas')
+      ->join('users', 'users.user_id', '=', 'inspector_datas.ins_id')
+      ->select(
+        'inspector_datas.*',
+        'users.user_id'
+      )
+      ->where('users.user_id', $record->chk_user)
+      ->first();
+
+
+    // 3. ดึงชื่อแบบฟอร์ม
+    $forms = DB::table('forms')
+      ->select('form_name', 'form_code')
+      ->where('form_id', $record->form_id)
+      ->first();
+
+    $company_datas = DB::table('supply_datas')
+      ->join('company_details', 'supply_datas.company_code', '=', 'company_details.company_id')
+      ->where('supply_datas.sup_id', $inspector_data->sup_id)
+      ->first();
+
+    //ดึงภาพประเมินรถ
+    $image8 = DB::table('vehicle_image_records')
+      ->where('record_id', $rec)
+      ->first();
+
+    return view('pages.local.FormImage8', compact('agent_name', 'record', 'forms', 'inspector_data', 'company_datas', 'image8'));
+  }
+
+  public function FormImage_Fail($rec)
+  {
+
+    $record = DB::table('chk_records')
+      ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+      ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+      ->select(
+        'vehicles_detail.*',
+        'vehicle_types.vehicle_type as veh_type_name',
+        'chk_records.created_at as date_check',
+        'chk_records.form_id',
+        'chk_records.record_id',     
+        'chk_records.user_id as chk_user',
+        'chk_records.agency_id as chk_agent'
+      )
+      ->where('chk_records.record_id', $rec)
+      ->first();
+
+    if (!$record) {
+      return back()->with('error', 'ไม่พบข้อมูลการตรวจรถที่ต้องการ');
+    }
+
+    // 2. ดึงชื่อหน่วยงานที่ตรวจ 
+    $agent_name = DB::table('users')
+      ->where('user_id', $record->chk_agent)
+      ->first();
+
+          // 5. ดึงผลการตรวจแยกตามหมวด
+    $results = DB::table('check_records_result')
+      ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
+      ->where('record_id', $rec)
+      ->whereIn('check_records_result.result_value', ['0', '2']) 
+      ->select(
+        'check_items.category_id',
+        'check_items.item_name',
+        'check_records_result.item_id',
+        'result_value',
+        'user_comment'
+      )
+      ->get()
+      ->groupBy('category_id');
+
+        // 4. ดึงรายการหมวดหมู่ที่เกี่ยวข้องกับแบบฟอร์ม
+    $categories = DB::table('check_categories')
+      ->where('form_id', $record->form_id)
+      ->orderBy('cates_no')
+      ->get();
+
+    // 6. ดึงภาพที่แนบในการตรวจ
+    $images = DB::table('check_result_images')
+      ->where('record_id', $rec)
+      ->get()
+      ->groupBy('item_id');
+
+    //ดึงข้อมูลช่างตรวจ
+    $inspector_data = DB::table('inspector_datas')
+      ->join('users', 'users.user_id', '=', 'inspector_datas.ins_id')
+      ->select(
+        'inspector_datas.*',
+        'users.user_id'
+      )
+      ->where('users.user_id', $record->chk_user)
+      ->first();
+
+
+    // 3. ดึงชื่อแบบฟอร์ม
+    $forms = DB::table('forms')
+      ->select('form_name', 'form_code')
+      ->where('form_id', $record->form_id)
+      ->first();
+
+    $company_datas = DB::table('supply_datas')
+      ->join('company_details', 'supply_datas.company_code', '=', 'company_details.company_id')
+      ->where('supply_datas.sup_id', $inspector_data->sup_id)
+      ->first();
+
+      return view('pages.local.FormImageFail', compact('agent_name', 'record', 'forms', 'inspector_data', 'company_datas', 'results','images','categories'));
   }
 
 

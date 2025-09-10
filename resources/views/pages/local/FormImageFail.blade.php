@@ -79,9 +79,10 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="mb-0 fs-20 fw-bold">รายงานการตรวจรถ</span>
-                          
-                                <a href="{{route('form_image8',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
-                                <a href="{{route('form_imagefail',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-danger">รูปถ่ายรถโม่ที่ต้องแก้ไข</a>
+                                <a href="{{ route('form_report', ['rec' => request()->rec]) }}"
+                                    class="btn btn-sm btn-outline-success">รายงานผลการประเมิน</a>
+                                          <a href="{{route('form_image8',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
+                             <a href="{{route('form_imagefail',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-danger">รูปถ่ายรถโม่ที่ต้องแก้ไข</a>
                                 <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
                                     <i class="fas fa-print"></i> พิมพ์
                                 </button>
@@ -89,18 +90,7 @@
                         </div>
                     </div>
 
-                    @php
-                        $ins_birth = $inspector_data->ins_birthyear;
 
-                        $year_en = $ins_birth - 543;
-                        $ins_age = date('Y') - $year_en;
-                        $userdata = DB::table('users')
-                            ->where('user_id', $record->chk_user)
-                            ->select('users.prefix', 'users.name', 'users.lastname', 'users.signature_image')
-                            ->first();
-
-                        $fullname = $userdata->prefix . $userdata->name . ' ' . $userdata->lastname;
-                    @endphp
                     <!-- print-->
                     <div id="print-area">
                         <div class="card mb-2 ">
@@ -114,21 +104,21 @@
                                         <td colspan="2" class="text-center">
                                             <span class="fw-bold fs-20 "> {{ $company_datas->company_name }}</span>
                                             <br>
-                                            <span class="fs-16">  {{ $forms->form_name }}</span>
+                                            <span class="fs-16"> {{ $forms->form_name }}</span>
                                         </td>
                                         <td width='20%' class="text-end">
                                             {{ $forms->form_code }}
-                                            
+
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4" class="table-light"><strong>บันทึก (Record Form) :</strong>
-                                          </td>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4"><strong>ข้อมูลเบื้องต้น</strong></td>
                                     </tr>
-                                   
+
                                     <tr>
                                         <td>
                                             <span class="fw-bold">ยี่ห้อ</span>
@@ -156,79 +146,57 @@
                                             <span class="fw-bold">ปีที่จดทะเบียน</span>
                                         </td>
                                         <td>
-                                            {{ $record->car_age }} 
+                                            {{ $record->car_age }}
                                         </td>
                                         <td class="fw-bold">บริษัทผู้ขนส่ง</td>
                                         <td> </td>
                                     </tr>
-                               
+
                                 </table>
-
-
-
-
-                                @foreach ($categories as $cat)
-                                    <span class="fs-18 fw-bold mt-4">{{ $cat->cates_no }}.
-                                        {{ $cat->chk_cats_name }}</span>
-
-                                    <table class="table table-bordered fixed-table mt-2 mb-4 report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>รายการตรวจประเมิน</th>
-                                                <th>ผลการประเมิน</th>
-                                                <th>สิ่งที่ตรวจพบ</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($results[$cat->category_id] ?? [] as $r)
+<label class="fw-bold fs-16">ภาพถ่ายรถโม่ที่ต้องแก้ไข</label>
+                                <table class="table table-bordered fixed-table mt-2 mb-4 report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>รายการตรวจประเมิน</th>
+                                            <th>ผลการประเมิน</th>
+                                            <th>สิ่งที่ตรวจพบ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($results ?? [] as $category_id => $items)
+                                            @foreach ($items as $r)
                                                 <tr>
                                                     <td class="text-left">{{ $r->item_name }}</td>
                                                     <td>
-                                                        @if ($r->result_value == '1')
+                                                       @if ($r->result_value == '1')
                                                             ผ่าน
                                                         @elseif($r->result_value == '0')
                                                             <span class="text-danger">ไม่ผ่าน</span>
                                                         @elseif($r->result_value == '2')
                                                             <span class="text-secondary"> ผ่าน แต่ต้องแก้ไขปรับปรุง
                                                             </span>
-                                                        @else
-                                                         <span > 
-                                                            {{ $r->result_value }}
-                                                            </span>
                                                         @endif
                                                     </td>
                                                     <td>{{ $r->user_comment }}</td>
-
                                                 </tr>
 
+                                                @if (!empty($images[$r->item_id]))
+                                                    <tr>
+                                                        <td colspan="3" class="text-center">
+                                                            @foreach ($images[$r->item_id] as $img)
+                                                                <img src="{{ asset($img->image_path) }}"
+                                                                    class="img-thumbnail" width="200px" alt="">
+                                                            @endforeach
+                                                        </td>
+                                                    </tr>
+                                                @endif
                                             @endforeach
-                                        </tbody>
-                                    </table>
-                                @endforeach
-
-                                <table class="table table-bordered report-table">
-                                    <tr>                                    
-                                        <td class="table-light">ผลการตรวจสอบ</td>
-                                    </tr>
-                                    <tr>                                        
-                                        <td>
-
-                                            <!--signature-->
-                                            @if (empty($userdata->signature_image))
-                                                <div class="text-center text-dark mt-40">
-                                                    .................................................</div>
-                                            @else
-                                                <div class="text-center"><img src="{{ asset($userdata->signature_image) }}"
-                                                        width="150px" alt=""></div>
-                                                <div class="text-center">..........................................</div>
-                                            @endif
-                                            <div class="text-center text-dark fs-16 mt-2">({{ $fullname }})</div>
-                                            <div class="text-center text-dark fs-16 mt-2">ผู้ตรวจสอบ</div>
-
-
-                                        </td>
-                                    </tr>
+                                        @endforeach
+                                    </tbody>
                                 </table>
+
+
+
 
                                 <div class="text-end text-dark fs-14 mt-2">{{ thai_datetime($record->date_check) }}</div>
 

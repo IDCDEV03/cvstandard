@@ -94,6 +94,8 @@ Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,a
     Route::get('/repair-notice', [VehiclesController::class, 'repair_notice'])->name('veh.notice');
 
     Route::get('/form-report/{rec}', [VehiclesController::class, 'Form_report'])->name('form_report');
+     Route::get('/form-image/{rec}', [VehiclesController::class, 'Form_Image8'])->name('form_image8');
+      Route::get('/form-image-fail/{rec}', [VehiclesController::class, 'FormImage_Fail'])->name('form_imagefail');
 });
 
 Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {

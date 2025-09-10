@@ -79,8 +79,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="mb-0 fs-20 fw-bold">รายงานการตรวจรถ</span>
-                          
-                                <a href="{{route('form_image8',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
+                                       <a href="{{route('form_report',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-secondary">รายงานผลการประเมิน</a>
                                 <a href="{{route('form_imagefail',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-danger">รูปถ่ายรถโม่ที่ต้องแก้ไข</a>
                                 <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
                                     <i class="fas fa-print"></i> พิมพ์
@@ -89,18 +88,7 @@
                         </div>
                     </div>
 
-                    @php
-                        $ins_birth = $inspector_data->ins_birthyear;
-
-                        $year_en = $ins_birth - 543;
-                        $ins_age = date('Y') - $year_en;
-                        $userdata = DB::table('users')
-                            ->where('user_id', $record->chk_user)
-                            ->select('users.prefix', 'users.name', 'users.lastname', 'users.signature_image')
-                            ->first();
-
-                        $fullname = $userdata->prefix . $userdata->name . ' ' . $userdata->lastname;
-                    @endphp
+              
                     <!-- print-->
                     <div id="print-area">
                         <div class="card mb-2 ">
@@ -164,71 +152,49 @@
                                
                                 </table>
 
-
-
-
-                                @foreach ($categories as $cat)
-                                    <span class="fs-18 fw-bold mt-4">{{ $cat->cates_no }}.
-                                        {{ $cat->chk_cats_name }}</span>
-
-                                    <table class="table table-bordered fixed-table mt-2 mb-4 report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>รายการตรวจประเมิน</th>
-                                                <th>ผลการประเมิน</th>
-                                                <th>สิ่งที่ตรวจพบ</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($results[$cat->category_id] ?? [] as $r)
-                                                <tr>
-                                                    <td class="text-left">{{ $r->item_name }}</td>
-                                                    <td>
-                                                        @if ($r->result_value == '1')
-                                                            ผ่าน
-                                                        @elseif($r->result_value == '0')
-                                                            <span class="text-danger">ไม่ผ่าน</span>
-                                                        @elseif($r->result_value == '2')
-                                                            <span class="text-secondary"> ผ่าน แต่ต้องแก้ไขปรับปรุง
-                                                            </span>
-                                                        @else
-                                                         <span > 
-                                                            {{ $r->result_value }}
-                                                            </span>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $r->user_comment }}</td>
-
-                                                </tr>
-
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @endforeach
-
-                                <table class="table table-bordered report-table">
-                                    <tr>                                    
-                                        <td class="table-light">ผลการตรวจสอบ</td>
-                                    </tr>
-                                    <tr>                                        
+                                 <table class="table table-bordered report-table">
+                                    <tr  class="text-center">
                                         <td>
-
-                                            <!--signature-->
-                                            @if (empty($userdata->signature_image))
-                                                <div class="text-center text-dark mt-40">
-                                                    .................................................</div>
-                                            @else
-                                                <div class="text-center"><img src="{{ asset($userdata->signature_image) }}"
-                                                        width="150px" alt=""></div>
-                                                <div class="text-center">..........................................</div>
-                                            @endif
-                                            <div class="text-center text-dark fs-16 mt-2">({{ $fullname }})</div>
-                                            <div class="text-center text-dark fs-16 mt-2">ผู้ตรวจสอบ</div>
-
-
+                                            <img src="{{asset('upload/vehicle_images/'.$image8->image1)}}" alt="" class="img-fluid">
+                                            <label class="mt-2">1. ด้านหน้ารถ</label>
                                         </td>
+                                         <td> <img src="{{asset('upload/vehicle_images/'.$image8->image2)}}" alt="" class="img-fluid">
+                                         <label class="mt-2">2. หลังรถเยื้องไปทางซ้าย</label>
+                                        </td>
+                                          <td>
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image3)}}" alt="" class="img-fluid">
+                                              <label class="mt-2">3. หลังรถเยื้องไปทางขวา</label>
+                                          </td>
+                                           <td>
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image4)}}" alt="" class="img-fluid">
+                                              <label class="mt-2">4. ด้านหลังรถเฟืองท้าย</label>
+                                           </td>
                                     </tr>
-                                </table>
+                                    <tr  class="text-center">
+                                        <td> 
+                                            <img src="{{asset('upload/vehicle_images/'.$image8->image5)}}" alt="" class="img-fluid">
+                                             <label class="mt-2">5. ในห้องโดยสารฝั่งคนขับ</label>
+                                        </td>
+                                         <td>
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image6)}}" alt="" class="img-fluid">
+                                              <label class="mt-2">6. เฟืองเกียร์หมุนโม่</label>
+                                         </td>
+                                          <td>
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image7)}}" alt="" class="img-fluid">
+                                              <label class="mt-2">7. ลูกหมากคันชักคันส่ง</label>
+                                          </td>
+                                           <td>
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image8)}}" alt="" class="img-fluid">
+                                              <label class="mt-2">8. เพลาส่งกำลัง</label>
+                                           </td>
+                                    </tr>
+                                 </table>
+
+
+
+
+
+                               
 
                                 <div class="text-end text-dark fs-14 mt-2">{{ thai_datetime($record->date_check) }}</div>
 
