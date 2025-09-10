@@ -44,7 +44,7 @@ class ManageCompanyController extends Controller
             $extension = $file->getClientOriginalExtension();
             $newName = Carbon::now()->format('Ymd_His') . '_' . $comp_id . '.' . $extension;
             $file->move($upload_location, $newName);
-            $fileName = $newName;
+            $fileName = $upload_location.$newName;
         }
 
         DB::table('company_details')->insert([
@@ -68,11 +68,12 @@ class ManageCompanyController extends Controller
             'lastname' => '-',
             'user_status' => '1',
             'email' => $request->company_email,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($request->company_password),
             'user_phone' => $request->company_phone,
             'role' => 'company',
             'company_code' => $comp_id,
             'agency_id' => '5',
+            'logo_agency' => $fileName,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
@@ -279,7 +280,7 @@ class ManageCompanyController extends Controller
             $extension = $file->getClientOriginalExtension();
             $newName = Carbon::now()->format('Ymd_His') . '_' . $sup_id . '.' . $extension;
             $file->move($upload_location, $newName);
-            $fileName = $newName;
+            $fileName = $upload_location.$newName;
         }
 
 
@@ -310,6 +311,7 @@ class ManageCompanyController extends Controller
             'role' => 'supply',
             'company_code' => $request->company_code,
             'agency_id' => '5',
+            'logo_agency' => $fileName,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

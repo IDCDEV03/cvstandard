@@ -75,8 +75,7 @@
                             <div class="row">
                                    <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label>เลขที่ใบขับขี่<span
-                                                    class="text-danger">*</span></label>
+                                        <label>เลขที่ใบขับขี่</label>
                                         <input type="text" name="dl_number" class="form-control">
                                     </div>
                                 </div>
@@ -91,8 +90,7 @@
                                <div class="row">
                                    <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label>ปี พ.ศ. เกิด<span
-                                                    class="text-danger">*</span></label>
+                                        <label>ปี พ.ศ. เกิด</label>
                                         <input type="text" name="ins_birthyear" class="form-control">
                                     </div>
                                 </div>

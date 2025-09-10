@@ -110,8 +110,8 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
 
     //เริ่มตรวจ
     Route::get('/check/start/{id}', [UserMainController::class, 'start_check'])->name('user.chk_start');
-
-    Route::POST('/chk/insert/step1/{id}', [UserMainController::class, 'insert_step1'])->name('user.insert1');
+Route::POST('/chk-insert/new1/{id}', [UserMainController::class, 'insert_new1'])->name('user.insert_new1');
+    //Route::POST('/chk/insert/step1/{id}', [UserMainController::class, 'insert_step1'])->name('user.insert1');
 
     Route::get('/check/step2/{rec}/{cats}', [UserMainController::class, 'chk_step2'])->name('user.chk_step2');
     Route::POST('/check-store/step2/{record_id}/{category_id}', [UserMainController::class, 'chk_insert_step2'])->name('user.chk_insert_step2');
@@ -184,9 +184,12 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
     // Route สำหรับ supply
-     Route::get('/home', [PageController::class, 'home'])->name('supply.home');
+    Route::get('/home', [PageController::class, 'home'])->name('supply.home');
 
-
+    //CRUD_Vehicles
+    Route::get('/create_veh', [SupplyMainController::class, 'Vehicles_Create'])->name('supply.new_veh');
+    Route::POST('/store-veh', [SupplyMainController::class, 'VehiclesInsert'])->name('supply.veh_store');
+     Route::get('/list-veh', [SupplyMainController::class, 'VehiclesList'])->name('supply.veh_list');
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {

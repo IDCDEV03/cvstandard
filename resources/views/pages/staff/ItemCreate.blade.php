@@ -60,8 +60,8 @@
                                         <div class="mb-2">
                                             <label>ประเภทการตรวจ</label>
                                             <select name="item_type[]" class="form-select" required>
-                                                <option value="1">แบบตัวเลือก (ผ่าน/ไม่ผ่าน)</option>
-                                                <option value="2" selected>แบบตัวเลือก (ปกติ/ปรับปรุง)</option>
+                                                <option value="1" selected>แบบตัวเลือก (ผ่าน/ไม่ผ่าน)</option>
+                                                <option value="2" >แบบตัวเลือก (ปกติ/ปรับปรุง)</option>
                                                 <option value="3">แบบกรอกข้อความ</option>
                                                 <option value="4">แบบเลือกวันที่</option>
                                             </select>
@@ -148,8 +148,8 @@
             <div class="mb-2">
                 <label>ประเภทการตรวจ</label>
                 <select name="item_type[]" class="form-select" required>
-                     <option value="1">แบบตัวเลือก (ผ่าน/ไม่ผ่าน)</option>
-                        <option value="2" selected>แบบตัวเลือก (ปกติ/ปรับปรุง)</option>
+                     <option value="1" selected>แบบตัวเลือก (ผ่าน/ไม่ผ่าน)</option>
+                        <option value="2" >แบบตัวเลือก (ปกติ/ปรับปรุง)</option>
                         <option value="3">แบบกรอกข้อความ</option>
                         <option value="4">แบบเลือกวันที่</option>
                 </select>

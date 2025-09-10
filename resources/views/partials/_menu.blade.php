@@ -250,7 +250,21 @@
              <li>
                  <a href="{{ route('supply.home') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
-                     <span class="menu-text">หน้าหลัก</span>
+                     <span class="menu-text">รถที่ตรวจแล้ว</span>
+                 </a>
+             </li>
+
+              <li>
+                 <a href="{{ route('supply.new_veh') }}" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">ลงทะเบียนรถ</span>
+                 </a>
+             </li>
+
+                <li>
+                 <a href="{{ route('supply.veh_list') }}" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">รายการรถ</span>
                  </a>
              </li>
 

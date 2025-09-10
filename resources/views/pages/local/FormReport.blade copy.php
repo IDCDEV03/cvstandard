@@ -79,8 +79,6 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="mb-0 fs-20 fw-bold">รายงานการตรวจรถ</span>
-                                <a href="" class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
-                                <a href="" class="btn btn-sm btn-outline-danger">รูปถ่ายรถโม่ที่ต้องแก้ไข</a>
                                 <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
                                     <i class="fas fa-print"></i> พิมพ์
                                 </button>
@@ -106,28 +104,40 @@
                             <div class="card-body">
                                 <table class="table table-bordered report-table">
                                     <tr>
-                                        <td width='20%'>
-                                            <img src="{{ asset($company_datas->company_logo) }}" width="180px"
+                                        <td>
+                                            <img src="{{ asset('logo/' . $company_datas->company_logo) }}" width="150px"
                                                 alt="">
                                         </td>
-                                        <td colspan="2" class="text-center">
+                                        <td colspan="2">
                                             <span class="fw-bold fs-20 "> {{ $company_datas->company_name }}</span>
-                                            <br>
-                                            <span class="fs-16">  {{ $forms->form_name }}</span>
                                         </td>
-                                        <td width='20%' class="text-end">
+                                        <td>
                                             {{ $forms->form_code }}
-                                            
+                                            <br>
+                                            วันที่ตรวจ {{ thai_datetime($record->date_check) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4" class="table-light"><strong>บันทึก (Record Form) :</strong>
-                                          </td>
+                                            {{ $forms->form_name }}</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="4"><strong>ข้อมูลเบื้องต้น</strong></td>
+                                        <td colspan="4"><strong>ส่วนที่ 1</strong> ข้อมูลเบื้องต้น</td>
                                     </tr>
-                                   
+                                    <tr>
+                                        <td class="fw-bold">ชื่อผู้ขับ</td>
+                                        <td> {{ $inspector_data->ins_prefix }} {{ $inspector_data->ins_name }}
+                                            {{ $inspector_data->ins_lastname }}
+                                        </td>
+                                        <td class="fw-bold">อายุ</td>
+                                        <td>{{ $ins_age }} ปี</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">ประสบการณ์ผู้ขับขี่</td>
+                                        <td>{{ $inspector_data->ins_experience }} ปี</td>
+                                        <td class="fw-bold">หน่วยงาน/สังกัด</td>
+                                        <td>{{ $agent_name->name }}</td>
+                                    </tr>
                                     <tr>
                                         <td>
                                             <span class="fw-bold">ยี่ห้อ</span>
@@ -135,7 +145,7 @@
                                         <td>
                                             {{ $record->car_brand }}
                                         </td>
-                                        <td class="fw-bold">รุ่นรถ</td>
+                                        <td class="fw-bold">รุ่น</td>
                                         <td> {{ $record->car_model }} </td>
                                     </tr>
                                     <tr>
@@ -145,22 +155,40 @@
                                         <td>
                                             {{ $record->car_plate }}
                                         </td>
-                                        <td class="fw-bold">หมายเลขข้างรถ</td>
+                                        <td class="fw-bold">หมายเลขรถ</td>
                                         <td> {{ $record->car_number_record }} </td>
                                     </tr>
 
                                     </tr>
                                     <tr>
                                         <td>
-                                            <span class="fw-bold">ปีที่จดทะเบียน</span>
+                                            <span class="fw-bold">อายุการใช้งาน</span>
                                         </td>
                                         <td>
-                                            {{ $record->car_age }} 
+                                            {{ $record->car_age }} ปี
                                         </td>
-                                        <td class="fw-bold">บริษัทผู้ขนส่ง</td>
-                                        <td> </td>
+                                        <td class="fw-bold">ป้ายภาษีประจำปี</td>
+                                        <td> {{ $record->car_tax }} </td>
                                     </tr>
-                               
+
+                                    <tr>
+                                        <td>
+                                            <span class="fw-bold">ประกันภัย</span>
+                                        </td>
+                                        <td>
+                                            {{ $record->car_insure }}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="4" class="table-light"><strong>ส่วนที่ 2</strong> รายงาน
+                                            {{ $forms->form_name }}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">ประเภทรถ {{ $record->veh_type_name }}</td>
+                                    </tr>
+
                                 </table>
 
 
@@ -184,15 +212,11 @@
                                                     <td class="text-left">{{ $r->item_name }}</td>
                                                     <td>
                                                         @if ($r->result_value == '1')
-                                                            ผ่าน
+                                                            ปกติ
                                                         @elseif($r->result_value == '0')
-                                                            <span class="text-danger">ไม่ผ่าน</span>
+                                                            <span class="text-danger">ไม่สามารถใช้งานได้</span>
                                                         @elseif($r->result_value == '2')
-                                                            <span class="text-secondary"> ผ่าน แต่ต้องแก้ไขปรับปรุง
-                                                            </span>
-                                                        @else
-                                                         <span > 
-                                                            {{ $r->result_value }}
+                                                            <span class="text-secondary"> ไม่ปกติ แต่ยังสามารถใช้งานได้
                                                             </span>
                                                         @endif
                                                     </td>
@@ -200,16 +224,37 @@
 
                                                 </tr>
 
+                                                @if (isset($images[$r->item_id]))
+                                                    <tr>
+                                                        <td colspan="3" class="text-center">
+                                                            @foreach ($images[$r->item_id] as $img)
+                                                                <img src="{{ asset($img->image_path) }}"
+                                                                    class="img-thumbnail" width="200px" alt="">
+                                                            @endforeach
+                                                        </td>
+                                                @endif
+                                                </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 @endforeach
 
                                 <table class="table table-bordered report-table">
-                                    <tr>                                    
-                                        <td class="table-light">ผลการตรวจสอบ</td>
+                                    <tr>
+                                        <td colspan="3" class="table-light" style="width: 50%;"><strong>ส่วนที่
+                                                3</strong> สภาพรถปัจจุบัน</td>
+                                        <td class="table-light"><strong>ส่วนที่ 4</strong> ผลการตรวจสอบ</td>
                                     </tr>
-                                    <tr>                                        
+                                    <tr>
+                                        <td>
+                                            <img src="{{ asset($record->img_front) }}" alt="" width="150px">
+                                        </td>
+                                        <td>
+                                            <img src="{{ asset($record->img_beside) }}" alt="" width="150px">
+                                        </td>
+                                        <td>
+                                            <img src="{{ asset($record->img_overall) }}" alt="" width="150px">
+                                        </td>
                                         <td>
 
                                             <!--signature-->
@@ -221,8 +266,8 @@
                                                         width="150px" alt=""></div>
                                                 <div class="text-center">..........................................</div>
                                             @endif
-                                            <div class="text-center text-dark fs-16 mt-2">({{ $fullname }})</div>
-                                            <div class="text-center text-dark fs-16 mt-2">ผู้ตรวจสอบ</div>
+                                            <div class="text-center text-dark fs-18 mt-2">({{ $fullname }})</div>
+                                            <div class="text-center text-dark fs-18 mt-2">ผู้ตรวจรถ</div>
 
 
                                         </td>

@@ -25,7 +25,7 @@
                                 <div class="alert alert-danger fs-20 fw-bold">{{ session('error') }}</div>
                             @endif
 
-                            <form action="{{ route('user.insert1', request()->id) }}" method="POST"
+                            <form action="{{ route('user.insert_new1', request()->id) }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
 
@@ -57,55 +57,50 @@
                                     </div>
                                 </div>
                                 <div class="border-top my-3"></div>
+                                <div class=" alert alert-secondary " role="alert">
+                                    <div class="alert-content">
+                                        <span class="fs-20 fw-bold">รูปถ่ายประเมินรอบคัน (8 ภาพ)</span>
+                                    </div>
+                                </div>
+                                 <a href="#" data-bs-toggle="modal" data-bs-target="#exampleImageModal" class="ms-2 fs-14 btn btn-sm btn-secondary mt-2 mb-2">
+                ดูตัวอย่างภาพ
+            </a>
+                                @php
+                                    $imageFields = [
+                                        'image1' => '1. ด้านหน้ารถ',
+                                        'image2' => '2. หลังรถเยื้องไปทางซ้าย',
+                                        'image3' => '3. หลังรถเยื้องไปทางขวา',
+                                        'image4' => '4. ด้านหลังรถเฟืองท้าย',
+                                        'image5' => '5. ในห้องโดยสารฝั่งคนขับ',
+                                        'image6' => '6. เฟืองเกียร์หมุนโม่',
+                                        'image7' => '7. ลูกหมากคันชักคันส่ง',
+                                        'image8' => '8. เพลาส่งกำลัง',
+                                    ];
+                                @endphp
 
-                                <div class="form-group row">
-                                    <div class="col-sm-2 d-flex aling-items-center">
-                                        <label for="front_image"
-                                            class="col-form-label color-dark fs-18 fw-bold align-center">ภาพหน้ารถ<span
-                                                class="text-danger">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" type="file" name="front_image" id="front_image"
-                                            accept="image/*" onchange="previewImage(this, 'preview_front')" required>
-                                        <img id="preview_front" src="#" alt="Preview" class="img-thumbnail mt-2"
-                                            style="display: none; max-width: 200px;">
-                                    </div>
-                                </div>
- <div class="border-top my-3"></div>
-                                <div class="form-group row">
-                                    <div class="col-sm-2 d-flex aling-items-center">
-                                        <label for="front_image"
-                                            class="col-form-label color-dark fs-18 fw-bold align-center">ภาพข้างรถ<span
-                                                class="text-danger">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" type="file" name="side_image" id="side_image"
-                                            accept="image/*" onchange="previewImage(this, 'preview_side')" required>
-                                        <img id="preview_side" src="#" alt="Preview" class="img-thumbnail mt-2"
-                                            style="display: none; max-width: 200px;">
-                                    </div>
-                                </div>
- <div class="border-top my-3"></div>
-                                <div class="form-group row">
-                                    <div class="col-sm-2 d-flex aling-items-center">
-                                        <label for="front_image"
-                                            class="col-form-label color-dark fs-18 fw-bold align-center">สภาพโดยรวม<span
-                                                class="text-danger">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" type="file" name="overall_image" id="overall_image"
-                                            accept="image/*" onchange="previewImage(this, 'preview_overall')" required>
-                                        <img id="preview_overall" src="#" alt="Preview" class="img-thumbnail mt-2"
-                                            style="display: none; max-width: 200px;">
-                                    </div>
-                                </div>
 
+                                @foreach ($imageFields as $field => $label)
+                                    <div class="form-group row mb-3">
+                                        <div class="col-sm-3 d-flex align-items-center">
+                                            <label for="{{ $field }}"
+                                                class="col-form-label color-dark fs-18 fw-bold">{{ $label }}</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="file" name="{{ $field }}"
+                                                id="{{ $field }}" accept="image/*"
+                                                onchange="previewImage(this, 'preview_{{ $field }}')" required>
+                                            <img id="preview_{{ $field }}" src="#" alt="Preview"
+                                                class="img-thumbnail mt-2" style="display: none; max-width: 200px;">
+                                        </div>
+                                    </div>
+                                @endforeach
 
 
                                 <div class="border-top my-3"></div>
 
-                                <button type="submit" class="btn btn-secondary fs-20">เริ่มการตรวจ &nbsp;<i
+                                <button type="submit" class="btn btn-block btn-primary fs-20">เริ่มการตรวจ &nbsp;<i
                                         class="fas fa-arrow-right"></i> </button>
+
                             </form>
 
                         </div>
@@ -114,22 +109,43 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="exampleImageModal" tabindex="-1" aria-labelledby="exampleImageLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleImageLabel">ตัวอย่างภาพประเมินรอบคัน</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="{{ asset('example_8.png') }}" alt="ตัวอย่างภาพหน้ารถ" class="img-fluid rounded">
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
     <script>
         function previewImage(input, previewId) {
             const file = input.files[0];
+            const preview = document.getElementById(previewId);
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const img = document.getElementById(previewId);
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                }
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
                 reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
             }
         }
+
+
 
 
         function updateClock() {

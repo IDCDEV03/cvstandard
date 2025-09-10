@@ -21,8 +21,6 @@ class StaffController extends Controller
 
     public function VehiclesList()
     {
-
-
         $veh_list = DB::table('vehicles_detail')
             ->select('vehicles_detail.car_id', 'vehicles_detail.car_plate', 'vehicles_detail.car_brand', 'vehicles_detail.car_model', 'users.company_code', 'users.name', 'vehicle_types.vehicle_type', 'vehicles_detail.status', 'vehicles_detail.created_at')
             ->leftjoin('users', 'users.company_code', '=', 'vehicles_detail.company_code')
