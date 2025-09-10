@@ -48,7 +48,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select name="form_id" id="select-alerts2" class="form-control " required>
-                                            <option value="0" selected disabled>-- กรุณาเลือก --</option>
+                                            <option value="JOM3GBDG" selected>-เอกสารตรวจสอบความปลอดภัยเพื่อขึ้นทะเบียนรถโม่</option>
                                             @foreach ($forms as $form)
                                                 <option value="{{ $form->form_id }}" class="fs-18">{{ $form->form_name }}
                                                 </option>
