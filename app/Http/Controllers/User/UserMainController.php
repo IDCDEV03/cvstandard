@@ -72,7 +72,9 @@ class UserMainController extends Controller
             ->join('forms', 'forms.form_id', '=', 'chk_records.form_id')
             ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'forms.form_name', 'chk_records.veh_id')
             ->orderBy('chk_records.created_at', 'DESC')
-            ->where('chk_records.user_id', $user)->get();
+            ->where('chk_records.user_id', $user)
+            ->where('chk_records.veh_id',$id)
+            ->get();
 
         return view('pages.user.VehiclesDetail', ['id' => $id], compact('vehicle', 'record'));
     }
