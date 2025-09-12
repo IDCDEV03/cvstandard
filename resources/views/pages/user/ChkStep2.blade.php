@@ -49,7 +49,7 @@
                                             </select>
                                             <textarea name="user_comment[{{ $item->id }}]" class="form-control mt-2"
                                                 placeholder="ความคิดเห็นเพิ่มเติม (ถ้ามี)"></textarea>
-                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 3 ภาพ)</label>
+                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
                                             <input type="file" name="item_images[{{ $item->id }}][]"
                                                 class="form-control image-input-multi" multiple accept="image/*">
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
@@ -63,13 +63,13 @@
                                             </select>
                                             <textarea name="user_comment[{{ $item->id }}]" class="form-control mt-2"
                                                 placeholder="ความคิดเห็นเพิ่มเติม (ถ้ามี)"></textarea>
-                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 3 ภาพ)</label>
+                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
                                             <input type="file" name="item_images[{{ $item->id }}][]"
                                                 class="form-control image-input-multi" multiple accept="image/*">
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '3')
                                             <textarea name="item_result[{{ $item->id }}]" class="form-control mt-2"></textarea>
-                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 3 ภาพ)</label>
+                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
                                             <input type="file" name="item_images[{{ $item->id }}][]"
                                                 class="form-control image-input-multi" multiple accept="image/*">
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
@@ -118,8 +118,8 @@
                 previewContainer.innerHTML = '';
 
                 const files = this.files;
-                if (files.length > 3) {
-                    alert('ไม่สามารถอัปโหลดได้เกิน 3 รูป');
+                if (files.length > 10) {
+                    alert('ไม่สามารถอัปโหลดได้เกิน 10 รูป');
                     this.value = '';
                     return;
                 }
