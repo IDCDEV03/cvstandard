@@ -28,6 +28,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Logo</th>
                                     <th>ชื่อ</th>
                                     <th>สถานะ</th>
                                     <th>วันที่เพิ่ม</th>
@@ -38,6 +39,17 @@
                                 @foreach ($company_list as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>
+
+                                               @if (empty($item->logo_agency))
+                                                            <img src="{{ asset('upload/No_Image.jpg') }}"
+                                                                class="img-thumbnail" width="100px" alt="">
+                                                        @else
+                                                            <img src="{{ asset($item->logo_agency) }}" class="img-thumbnail"
+                                                               width="150px">
+                                                        @endif
+
+                                        </td>
                                         <td> 
                                             <a href="{{route('admin.sup_list',['id'=>$item->company_code])}}">
                                             {{ $item->name }} </a>

@@ -37,11 +37,17 @@
                                         <a class="nav-link" id="tab-v-3-tab" data-bs-toggle="tab" href="#tab-v-3"
                                             role="tab" aria-selected="false">เปลี่ยนรหัสผ่าน</a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="tab-v-4-tab" data-bs-toggle="tab" href="#tab-v-4"
+                                            role="tab" aria-selected="false">เปลี่ยน Logo</a>
+                                    </li>
                                 </ul>
                                 <div class="tab-content">
                                     <div class="tab-pane fade show active" id="tab-v-1" role="tabpanel"
                                         aria-labelledby="tab-v-1-tab">
-                                        <form action="{{ route('admin.cp_update', ['id' => request()->id,'tab'=>'part1']) }}" method="POST">
+                                        <form
+                                            action="{{ route('admin.cp_update', ['id' => request()->id, 'tab' => 'part1']) }}"
+                                            method="POST">
                                             @csrf
 
                                             @foreach ($company_detail as $data)
@@ -57,11 +63,17 @@
                                                 </div>
 
 
-                                                <div class="mb-3">
-                                                    <label>จังหวัด <span class="text-danger">*</span></label>
-                                                    <input type="text" name="province" class="form-control"
-                                                        value="{{ $data->company_province }}">
-                                                </div>
+                        <div class="mb-3">
+                            <label>จังหวัด <span class="text-danger">*</span></label>
+                              <select name="company_province" id="select-alerts2" class="form-control ">
+                                    <option value="{{ $data->company_province }}" selected>-{{ $data->company_province }}</option>
+                                    @foreach ($province as $item)
+                                        <option value="{{ $item->name_th }}">{{ $item->name_th }}</option>
+                                    @endforeach
+                                </select>
+
+                           
+                        </div>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="mb-3">
@@ -85,32 +97,95 @@
                                         </form>
                                     </div>
                                     <div class="tab-pane fade" id="tab-v-2" role="tabpanel" aria-labelledby="tab-v-2-tab">
-                                            <form action="{{ route('admin.cp_update', ['id' => request()->id,'tab'=>'part2']) }}" method="POST">
+                                        <form
+                                            action="{{ route('admin.cp_update', ['id' => request()->id, 'tab' => 'part2']) }}"
+                                            method="POST">
                                             @csrf
-                                        <div class="mb-3 mt-3">
-                                            <label class="mb-3">กำหนด Username ใหม่</label>
-                                            <input type="text" name="company_user" id="company_user"
-                                                class="form-control">
-                                            <div id="username-alert" class="alert alert-danger mt-2" style="display: none;">
+                                             <div class="mb-3">
+                                                <label>Username ปัจจุบัน </label>
+                                                  <input type="text" class="form-control"
+                                                    value="{{$company_logo->username}}" readonly disabled>
+                                              </div>
+                                            <div class="mb-3 mt-3">
+                                                <label class="mb-1">กำหนด Username ใหม่</label>
+                                                <br>
+                                                  <span class="fs-12 text-danger">*หากไม่เปลี่ยน ไม่ต้องกรอก</span>
+                                                <input type="text" name="company_user" id="company_user"
+                                                    class="form-control">
+                                                <div id="username-alert" class="alert alert-danger mt-2"
+                                                    style="display: none;">
+                                                </div>
                                             </div>
-                                        </div>
-                                          <div class="border-top my-3"></div>
-                                              <button type="submit"
+                                            <div class="border-top my-3"></div>
+                                            <button type="submit"
                                                 class="fs-18 btn btn-block btn-secondary">บันทึกการแก้ไข</button>
                                         </form>
                                     </div>
 
-                                    <div class="tab-pane fade" id="tab-v-3" role="tabpanel" aria-labelledby="tab-v-3-tab">
-                                           <form action="{{ route('admin.cp_update', ['id' => request()->id,'tab'=>'part3']) }}" method="POST">
+                                    <div class="tab-pane fade" id="tab-v-3" role="tabpanel"
+                                        aria-labelledby="tab-v-3-tab">
+                                        <form
+                                            action="{{ route('admin.cp_update', ['id' => request()->id, 'tab' => 'part3']) }}"
+                                            method="POST">
                                             @csrf
-                                        <div class="mb-3">
-                                            <label class="mb-3">กำหนด Password ใหม่</label>
-                                            <input type="text" name="company_password" class="form-control">
-                                        </div>
-                                          <div class="border-top my-3"></div>
+                                            <div class="mb-3">
+                                                <label class="mb-1">กำหนด Password ใหม่</label>
+                                                  <br>
+                                                  <span class="fs-12 text-danger">*หากไม่เปลี่ยน ไม่ต้องกรอก</span>
+                                                <input type="text" name="company_password" class="form-control">
+                                            </div>
                                             <div class="border-top my-3"></div>
-                                              <button type="submit"
+                                            <div class="border-top my-3"></div>
+                                            <button type="submit"
                                                 class="fs-18 btn btn-block btn-secondary">บันทึกการแก้ไข</button>
+                                        </form>
+                                    </div>
+
+
+                                    <div class="tab-pane fade" id="tab-v-4" role="tabpanel"
+                                        aria-labelledby="tab-v-4-tab">
+                                        <form
+                                            action="{{ route('admin.cp_update', ['id' => request()->id, 'tab' => 'part4']) }}"
+                                            method="POST" enctype="multipart/form-data">
+                                            @csrf
+
+                                            <div class="mb-3">
+                                                <label class="mb-3">Logo ปัจจุบัน</label>
+                                                <br>
+                                                @if ($company_logo->logo_agency)
+                                                    <img src="{{ asset($company_logo->logo_agency) }}" alt="old image"
+                                                        width="200" class="img-thumbnail">
+                                                @else
+                                                    <p class="text-muted">ยังไม่มีรูปภาพ</p>
+                                                @endif
+                                            </div>
+
+                                            <div class="border-top my-3"></div>
+
+                                            <div class="mb-3">
+                                                <label for="image" class="form-label">อัปโหลด logo ใหม่</label>
+                                                <input type="file" name="logo_agency" id="image"
+                                                    class="form-control" accept="image/*">
+                                                @error('image')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+
+                                            </div>
+
+                                            <div class="mb-3" id="preview-container"
+                                                style="display:none; position: relative; width: fit-content;">
+                                                <img id="preview" src="#" alt="preview"
+                                                    style="max-width:200px;" class="img-thumbnail">
+                                                <button type="button" id="remove-preview" class="btn btn-sm btn-danger"
+                                                    style="position: absolute; top: 5px; right: 5px; border-radius: 10%; padding: 2px 6px; line-height: 1;">
+                                                    ลบ
+                                                </button>
+                                            </div>
+
+
+
+                                            <div class="border-top my-3"></div>
+                                            <button type="submit" class="fs-18 btn btn-success">บันทึกการแก้ไข</button>
                                         </form>
                                     </div>
 
@@ -124,6 +199,28 @@
     @endsection
     @push('scripts')
         <script>
+            const imageInput = document.getElementById('image');
+            const preview = document.getElementById('preview');
+            const previewContainer = document.getElementById('preview-container');
+            const removeBtn = document.getElementById('remove-preview');
+
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    previewContainer.style.display = 'inline-block';
+                } else {
+                    previewContainer.style.display = 'none';
+                    preview.src = "#";
+                }
+            });
+
+            removeBtn.addEventListener('click', function() {
+                preview.src = "#";
+                previewContainer.style.display = 'none';
+                imageInput.value = "";
+            });
+
             $(document).ready(function() {
                 $('#company_user').blur(function() {
                     var username = $(this).val();

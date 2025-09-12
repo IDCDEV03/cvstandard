@@ -98,12 +98,19 @@
 @push('scripts')
 <script>
 function generateRandom(fieldId) {
-    const chars = 'abcdefghijklmnpqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < 7; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+  
+    let letters = '';
+    const alphabet = 'ABCDEFGHIJKLMNPQRSTUVWXYZ';
+    for (let i = 0; i < 4; i++) {
+        letters += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
     }
-    document.getElementById(fieldId).value = result;
+
+     let numbers = '';
+    const digits = '0123456789';
+    for (let j = 0; j < 3; j++) {
+        numbers += digits.charAt(Math.floor(Math.random() * digits.length));
+    }
+     document.getElementById(fieldId).value = letters + numbers;
 }
    
 document.getElementById('logo-input')?.addEventListener('change', function (event) {

@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
-use PhpParser\Node\Expr\FuncCall;
 
 class ManageCompanyController extends Controller
 {
@@ -111,6 +110,7 @@ class ManageCompanyController extends Controller
             DB::table('company_details')
                 ->where('company_id', $company_id->user_id)
                 ->update([
+                    'company_name' => $request->company_name,
                     'company_address' => $request->company_address,
                     'company_province' => $request->province,
                     'updated_at' => Carbon::now(),
@@ -146,10 +146,46 @@ class ManageCompanyController extends Controller
             DB::table('users')
                 ->where('user_id', $company_id->company_code)
                 ->update([
-                    'password' => Hash::make($request->password),
+                    'password' => Hash::make($request->company_password),
                     'updated_at' => Carbon::now(),
                 ]);
             return redirect()->route('admin.cp_list')->with('success', 'บันทึกการแก้ไขสำเร็จ');
+        } elseif ($tab == 'part4') {
+
+              // ดึงข้อมูลเก่า
+        $old = DB::table('users')->where('user_id', $company_id->user_id)->first();
+
+        $newFileName = $old->logo_agency; // ค่าเดิมก่อนเปลี่ยน
+        $upload_location = 'logo/';
+
+        if ($request->hasFile('logo_agency')) {
+            // ลบไฟล์เก่าออก
+            if ($old && $old->logo_agency && Storage::exists('public/'.$old->logo_agency)) {
+                Storage::delete('public/'.$old->logo_agency);
+            }
+
+            // อัปโหลดใหม่
+            $file = $request->file('logo_agency');
+            $newFileName = $upload_location.$company_id->user_id.'_'.time().'_'.$file->getClientOriginalName();
+            $file->move($upload_location, $newFileName);           
+        }
+
+        // อัปเดต DB_user
+        DB::table('users')
+            ->where('user_id', $company_id->user_id)
+            ->update([
+                'logo_agency' => $newFileName,
+                'updated_at' => now(),
+            ]);
+
+                 // อัปเดต DB_company_details
+        DB::table('company_details')
+            ->where('company_id', $company_id->user_id)
+            ->update([
+                'company_logo' => $newFileName,
+                'updated_at' => now(),
+            ]);
+   return redirect()->route('admin.cp_list')->with('success', 'บันทึกการแก้ไขสำเร็จ');
         }
     }
 
@@ -159,6 +195,7 @@ class ManageCompanyController extends Controller
         ->select('users.*','company_details.company_name')
         ->join('company_details','users.company_code','=','company_details.company_id')
         ->where('users.role','supply')
+        ->orderBy('users.name','ASC')
         ->get();
 
          return view('pages.admin.SupplyAll', compact('supply_list'));

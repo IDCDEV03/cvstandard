@@ -38,6 +38,10 @@
                                         <a class="nav-link" id="tab-v-3-tab" data-bs-toggle="tab" href="#tab-v-3"
                                             role="tab" aria-selected="false">เปลี่ยนรหัสผ่าน</a>
                                     </li>
+                                     <li class="nav-item">
+                                        <a class="nav-link" id="tab-v-4-tab" data-bs-toggle="tab" href="#tab-v-4"
+                                            role="tab" aria-selected="false">เปลี่ยน Logo</a>
+                                    </li>
                                 </ul>
                                 <div class="tab-content">
                                     <div class="tab-pane fade show active" id="tab-v-1" role="tabpanel"
@@ -138,6 +142,54 @@
                                         </form>
                                     </div>
 
+                                    
+                                    <div class="tab-pane fade" id="tab-v-4" role="tabpanel"
+                                        aria-labelledby="tab-v-4-tab">
+                                        <form
+                                            action="{{ route('admin.cp_update', ['id' => request()->id, 'tab' => 'part4']) }}"
+                                            method="POST" enctype="multipart/form-data">
+                                            @csrf
+
+                                            <div class="mb-3">
+                                                <label class="mb-3">Logo ปัจจุบัน</label>
+                                                <br>
+                                                @if ($supply_data->logo_agency)
+                                                    <img src="{{ asset($supply_data->logo_agency) }}" alt="old image"
+                                                        width="200" class="img-thumbnail">
+                                                @else
+                                                    <p class="text-muted">ยังไม่มีรูปภาพ</p>
+                                                @endif
+                                            </div>
+
+                                            <div class="border-top my-3"></div>
+
+                                            <div class="mb-3">
+                                                <label for="image" class="form-label">อัปโหลด logo ใหม่</label>
+                                                <input type="file" name="logo_agency" id="image"
+                                                    class="form-control" accept="image/*">
+                                                @error('image')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+
+                                            </div>
+
+                                            <div class="mb-3" id="preview-container"
+                                                style="display:none; position: relative; width: fit-content;">
+                                                <img id="preview" src="#" alt="preview"
+                                                    style="max-width:200px;" class="img-thumbnail">
+                                                <button type="button" id="remove-preview" class="btn btn-sm btn-danger"
+                                                    style="position: absolute; top: 5px; right: 5px; border-radius: 10%; padding: 2px 6px; line-height: 1;">
+                                                    ลบ
+                                                </button>
+                                            </div>
+
+
+
+                                            <div class="border-top my-3"></div>
+                                            <button type="submit" class="fs-18 btn btn-success">บันทึกการแก้ไข</button>
+                                        </form>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -148,6 +200,29 @@
     @endsection
     @push('scripts')
         <script>
+
+   const imageInput = document.getElementById('image');
+            const preview = document.getElementById('preview');
+            const previewContainer = document.getElementById('preview-container');
+            const removeBtn = document.getElementById('remove-preview');
+
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    previewContainer.style.display = 'inline-block';
+                } else {
+                    previewContainer.style.display = 'none';
+                    preview.src = "#";
+                }
+            });
+
+            removeBtn.addEventListener('click', function() {
+                preview.src = "#";
+                previewContainer.style.display = 'none';
+                imageInput.value = "";
+            });
+
             $(document).ready(function() {
                 $('#company_user').blur(function() {
                     var username = $(this).val();

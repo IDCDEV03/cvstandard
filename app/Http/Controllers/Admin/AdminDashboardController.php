@@ -58,7 +58,12 @@ class AdminDashboardController extends Controller
             ->where('users.id', '=', $id)
             ->get();
 
-        return view('pages.admin.CompanyEdit', compact('province', 'company_detail'));
+        $company_logo = DB::table('users')
+        ->select('users.logo_agency','users.username')
+        ->where('users.id', '=', $id)
+        ->first();
+
+        return view('pages.admin.CompanyEdit', compact('province', 'company_detail','company_logo'));
     }
 
 

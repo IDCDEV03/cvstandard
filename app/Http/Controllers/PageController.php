@@ -104,7 +104,7 @@ class PageController extends Controller
             $supply = DB::table('users')->where('id', Auth::id())->first();
 
             $chk_list = DB::table('chk_records')
-             ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'vehicles_detail.car_plate','vehicles_detail.car_number_record', 'chk_records.veh_id')
+            ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'vehicles_detail.car_plate','vehicles_detail.car_number_record', 'chk_records.veh_id')
             ->join('vehicles_detail','chk_records.veh_id','=','vehicles_detail.car_id')
             ->where('chk_records.agency_id',$user_id)
             ->groupBy('chk_records.record_id')

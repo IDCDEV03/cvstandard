@@ -1,4 +1,4 @@
-@section('title', 'ระบบปฏิบัติการพนักงานขับรถราชการ')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -82,7 +82,7 @@
                                 <a href="{{ route('form_report', ['rec' => request()->rec]) }}"
                                     class="btn btn-sm btn-outline-success">รายงานผลการประเมิน</a>
                                           <a href="{{route('form_image8',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
-                             <a href="{{route('form_imagefail',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-danger">รูปถ่ายรถโม่ที่ต้องแก้ไข</a>
+                             <a href="{{route('form_imagefail',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-danger">รูปถ่ายรถที่ต้องแก้ไข</a>
                                 <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
                                     <i class="fas fa-print"></i> พิมพ์
                                 </button>

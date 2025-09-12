@@ -6,12 +6,18 @@
         <div class="row">
             <div class="col-md-12">
 
-                <div class="card mt-20 mb-25 shadow-sm">
+         <div class="card mt-20 mb-25 shadow-sm">
                     <div class="card-body">
-                        <span class="fs-20 fw-bold">รายการบริษัทขนส่ง (Supply)</span>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold fs-20 ">
+                                รายการบริษัทขนส่ง (Supply)
+                            </div>
+                            <a href="{{ route('admin.cp_list') }}" class="btn btn-sm btn-info">
+                               + ลงทะเบียน Supply
+                            </a>
+                        </div>
                     </div>
                 </div>
-
 
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -24,7 +30,7 @@
                                     <th>สถานะ</th>
                                     <th>บริษัทว่าจ้าง</th>
                                     <th>วันที่เพิ่ม</th>
-                                   <th>จัดการ</th>
+                                    <th>จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -33,27 +39,31 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td> {{ $item->name }} </td>
                                         <td>
-                                          @if ($item->user_status == '1')
+                                            @if ($item->user_status == '1')
                                                 <label class="badge badge-round badge-success">ใช้งาน</label>
                                             @elseif ($item->user_status == '0')
                                                 <label class="badge badge-round badge-warning">ปิด</label>
                                             @endif
                                         </td>
-                                        <td>{{$item->company_name}}</td>
+                                        <td>{{ $item->company_name }}</td>
                                         <td> {{ thai_date($item->created_at) }}</td>
-                               <td>
+                                        <td>
 
-                                <div class="dropdown">
-                                       <button type="button" class="btn btn-light btn-outlined btn-outline-light color-light dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                          ตัวเลือก
-                                          <i class="la la-angle-down"></i>
-                                       </button>
-                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                          <a class="dropdown-item" href="{{route('admin.sup_edit',$item->user_id)}}">แก้ไขข้อมูล</a>
-                                          <a class="dropdown-item" href="#">ลบ</a>
-                                       </div>
+                                            <div class="dropdown">
+                                                <button type="button"
+                                                    class="btn btn-light btn-outlined btn-outline-light color-light dropdown-toggle"
+                                                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                    ตัวเลือก
+                                                    <i class="la la-angle-down"></i>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('admin.sup_edit', $item->user_id) }}">แก้ไขข้อมูล</a>
+                                                    <a class="dropdown-item" href="#">ลบ</a>
+                                                </div>
 
-                               </td>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

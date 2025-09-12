@@ -112,7 +112,7 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
 
     //เริ่มตรวจ
     Route::get('/check/start/{id}', [UserMainController::class, 'start_check'])->name('user.chk_start');
-Route::POST('/chk-insert/new1/{id}', [UserMainController::class, 'insert_new1'])->name('user.insert_new1');
+    Route::POST('/chk-insert/new1/{id}', [UserMainController::class, 'insert_new1'])->name('user.insert_new1');
     //Route::POST('/chk/insert/step1/{id}', [UserMainController::class, 'insert_step1'])->name('user.insert1');
 
     Route::get('/check/step2/{rec}/{cats}', [UserMainController::class, 'chk_step2'])->name('user.chk_step2');
@@ -145,7 +145,6 @@ Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () 
     Route::get('/managerlist', [ManageAccountController::class, 'ManagerList'])->name('agency.manager_list');
     Route::get('/userlist', [ManageAccountController::class, 'UserList'])->name('agency.user_list');
     Route::post('/check-username', [ManageAccountController::class, 'checkUsername'])->name('check.username');
-
 
     Route::get('/create-account/{role}', [ManageAccountController::class, 'createAccount'])->name('agency.create_account');
     Route::post('/insert_account', [ManageAccountController::class, 'InsertAccount'])->name('agency.insert_account');
