@@ -68,14 +68,14 @@
                                                 class="form-control image-input-multi" multiple accept="image/*">
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '3')
-                                            <textarea name="item_result[{{ $item->id }}]" class="form-control mt-2"></textarea>
+                                            <textarea name="item_result[{{ $item->id }}]" class="form-control mt-2" required></textarea>
                                             <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
                                             <input type="file" name="item_images[{{ $item->id }}][]"
                                                 class="form-control image-input-multi" multiple accept="image/*">
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '4')
                                             <input type="text" id="date_input" name="item_result[{{ $item->id }}]" class="form-control"
-                                                placeholder="เลือกวันที่">
+                                                placeholder="เลือกวันที่" required>
                                         @endif
 
 
