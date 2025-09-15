@@ -38,7 +38,7 @@ class RedirectController extends Controller
                 return redirect()->route('local.home');
 
             default:
-                return redirect('/home');
+                return redirect('/login');
         }
     }
 }
