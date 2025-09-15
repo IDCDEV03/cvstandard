@@ -30,8 +30,11 @@ use App\Http\Controllers\SupplyMainController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::middleware('auth')->group(function () {
+    Route::get('/', [RedirectController::class, 'handleRoot'])->name('root');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+});
 
-Route::get('/', [RedirectController::class, 'handleRoot'])->name('root');
 Route::get('/comingsoon', [PageController::class, 'coming_soon'])->name('coming_soon');
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
@@ -250,7 +253,7 @@ Route::get('/check-username', function () {
     return response()->json(['exists' => $exists]);
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 
 //Route::post('/logout',[AuthController::class,'logout'])->name('logout')->middleware('auth');
 //Route::get('/lang/{lang}',[ LanguageController::class,'switchLang'])->name('switch_lang');
