@@ -24,7 +24,7 @@ class RedirectController extends Controller
             return redirect()->route('login');
         }
 
-        switch (optional($user)->role) {
+       switch ($user?->role) {
             case Role::Admin:
                 return redirect()->route('admin.dashboard');
 
