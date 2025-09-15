@@ -12,13 +12,19 @@ class RedirectController extends Controller
 
     public function handleRoot()
     {
+
+        if (!Auth::check()) {
+            
+            return redirect()->route('login');
+        }
+
         $user = Auth::user();
 
         if (!$user || !$user->role) {
-           return redirect()->route('login');
+            return redirect()->route('login');
         }
 
-         switch ($user->role) {
+        switch ($user->role) {
             case Role::Admin:
                 return redirect()->route('admin.dashboard');
 
