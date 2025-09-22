@@ -15,7 +15,26 @@
                         </div>
                     </div>
 
-                    <div class="card mb-25">
+                    <div class="card card-default card-sm mb-4">
+                        <div class="card-header">
+            <label class="fw-bold">รายการหมวดหมู่</label>
+        </div>
+                        <div class="card-body">
+                            
+{{-- เมนูเลือกหมวด --}}
+<div class="d-flex flex-wrap gap-2 mb-3">
+    @foreach($allCategories as $cat)
+        <a href="{{ route('user.chk_step2', ['rec' => $record->record_id, 'cats' => $cat->category_id]) }}"
+           class="btn btn-xs {{ $category->category_id == $cat->category_id ? 'btn-secondary' : 'btn-outline-secondary' }}">
+            {{ $cat->cates_no }}. {{ $cat->chk_cats_name }}
+        </a>
+    @endforeach
+</div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-25">
                         <div class="card-body">
 
 

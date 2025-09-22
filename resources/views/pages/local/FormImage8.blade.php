@@ -155,36 +155,44 @@
                                  <table class="table table-bordered report-table">
                                     <tr  class="text-center">
                                         <td>
-                                            <img src="{{asset('upload/vehicle_images/'.$image8->image1)}}" alt="" class="img-fluid">
+                                            <img src="{{asset('upload/vehicle_images/'.$image8->image1)}}" width="300px" alt="" class="img-fluid">
+                                             <br>
                                             <label class="mt-2">1. ด้านหน้ารถ</label>
                                         </td>
-                                         <td> <img src="{{asset('upload/vehicle_images/'.$image8->image2)}}" alt="" class="img-fluid">
+                                         <td> <img src="{{asset('upload/vehicle_images/'.$image8->image2)}}"  width="300px" alt="" class="img-fluid">
+                                             <br>
                                          <label class="mt-2">2. หลังรถเยื้องไปทางซ้าย</label>
                                         </td>
                                           <td>
-                                             <img src="{{asset('upload/vehicle_images/'.$image8->image3)}}" alt="" class="img-fluid">
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image3)}}"  width="300px" alt="" class="img-fluid">
+                                              <br>
                                               <label class="mt-2">3. หลังรถเยื้องไปทางขวา</label>
                                           </td>
                                            <td>
-                                             <img src="{{asset('upload/vehicle_images/'.$image8->image4)}}" alt="" class="img-fluid">
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image4)}}"  width="300px" alt="" class="img-fluid">
+                                              <br>
                                               <label class="mt-2">4. ด้านหลังรถเฟืองท้าย</label>
                                            </td>
                                     </tr>
                                     <tr  class="text-center">
                                         <td> 
-                                            <img src="{{asset('upload/vehicle_images/'.$image8->image5)}}" alt="" class="img-fluid">
+                                            <img src="{{asset('upload/vehicle_images/'.$image8->image5)}}"  width="300px" alt="" class="img-fluid">
+                                             <br>
                                              <label class="mt-2">5. ในห้องโดยสารฝั่งคนขับ</label>
                                         </td>
                                          <td>
-                                             <img src="{{asset('upload/vehicle_images/'.$image8->image6)}}" alt="" class="img-fluid">
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image6)}}"  width="300px" alt="" class="img-fluid">
+                                              <br>
                                               <label class="mt-2">6. เฟืองเกียร์หมุนโม่</label>
                                          </td>
                                           <td>
-                                             <img src="{{asset('upload/vehicle_images/'.$image8->image7)}}" alt="" class="img-fluid">
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image7)}}"  width="300px" alt="" class="img-fluid">
+                                              <br>
                                               <label class="mt-2">7. ลูกหมากคันชักคันส่ง</label>
                                           </td>
                                            <td>
-                                             <img src="{{asset('upload/vehicle_images/'.$image8->image8)}}" alt="" class="img-fluid">
+                                             <img src="{{asset('upload/vehicle_images/'.$image8->image8)}}"  width="300px" alt="" class="img-fluid">
+                                             <br>
                                               <label class="mt-2">8. เพลาส่งกำลัง</label>
                                            </td>
                                     </tr>

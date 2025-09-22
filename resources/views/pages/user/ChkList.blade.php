@@ -1,4 +1,4 @@
-@section('title', 'ระบบปฏิบัติการพนักงานขับรถราชการ')
+@section('title', 'ระบบ E-Checker')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -43,7 +43,7 @@
                                                     </a>
 
                                                     <a href="{{ route('user.create_repair', ['record_id' => $data->record_id]) }}"
-                                                        class="btn btn-xs btn-secondary btn-shadow-secondary">บันทึกแจ้งข้อบกพร่อง</a>
+                                                        class="btn btn-xs btn-secondary btn-shadow-secondary disabled" >บันทึกแจ้งข้อบกพร่อง</a>
 
                                                 </div>
                                             </td>

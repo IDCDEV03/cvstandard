@@ -80,7 +80,7 @@ class SupplyMainController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
 
-        return redirect()->route('supply.home')->with('success', 'บันทึกสำเร็จ');
+        return redirect()->route('supply.veh_list')->with('success', 'บันทึกสำเร็จ');
     }
 
      public function VehiclesList()

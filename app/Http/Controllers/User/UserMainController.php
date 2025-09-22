@@ -308,16 +308,24 @@ class UserMainController extends Controller
     {
         $forms = DB::table('check_categories')
             ->join('forms', 'check_categories.form_id', '=', 'forms.form_id')
-            ->select('forms.form_name')
+            ->select('forms.form_name','forms.form_id')
             ->where('check_categories.category_id', '=', $cats)
             ->first();
 
         $record = DB::table('chk_records')->where('record_id', $rec)->first();
+
         $category = DB::table('check_categories')->where('category_id', $cats)->first();
+
         $items = DB::table('check_items')
             ->where('category_id', $category->category_id)->get();
 
-        return view('pages.user.ChkStep2', compact('record', 'category', 'items', 'forms'));
+        $allCategories = DB::table('check_categories')
+        ->where('form_id', $forms->form_id)
+        ->orderBy('cates_no', 'asc') // ถ้ามีลำดับหมวด
+        ->get();
+
+       
+        return view('pages.user.ChkStep2', compact('record', 'category', 'items', 'forms','allCategories'));
     }
 
     public function chk_insert_step2(Request $request, $record_id, $category_id)
