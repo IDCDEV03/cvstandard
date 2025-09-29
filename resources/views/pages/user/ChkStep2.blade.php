@@ -17,20 +17,34 @@
 
                     <div class="card card-default card-sm mb-4">
                         <div class="card-header">
-            <label class="fw-bold">รายการหมวดหมู่</label>
-        </div>
+                            <label class="fw-bold fs-18">รายการหมวดหมู่</label>
+                        </div>
                         <div class="card-body">
-                            
-{{-- เมนูเลือกหมวด --}}
+
 <div class="d-flex flex-wrap gap-2 mb-3">
     @foreach($allCategories as $cat)
+        @php
+            $isActive  = $category->category_id == $cat->category_id;
+            $isChecked = in_array($cat->category_id, $checkedCategories);
+
+            if ($isActive) {
+                $btnClass = 'btn-primary'; // หมวดปัจจุบัน
+            } elseif ($isChecked) {
+                $btnClass = 'btn-success'; // หมวดที่ตรวจแล้ว
+            } else {
+                $btnClass = 'btn-outline-primary'; // ยังไม่ได้ตรวจ
+            }
+        @endphp
+
         <a href="{{ route('user.chk_step2', ['rec' => $record->record_id, 'cats' => $cat->category_id]) }}"
-           class="btn btn-xs {{ $category->category_id == $cat->category_id ? 'btn-secondary' : 'btn-outline-secondary' }}">
+           class="btn btn-xs {{ $btnClass }}">
+            @if($isChecked) <i class="fas fa-check"></i> @endif
             {{ $cat->cates_no }}. {{ $cat->chk_cats_name }}
         </a>
     @endforeach
 </div>
-                            
+                    
+
                         </div>
                     </div>
 
@@ -44,7 +58,7 @@
                             <p class="fs-20 fw-bold">หมวดหมู่ที่ {{ $category->cates_no }} : {{ $category->chk_cats_name }}
                             </p>
                             <form method="POST"
-                                action="{{ route('user.chk_insert_step2', [$record->record_id, $category->category_id]) }}"
+                                action="{{ route('user.storeOrUpdate', [$record->record_id, $category->category_id]) }}"
                                 enctype="multipart/form-data">
                                 @csrf
 
@@ -93,8 +107,8 @@
                                                 class="form-control image-input-multi" multiple accept="image/*">
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '4')
-                                            <input type="text" id="date_input" name="item_result[{{ $item->id }}]" class="form-control"
-                                                placeholder="เลือกวันที่" required>
+                                            <input type="text" id="date_input" name="item_result[{{ $item->id }}]"
+                                                class="form-control" placeholder="เลือกวันที่" required>
                                         @endif
 
 
@@ -102,9 +116,13 @@
                                 @endforeach
 
                                 <div class="border-top my-3"></div>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button type="submit" class="btn btn-success fs-18">บันทึกผลการตรวจ หมวดหมู่ที่ {{ $category->cates_no }}.{{ $category->chk_cats_name }}</button>
 
-                                <button type="submit" class="btn btn-block btn-success fs-18">บันทึกและไปต่อ <i
-                                        class="fas fa-arrow-right"></i></button>
+                                    <a href="{{ route('user.chk_summary', $record->record_id) }}" class="btn btn-primary fs-18">
+                                        ดูสรุปผล
+                                    </a>
+                                </div>
                             </form>
 
                         </div>
@@ -122,13 +140,12 @@
         flatpickr("#date_input", {
             dateFormat: 'j F Y',
             altInput: true,
-            altFormat: "j F Y", 
+            altFormat: "j F Y",
             locale: "th",
-            disableMobile: true, 
-            defaultDate: "today",     
-             
-        });    
-   
+            disableMobile: true,
+            defaultDate: "today",
+
+        });
     </script>
     <script>
         document.querySelectorAll('.image-input-multi').forEach(input => {

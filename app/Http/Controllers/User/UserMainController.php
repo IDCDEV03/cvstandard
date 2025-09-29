@@ -73,7 +73,7 @@ class UserMainController extends Controller
             ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'forms.form_name', 'chk_records.veh_id')
             ->orderBy('chk_records.created_at', 'DESC')
             ->where('chk_records.user_id', $user)
-            ->where('chk_records.veh_id',$id)
+            ->where('chk_records.veh_id', $id)
             ->get();
 
         return view('pages.user.VehiclesDetail', ['id' => $id], compact('vehicle', 'record'));
@@ -135,9 +135,6 @@ class UserMainController extends Controller
                 'chk_records.created_at as date_check',
                 'chk_records.form_id',
                 'chk_records.record_id',
-                'chk_records.img_front',
-                'chk_records.img_beside',
-                'chk_records.img_overall',
                 'chk_records.user_id as chk_user',
                 'chk_records.agency_id as chk_agent'
             )
@@ -205,20 +202,20 @@ class UserMainController extends Controller
             'updated_at' => Carbon::now(),
         ];
 
-         for ($i = 1; $i <= 8; $i++) {
-        $field = "image{$i}";
-        if ($request->hasFile($field)) {
-            $file = $request->file($field);
+        for ($i = 1; $i <= 8; $i++) {
+            $field = "image{$i}";
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
 
-            $filename = $id.'_'."{$field}_" . date('Ymd') . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('upload/vehicle_images'), $filename);
+                $filename = $id . '_' . "{$field}_" . date('Ymd') . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('upload/vehicle_images'), $filename);
 
-            $data[$field] = $filename;
-        } else {
-            $data[$field] = null;
+                $data[$field] = $filename;
+            } else {
+                $data[$field] = null;
+            }
         }
-    }
-        
+
         DB::table('chk_records')->insert([
             'user_id' =>  $user_main_id,
             'veh_id' => $id,
@@ -289,9 +286,6 @@ class UserMainController extends Controller
             'record_id' => $record_id,
             'form_id' => $request->form_id,
             'agency_id' => $user_sup->sup_id,
-            'img_front' => $fileName_front,
-            'img_beside' => $fileName_side,
-            'img_overall' => $fileName_overall,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
@@ -308,7 +302,7 @@ class UserMainController extends Controller
     {
         $forms = DB::table('check_categories')
             ->join('forms', 'check_categories.form_id', '=', 'forms.form_id')
-            ->select('forms.form_name','forms.form_id')
+            ->select('forms.form_name', 'forms.form_id')
             ->where('check_categories.category_id', '=', $cats)
             ->first();
 
@@ -319,13 +313,21 @@ class UserMainController extends Controller
         $items = DB::table('check_items')
             ->where('category_id', $category->category_id)->get();
 
-        $allCategories = DB::table('check_categories')
-        ->where('form_id', $forms->form_id)
-        ->orderBy('cates_no', 'asc') // ถ้ามีลำดับหมวด
-        ->get();
+        $checkedCategories = DB::table('check_records_result')
+            ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
+            ->where('check_records_result.record_id', $rec)
+            ->pluck('check_items.category_id')
+            ->unique()   // กันซ้ำ
+            ->toArray();
 
-       
-        return view('pages.user.ChkStep2', compact('record', 'category', 'items', 'forms','allCategories'));
+        $allCategories = DB::table('check_categories')
+            ->where('form_id', $category->form_id)
+            ->orderBy('cates_no', 'asc') // ถ้ามีลำดับหมวด
+            ->get();
+
+      
+
+        return view('pages.user.ChkStep2', compact('record', 'category', 'items', 'forms', 'allCategories', 'checkedCategories'));
     }
 
     public function chk_insert_step2(Request $request, $record_id, $category_id)
@@ -373,6 +375,100 @@ class UserMainController extends Controller
         }
         return redirect()->route('form_report', ['rec' => $record_id])->with('success', 'บันทึกสำเร็จ');
     }
+
+    //* สำหรับบันทึกไม่เรียงหมวดหมู่ *//
+    public function storeOrUpdate(Request $request, $recordId, $categoryId)
+    {
+        foreach ($request->input('item_result', []) as $item_id => $value) {
+            $comment = $request->input("user_comment.$item_id");
+
+            if ($request->hasFile("item_images.$item_id")) {
+                foreach ($request->file("item_images.$item_id") as $image) {
+                    $imagePath = 'upload/';
+                    $newname = $item_id . '_' . $image->getClientOriginalName();
+                    $image->move($imagePath, $newname);
+                    $fileName = $imagePath . $newname;
+
+                    DB::table('check_result_images')->insert([
+                        'record_id' => $recordId,
+                        'item_id' => $item_id,
+                        'image_path' => $fileName,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                }
+            }
+
+            DB::table('check_records_result')->updateOrInsert(
+                [
+                    'user_id' => Auth::id(),
+                    'record_id'   => $recordId,
+                    'item_id'     => $item_id,
+                ],
+                [
+                    'result_value' => $value,
+                    'user_comment' => $comment,
+                    'updated_at'   => now(),
+                    'created_at'   => now(),
+                ]
+            );
+        }
+
+        return redirect()->route('user.chk_step2', [$recordId, $categoryId])
+            ->with('success', 'บันทึกผลการตรวจเรียบร้อยแล้ว');
+    }
+
+    //*หน้าสรุปผล*//
+    public function summary($recordId)
+    {
+        $record = DB::table('chk_records')->where('record_id', $recordId)->first();
+
+        // ถ้า confirm แล้ว → redirect กลับ
+        if ($record->chk_status === '1') {
+            return redirect()->route('records.category', [$recordId, 1])
+                ->with('error', 'การตรวจนี้ถูกยืนยันแล้ว ไม่สามารถแก้ไขได้');
+        }
+
+        $veh_detail = DB::table('vehicles_detail')
+            ->where('car_id', $record->veh_id)
+            ->first();
+
+        $categories = DB::table('check_categories')
+            ->where('form_id', $record->form_id)
+            ->orderBy('cates_no')
+            ->get();
+
+        $items = DB::table('check_items')
+            ->select('id', 'category_id', 'item_name', 'item_no')
+            ->whereIn('category_id', $categories->pluck('category_id'))
+            ->orderBy('item_no')
+            ->get();
+
+        $itemsByCategory = $items->groupBy('category_id');
+
+        // ดึงผลการตรวจทั้งหมดของ record นี้ map ด้วย item_id
+        $results = DB::table('check_records_result')
+            ->where('record_id', $recordId)
+            ->get()
+            ->keyBy('item_id');
+
+             $checkedCategories = DB::table('check_records_result')
+            ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
+            ->where('check_records_result.record_id', $recordId)
+            ->pluck('check_items.category_id')
+            ->unique()   // กันซ้ำ
+            ->toArray();
+
+
+        // คำนวณ progress
+        $totalItems   = $items->count();
+        $checkedItems = $results->count();
+        $progress     = $totalItems > 0 ? round(($checkedItems / $totalItems) * 100) : 0;
+
+
+        return view('pages.user.Summary', compact('record', 'categories', 'itemsByCategory', 'results', 'veh_detail', 'totalItems', 'checkedItems', 'progress','checkedCategories'));
+    }
+
 
     public function chk_result($record_id)
     {

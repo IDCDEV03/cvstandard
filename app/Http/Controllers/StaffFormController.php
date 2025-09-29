@@ -150,6 +150,42 @@ class StaffFormController extends Controller
         return view('pages.staff.Categories_Detail', ['cates_id' => $cates_id], compact('cates_data', 'item_data'));
     }
 
+    //แก้ไขชื่อหมวดหมู่
+      public function cates_update(Request $request, $id)
+    {
+        $request->validate([
+            'category_name' => 'required|string|max:255',
+        ]);
+
+        $form_id = DB::table('check_categories')
+            ->select('check_categories.form_id')
+            ->where('id', $id)
+            ->first();
+
+        DB::table('check_categories')
+            ->where('id', $id)
+            ->update([
+                'chk_cats_name' => $request->category_name,
+                'updated_at' => now(),
+            ]);
+
+        return redirect()->route('staff.form_step3', ['id' => $form_id->form_id])->with('success', 'แก้ไขหมวดหมู่เรียบร้อยแล้ว');
+    }
+
+    //ลบหมวดหมู่
+    public function cates_delete(Request $request, $id)
+    {
+        $form_id = $request->form_id;
+        // ลบ check_items ที่อ้างอิงหมวดหมู่
+        DB::table('check_items')->where('category_id', $id)->delete();
+
+        // ลบหมวดหมู่
+        DB::table('check_categories')->where('category_id', $id)->delete();
+
+        return redirect()->route('staff.form_step3', ['id' => $form_id])->with('success', 'ลบหมวดหมู่และข้อตรวจที่เกี่ยวข้องเรียบร้อยแล้ว');
+    }
+
+
      public function item_create($id)
     {
         $cates_data = DB::table('check_categories')
@@ -159,6 +195,30 @@ class StaffFormController extends Controller
             ->first();
 
         return view('pages.staff.ItemCreate', ['id' => $id], compact('cates_data'));
+    }
+
+      public function item_create_plus($id)
+    {
+        $cates_data = DB::table('check_categories')
+            ->join('forms', 'check_categories.form_id', '=', 'forms.form_id')
+            ->select('forms.form_name', 'check_categories.category_id', 'check_categories.chk_cats_name')
+            ->where('check_categories.category_id', '=', $id)
+            ->first();
+
+        $item_data = DB::table('check_items')
+            ->select('item_no','item_name')
+            ->where('category_id', $id)
+            ->get();
+
+        $lastOrder = DB::table('check_items')
+            ->where('category_id', $id)
+            ->max('item_no');
+
+        $lastOrder = $lastOrder ?? 0;
+
+        $category = DB::table('check_categories')->where('id', $id)->first();
+
+        return view('pages.staff.ItemCreate_plus', ['id' => $id], compact('cates_data', 'lastOrder','item_data'));
     }
 
        public function item_insert(Request $request)
@@ -201,6 +261,8 @@ class StaffFormController extends Controller
         }
         return redirect()->route('staff.categories_detail', ['cates_id' => $request->cate_id])->with('success', 'บันทึกข้อตรวจเรียบร้อยแล้ว');
     }
+
+
 
      public function item_edit($id)
     {

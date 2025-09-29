@@ -30,6 +30,7 @@ use App\Http\Controllers\SupplyMainController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::middleware('auth')->group(function () {
     Route::get('/', [RedirectController::class, 'handleRoot'])->name('root');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -97,8 +98,8 @@ Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,a
     Route::get('/repair-notice', [VehiclesController::class, 'repair_notice'])->name('veh.notice');
 
     Route::get('/form-report/{rec}', [VehiclesController::class, 'Form_report'])->name('form_report');
-     Route::get('/form-image/{rec}', [VehiclesController::class, 'Form_Image8'])->name('form_image8');
-      Route::get('/form-image-fail/{rec}', [VehiclesController::class, 'FormImage_Fail'])->name('form_imagefail');
+    Route::get('/form-image/{rec}', [VehiclesController::class, 'Form_Image8'])->name('form_image8');
+    Route::get('/form-image-fail/{rec}', [VehiclesController::class, 'FormImage_Fail'])->name('form_imagefail');
 });
 
 Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
@@ -119,9 +120,18 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
     //Route::POST('/chk/insert/step1/{id}', [UserMainController::class, 'insert_step1'])->name('user.insert1');
 
     Route::get('/check/step2/{rec}/{cats}', [UserMainController::class, 'chk_step2'])->name('user.chk_step2');
-    Route::POST('/check-store/step2/{record_id}/{category_id}', [UserMainController::class, 'chk_insert_step2'])->name('user.chk_insert_step2');
+    //Route::POST('/check-store/step2/{record_id}/{category_id}', [UserMainController::class, 'chk_insert_step2'])->name('user.chk_insert_step2');
 
     Route::get('/check/result/{record_id}', [UserMainController::class, 'chk_result'])->name('user.chk_result');
+
+    //ปรับฟอร์มการตรวจแบบไม่เรียงหมวดหมู่ สามารถสลับหมวดหมู่การตรวจได้
+    Route::get('/check/{record}/summary', [UserMainController::class, 'summary'])
+        ->name('user.chk_summary');
+     Route::POST('/check-store/{record_id}/{category_id}', [UserMainController::class, 'storeOrUpdate'])->name('user.storeOrUpdate');
+
+    Route::post('/check/{record}/confirm', [UserMainController::class, 'confirm'])
+        ->name('user.chk_confirm');
+
 
     //แก้ไขภาพ
     Route::get('/images/edit/{record_id}/{id}', [VehiclesController::class, 'edit_images'])->name('user.edit_images');
@@ -193,7 +203,7 @@ Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () 
     //CRUD_Vehicles
     Route::get('/create_veh', [SupplyMainController::class, 'Vehicles_Create'])->name('supply.new_veh');
     Route::POST('/store-veh', [SupplyMainController::class, 'VehiclesInsert'])->name('supply.veh_store');
-     Route::get('/list-veh', [SupplyMainController::class, 'VehiclesList'])->name('supply.veh_list');
+    Route::get('/list-veh', [SupplyMainController::class, 'VehiclesList'])->name('supply.veh_list');
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
@@ -228,6 +238,10 @@ Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
 
     Route::get('/categories/{id}', [StaffFormController::class, 'FormNew_Step3'])->name('staff.form_step3');
     Route::get('/cate-detail/{cates_id}', [StaffFormController::class, 'categories_detail'])->name('staff.categories_detail');
+    //แก้ไขชื่อหมวดหมู่
+    Route::post('/categories/{id}/update', [StaffFormController::class, 'cates_update'])->name('staff.cates_update');
+    //ลบหมวดหมู่
+    Route::post('/categories/{id}/delete', [StaffFormController::class, 'cates_delete'])->name('staff.cates_delete');
 
     Route::get('/item-create/{id}', [StaffFormController::class, 'item_create'])->name('staff.ItemCreate');
     Route::post('/insert-item', [StaffFormController::class, 'item_insert'])->name('staff.item_insert');
@@ -235,6 +249,9 @@ Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/item-edit/{id}', [StaffFormController::class, 'item_edit'])->name('staff.item_edit');
     Route::post('/item-update', [StaffFormController::class, 'item_update'])->name('staff.item_update');
     Route::get('/item-delete/{id}/image', [StaffFormController::class, 'item_delete_image'])->name('staff.item_delete_image');
+
+    //เพิ่มข้อตรวจต่อจากเดิม
+    Route::get('/item-plus/{id}', [StaffFormController::class, 'item_create_plus'])->name('staff.item_create_plus');
 });
 
 

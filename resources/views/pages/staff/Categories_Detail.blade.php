@@ -24,7 +24,6 @@
 
                     <div class="card mb-2">
                         <div class="card-body">
-
                             @php
                                 $cates_id = request()->cates_id;
                                 $item_data_count = DB::table('check_items')
@@ -38,15 +37,12 @@
                                     <i class="fas fa-long-arrow-alt-left"></i> กลับไปรายการหมวดหมู่
                                 </a>
 
-                                <a href="#" class="mx-2 btn btn-warning btn-default btn-squared btn-shadow-warning ">
-                                    <i class="fas fa-edit"></i> แก้ไขชื่อหมวดหมู่
-                                </a>
                                 @if (isset($item_data_count))
-                                    <a href="#" class="mx-2 btn btn-info btn-default btn-squared btn-shadow-info ">
+                                    <a href="{{route('staff.item_create_plus', ['id' => request()->cates_id])}}" class="mx-2 btn btn-info btn-default btn-squared btn-shadow-info ">
                                         <i class="fas fa-redo-alt"></i> เพิ่มข้อตรวจ
                                     </a>
                                 @else
-                                    <a href="{{ route('staff.ItemCreate', ['id' => request()->cates_id]) }}"
+                                    <a href="{{ route('agency.item_create', ['id' => request()->cates_id]) }}"
                                         class="mx-2 btn btn-secondary btn-default btn-squared btn-shadow-secondary ">
                                         <i class="fas fa-plus"></i> เพิ่มข้อตรวจ
                                     </a>
@@ -56,8 +52,7 @@
                         </div>
                     </div>
 
-
-                    <div class="card">
+                    <div class="card mb-10">
                         <div class="card-body">
                             <div class="table4 p-25 mb-30">
                                 <div class="table-responsive">

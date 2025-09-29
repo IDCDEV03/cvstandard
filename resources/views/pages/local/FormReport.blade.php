@@ -79,9 +79,11 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="mb-0 fs-20 fw-bold">รายงานการตรวจรถ</span>
-                          
-                                <a href="{{route('form_image8',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
-                                <a href="{{route('form_imagefail',['rec'=>request()->rec])}}" class="btn btn-sm btn-outline-danger">รูปถ่ายรถที่ต้องแก้ไข</a>
+
+                                <a href="{{ route('form_image8', ['rec' => request()->rec]) }}"
+                                    class="btn btn-sm btn-outline-secondary">รูปถ่ายประเมินรอบคัน</a>
+                                <a href="{{ route('form_imagefail', ['rec' => request()->rec]) }}"
+                                    class="btn btn-sm btn-outline-danger">รูปถ่ายรถที่ต้องแก้ไข</a>
                                 <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
                                     <i class="fas fa-print"></i> พิมพ์
                                 </button>
@@ -114,21 +116,21 @@
                                         <td colspan="2" class="text-center">
                                             <span class="fw-bold fs-20 "> {{ $company_datas->company_name }}</span>
                                             <br>
-                                            <span class="fs-16">  {{ $forms->form_name }}</span>
+                                            <span class="fs-16"> {{ $forms->form_name }}</span>
                                         </td>
                                         <td width='20%' class="text-end">
                                             {{ $forms->form_code }}
-                                            
+
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4" class="table-light"><strong>บันทึก (Record Form) :</strong>
-                                          </td>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4"><strong>ข้อมูลเบื้องต้น</strong></td>
                                     </tr>
-                                   
+
                                     <tr>
                                         <td>
                                             <span class="fw-bold">ยี่ห้อ</span>
@@ -156,12 +158,12 @@
                                             <span class="fw-bold">ปีที่จดทะเบียน</span>
                                         </td>
                                         <td>
-                                            {{ $record->car_age }} 
+                                            {{ $record->car_age }}
                                         </td>
                                         <td class="fw-bold">บริษัทผู้ขนส่ง</td>
                                         <td> </td>
                                     </tr>
-                               
+
                                 </table>
 
 
@@ -191,26 +193,28 @@
                                                         @elseif($r->result_value == '2')
                                                             <span class="text-secondary"> ผ่าน แต่ต้องแก้ไขปรับปรุง
                                                             </span>
+                                                        @elseif($r->result_value == '3')
+                                                            <span class="text-muted"> ไม่เกี่ยวข้อง
+                                                            </span>
                                                         @else
-                                                         <span > 
-                                                            {{ $r->result_value }}
+                                                            <span>
+                                                                {{ $r->result_value }}
                                                             </span>
                                                         @endif
                                                     </td>
                                                     <td>{{ $r->user_comment }}</td>
 
                                                 </tr>
-
                                             @endforeach
                                         </tbody>
                                     </table>
                                 @endforeach
 
                                 <table class="table table-bordered report-table">
-                                    <tr>                                    
+                                    <tr>
                                         <td class="table-light">ผลการตรวจสอบ</td>
                                     </tr>
-                                    <tr>                                        
+                                    <tr>
                                         <td>
 
                                             <!--signature-->
