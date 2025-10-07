@@ -21,29 +21,31 @@
                         </div>
                         <div class="card-body">
 
-<div class="d-flex flex-wrap gap-2 mb-3">
-    @foreach($allCategories as $cat)
-        @php
-            $isActive  = $category->category_id == $cat->category_id;
-            $isChecked = in_array($cat->category_id, $checkedCategories);
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                @foreach ($allCategories as $cat)
+                                    @php
+                                        $isActive = $category->category_id == $cat->category_id;
+                                        $isChecked = in_array($cat->category_id, $checkedCategories);
 
-            if ($isActive) {
-                $btnClass = 'btn-primary'; // หมวดปัจจุบัน
-            } elseif ($isChecked) {
-                $btnClass = 'btn-success'; // หมวดที่ตรวจแล้ว
-            } else {
-                $btnClass = 'btn-outline-primary'; // ยังไม่ได้ตรวจ
-            }
-        @endphp
+                                        if ($isActive) {
+                                            $btnClass = 'btn-primary'; // หมวดปัจจุบัน
+                                        } elseif ($isChecked) {
+                                            $btnClass = 'btn-success'; // หมวดที่ตรวจแล้ว
+                                        } else {
+                                            $btnClass = 'btn-outline-primary'; // ยังไม่ได้ตรวจ
+                                        }
+                                    @endphp
 
-        <a href="{{ route('user.chk_step2', ['rec' => $record->record_id, 'cats' => $cat->category_id]) }}"
-           class="btn btn-xs {{ $btnClass }}">
-            @if($isChecked) <i class="fas fa-check"></i> @endif
-            {{ $cat->cates_no }}. {{ $cat->chk_cats_name }}
-        </a>
-    @endforeach
-</div>
-                    
+                                    <a href="{{ route('user.chk_step2', ['rec' => $record->record_id, 'cats' => $cat->category_id]) }}"
+                                        class="btn btn-xs {{ $btnClass }}">
+                                        @if ($isChecked)
+                                            <i class="fas fa-check"></i>
+                                        @endif
+                                        {{ $cat->cates_no }}. {{ $cat->chk_cats_name }}
+                                    </a>
+                                @endforeach
+                            </div>
+
 
                         </div>
                     </div>
@@ -63,63 +65,79 @@
                                 @csrf
 
                                 @foreach ($items as $item)
+                                    @php
+                                        $key = $item->id; // <<-- ใช้ id จาก check_items
+                                        $val = old("item_result.$key", $item->result_value);
+                                        $comm = old("user_comment.$key", $item->user_comment);
+                                    @endphp
                                     <div class="mb-3 border-success rounded p-3">
                                         <label class="fw-bold fs-18">{{ $item->item_no }}. {{ $item->item_name }}</label>
-                                        <div class="text-danger d-block mb-2 mt-2">{{ $item->item_description }}</div>
-                                        @if (empty($item->item_image))
-                                        @else
-                                            <p></p><img src="{{ asset($item->item_image) }}" class="img-thumbnail mb-2"
-                                                width="400px" alt=""><br>
+                                        @if (!empty($item->item_description))
+                                            <div class="text-danger d-block mb-2 mt-2">{{ $item->item_description }}</div>
                                         @endif
+                                        @if (!empty($item->item_image))
+                                            <p></p>
+                                            <img src="{{ asset($item->item_image) }}" class="img-thumbnail mb-2"
+                                                width="400" alt="">
+                                            <br>
+                                        @endif
+
                                         @if ($item->item_type == '1')
-                                            <select name="item_result[{{ $item->id }}]" class="form-select mt-2"
+                                            <select name="item_result[{{ $key }}]" class="form-select mt-2"
                                                 required>
-
-                                                <option value="1" selected>✅ ผ่าน</option>
-                                                <option value="2">⚠️ ผ่าน แต่ต้องแก้ไขปรับปรุง</option>
-                                                <option value="0">❌ ไม่ผ่าน</option>
-
+                                                <option value="1" {{ (string) $val === '1' ? 'selected' : '' }}>✅ ผ่าน
+                                                </option>
+                                                <option value="2" {{ (string) $val === '2' ? 'selected' : '' }}>⚠️
+                                                    ผ่าน
+                                                    แต่ต้องแก้ไขปรับปรุง</option>
+                                                <option value="0" {{ (string) $val === '0' ? 'selected' : '' }}>❌
+                                                    ไม่ผ่าน
+                                                </option>
                                             </select>
-                                            <textarea name="user_comment[{{ $item->id }}]" class="form-control mt-2"
-                                                placeholder="ความคิดเห็นเพิ่มเติม (ถ้ามี)"></textarea>
-                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
-                                            <input type="file" name="item_images[{{ $item->id }}][]"
-                                                class="form-control image-input-multi" multiple accept="image/*">
+
+                                            <textarea name="user_comment[{{ $key }}]" class="form-control mt-2"
+                                                placeholder="ความคิดเห็นเพิ่มเติม (ถ้ามี)">{{ $comm }}</textarea>
+
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '2')
-                                            <select name="item_result[{{ $item->id }}]" class="form-select mt-2"
+                                            <select name="item_result[{{ $key }}]" class="form-select mt-2"
                                                 required>
-                                                <option value="1" selected>✅ ปกติ</option>
-                                                <option value="2">⚠️ ไม่ปกติ แต่ยังสามารถใช้งานได้</option>
-                                                <option value="0">❌ ไม่สามารถใช้งานได้</option>
-                                                <option value="3">⛔ ไม่เกี่ยวข้อง</option>
+                                                <option value="1" {{ (string) $val === '1' ? 'selected' : '' }}>✅ ปกติ
+                                                </option>
+                                                <option value="2" {{ (string) $val === '2' ? 'selected' : '' }}>⚠️
+                                                    ไม่ปกติ แต่ยังสามารถใช้งานได้</option>
+                                                <option value="0" {{ (string) $val === '0' ? 'selected' : '' }}>❌
+                                                    ไม่สามารถใช้งานได้</option>
+                                                <option value="3" {{ (string) $val === '3' ? 'selected' : '' }}>⛔
+                                                    ไม่เกี่ยวข้อง</option>
                                             </select>
-                                            <textarea name="user_comment[{{ $item->id }}]" class="form-control mt-2"
-                                                placeholder="ความคิดเห็นเพิ่มเติม (ถ้ามี)"></textarea>
-                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
-                                            <input type="file" name="item_images[{{ $item->id }}][]"
-                                                class="form-control image-input-multi" multiple accept="image/*">
+                                            <textarea name="user_comment[{{ $key }}]" class="form-control mt-2"
+                                                placeholder="ความคิดเห็นเพิ่มเติม (ถ้ามี)">{{ $comm }}</textarea>
+
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '3')
-                                            <textarea name="item_result[{{ $item->id }}]" class="form-control mt-2" required></textarea>
-                                            <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
-                                            <input type="file" name="item_images[{{ $item->id }}][]"
-                                                class="form-control image-input-multi" multiple accept="image/*">
+                                            <textarea name="item_result[{{ $key }}]" class="form-control mt-2" required>{{ $val }}</textarea>
+
                                             <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
                                         @elseif ($item->item_type == '4')
-                                            <input type="text" id="date_input" name="item_result[{{ $item->id }}]"
-                                                class="form-control" placeholder="เลือกวันที่" required>
+                                            <input type="date" name="item_result[{{ $key }}]"
+                                                class="form-control mt-2" value="{{ $val }}" required>
                                         @endif
-
+                                        <label class="mt-2">อัปโหลดภาพ (ไม่เกิน 10 ภาพ)</label>
+                                        <input type="file" name="item_images[{{ $key }}][]"
+                                            class="form-control image-input-multi" multiple accept="image/*">
+                                        <div class="preview-multi d-flex flex-wrap gap-2 mt-2"></div>
 
                                     </div>
                                 @endforeach
 
                                 <div class="border-top my-3"></div>
                                 <div class="d-flex justify-content-between mt-4">
-                                    <button type="submit" class="btn btn-success fs-18">บันทึกผลการตรวจ หมวดหมู่ที่ {{ $category->cates_no }}.{{ $category->chk_cats_name }}</button>
+                                    <button type="submit" class="btn btn-success fs-18">บันทึกผลการตรวจ หมวดหมู่ที่
+                                        {{ $category->cates_no }}.{{ $category->chk_cats_name }}</button>
 
-                                    <a href="{{ route('user.chk_summary', $record->record_id) }}" class="btn btn-primary fs-18">
+                                    <a href="{{ route('user.chk_summary', $record->record_id) }}"
+                                        class="btn btn-primary fs-18">
                                         ดูสรุปผล
                                     </a>
                                 </div>

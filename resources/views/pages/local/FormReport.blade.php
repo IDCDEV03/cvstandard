@@ -210,31 +210,40 @@
                                     </table>
                                 @endforeach
 
-                                <table class="table table-bordered report-table">
+                                @php
+                                    $get = fn($id, $field = 'result_value') => optional($rr->get($id))->{$field};
+                                    $date_th = $get(43);
+                                @endphp
+
+                                <table class="table table-borderless report-table">
                                     <tr>
-                                        <td class="table-light">ผลการตรวจสอบ</td>
+                                        <td>ข้อเสนอแนะ</td>
+                                        <td>{{ $get(42) ?? '-' }}</td>
                                     </tr>
                                     <tr>
+                                        <td>ตรวจสอบวันที่ : {{ thai_date($date_th) ?? '-' }}</td>
+                                        <td>เวลา : {{ $get(44) ?? '-' }} </td>
                                         <td>
-
                                             <!--signature-->
                                             @if (empty($userdata->signature_image))
-                                                <div class="text-center text-dark mt-40">
+                                                <div class="text-center text-dark mt-10">
                                                     .................................................</div>
                                             @else
                                                 <div class="text-center"><img src="{{ asset($userdata->signature_image) }}"
                                                         width="150px" alt=""></div>
                                                 <div class="text-center">..........................................</div>
                                             @endif
-                                            <div class="text-center text-dark fs-16 mt-2">({{ $fullname }})</div>
-                                            <div class="text-center text-dark fs-16 mt-2">ผู้ตรวจสอบ</div>
-
-
+                                            <div class="text-center text-dark fs-14 mt-2">ผู้ตรวจสอบ {{ $fullname }}</div>                                           
                                         </td>
+                                        <td>หน่วยงาน : {{ $get(46) ?? '-' }}</td>
                                     </tr>
+                                    <tr>
+                                        <td>สถานที่ตรวจสอบ : {{ $get(45) ?? '-' }}</td>
+                                    </tr>
+
                                 </table>
 
-                                <div class="text-end text-dark fs-14 mt-2">{{ thai_datetime($record->date_check) }}</div>
+                                <div class="text-end text-dark fs-14 mt-2"></div>
 
 
                             </div>

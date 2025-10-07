@@ -220,15 +220,23 @@ class VehiclesController extends Controller
       ->first();
 
     // 4. ดึงรายการหมวดหมู่ที่เกี่ยวข้องกับแบบฟอร์ม
+$exclude_cate10 = ['CAT-10-BAHDYHRW'];
+
     $categories = DB::table('check_categories')
       ->where('form_id', $record->form_id)
+      ->whereNotIN('check_categories.category_id',$exclude_cate10)
       ->orderBy('cates_no')
       ->get();
 
+    //local 
+    //$excludeIds = [57, 58, 59, 60];
+    //host
+    $excludeIds = [42,43,44,45];
     // 5. ดึงผลการตรวจแยกตามหมวด
     $results = DB::table('check_records_result')
       ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
       ->where('record_id', $rec)
+      ->whereNotIN('check_records_result.item_id', $excludeIds)
       ->select(
         'check_items.category_id',
         'check_items.item_name',
@@ -250,8 +258,14 @@ class VehiclesController extends Controller
       ->where('supply_datas.sup_id', $inspector_data->sup_id)
       ->first();
 
+    $rr = DB::table('check_records_result')
+    ->where('record_id', $rec)
+    ->select('item_id','result_value','user_comment')
+    ->get()
+    ->keyBy('item_id');
 
-    return view('pages.local.FormReport', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images', 'inspector_data', 'company_datas'));
+
+    return view('pages.local.FormReport', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images', 'inspector_data', 'company_datas','rr'));
   }
 
   public function Form_Image8($rec)

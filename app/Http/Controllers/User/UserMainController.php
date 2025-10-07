@@ -310,8 +310,18 @@ class UserMainController extends Controller
 
         $category = DB::table('check_categories')->where('category_id', $cats)->first();
 
-        $items = DB::table('check_items')
-            ->where('category_id', $category->category_id)->get();
+        // ✅ ดึง items พร้อมผลตรวจของ record นี้ (LEFT JOIN)
+        $items = DB::table('check_items as i')
+            ->leftJoin('check_records_result as r', function ($join) use ($rec) {
+                $join->on('r.item_id', '=', 'i.id')   // ถ้า PK ของ check_items เป็น 'id' ให้เปลี่ยนเป็น 'i.id'
+                    ->where('r.record_id', '=', $rec);
+            })
+            ->where('i.category_id', $category->category_id)
+            ->orderBy('i.item_no')
+            ->select('i.*', 'r.result_value', 'r.user_comment')
+            ->get();
+
+
 
         $checkedCategories = DB::table('check_records_result')
             ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
@@ -325,7 +335,7 @@ class UserMainController extends Controller
             ->orderBy('cates_no', 'asc') // ถ้ามีลำดับหมวด
             ->get();
 
-      
+
 
         return view('pages.user.ChkStep2', compact('record', 'category', 'items', 'forms', 'allCategories', 'checkedCategories'));
     }
@@ -414,8 +424,26 @@ class UserMainController extends Controller
             );
         }
 
-        return redirect()->route('user.chk_step2', [$recordId, $categoryId])
-            ->with('success', 'บันทึกผลการตรวจเรียบร้อยแล้ว');
+        // หา "หมวดถัดไป" ตามลำดับ cates_no
+        $currentCat = DB::table('check_categories')->where('category_id', $categoryId)->first();
+
+        $nextCatId = DB::table('check_categories')
+            ->where('form_id', $currentCat->form_id)
+            ->where('cates_no', '>', $currentCat->cates_no)
+            ->orderBy('cates_no')
+            ->value('category_id');
+
+        if ($nextCatId) {
+            // ไปหมวดถัดไป
+            return redirect()
+                ->route('user.chk_step2', ['rec' => $recordId, 'cats' => $nextCatId])
+                ->with('success', 'บันทึกผลการตรวจเรียบร้อยแล้ว');
+        }
+
+        // ถ้าเป็นหมวดสุดท้าย → ไปสรุป
+        return redirect()
+            ->route('user.chk_summary', $recordId)
+            ->with('success', 'บันทึกครบทุกหมวดแล้ว กำลังไปหน้ารายงานผล');
     }
 
     //*หน้าสรุปผล*//
@@ -441,7 +469,8 @@ class UserMainController extends Controller
         $items = DB::table('check_items')
             ->select('id', 'category_id', 'item_name', 'item_no')
             ->whereIn('category_id', $categories->pluck('category_id'))
-            ->orderBy('item_no')
+            ->orderBy('category_id', 'asc')   // ให้เรียงตามหมวดก่อน
+            ->orderBy('item_no', 'asc')
             ->get();
 
         $itemsByCategory = $items->groupBy('category_id');
@@ -452,12 +481,21 @@ class UserMainController extends Controller
             ->get()
             ->keyBy('item_id');
 
-             $checkedCategories = DB::table('check_records_result')
+        $checkedCategories = DB::table('check_records_result')
             ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')
             ->where('check_records_result.record_id', $recordId)
             ->pluck('check_items.category_id')
             ->unique()   // กันซ้ำ
             ->toArray();
+
+        $images = DB::table('check_result_images')
+            ->where('record_id', $recordId)
+            ->select('item_id', 'image_path')
+            ->orderBy('id', 'asc')
+            ->get()
+            ->groupBy('item_id');
+
+        $imageBase = '/';
 
 
         // คำนวณ progress
@@ -466,7 +504,8 @@ class UserMainController extends Controller
         $progress     = $totalItems > 0 ? round(($checkedItems / $totalItems) * 100) : 0;
 
 
-        return view('pages.user.Summary', compact('record', 'categories', 'itemsByCategory', 'results', 'veh_detail', 'totalItems', 'checkedItems', 'progress','checkedCategories'));
+
+        return view('pages.user.Summary', compact('record', 'categories', 'itemsByCategory', 'results', 'veh_detail', 'totalItems', 'checkedItems', 'progress', 'checkedCategories', 'images', 'imageBase'));
     }
 
 
@@ -512,5 +551,29 @@ class UserMainController extends Controller
             ->get();
 
         return view('pages.user.ChkResult', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images', 'item_chk'));
+    }
+
+    public function confirm($record)
+    {
+
+        $rec = DB::table('chk_records')->where('record_id', $record)->first();
+        if (!$rec) {
+            return back()->with('error', 'ไม่พบข้อมูลการตรวจ');
+        }
+
+        if ($rec->chk_status === '1') {
+            return redirect()->route('user.chk_summary', $record)
+                ->with('error', 'การตรวจนี้ถูกยืนยันแล้ว');
+        }
+
+        DB::table('chk_records')
+        ->where('record_id', $record)
+        ->update([
+            'chk_status'  => '1',        
+            'updated_at'  => now(),
+        ]);
+
+    return redirect()->route('user.chk_list')->with('success', 'ยืนยันผลตรวจเรียบร้อย');
+
     }
 }
