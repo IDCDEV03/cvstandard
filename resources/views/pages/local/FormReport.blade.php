@@ -24,12 +24,23 @@
                 top: 0;
                 width: 100%;
             }
+
         }
-    </style>
-    <style>
+
         .fixed-table {
             table-layout: fixed;
             width: 100%;
+        }
+
+        .custom-table thead {
+            background-color: #20d185;
+            /* เขียวพาสเทลแบบ custom */
+        }
+
+        .table.table-bordered th,
+        .table.table-bordered td {
+            border: 1px solid #000 !important;
+            /* บังคับให้เป็นสีดำ */
         }
 
         .fixed-table th,
@@ -107,9 +118,9 @@
                     <div id="print-area">
                         <div class="card mb-2 ">
                             <div class="card-body">
-                                <table class="table table-bordered report-table">
+                                <table class="table table-bordered report-table ">
                                     <tr>
-                                        <td width='20%'>
+                                        <td width='20%' class="text-center">
                                             <img src="{{ asset($company_datas->company_logo) }}" width="180px"
                                                 alt="">
                                         </td>
@@ -123,67 +134,57 @@
 
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="4" class="table-light"><strong>บันทึก (Record Form) :</strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4"><strong>ข้อมูลเบื้องต้น</strong></td>
-                                    </tr>
 
                                     <tr>
-                                        <td>
+                                        <td style="background-color: #20d185;">
                                             <span class="fw-bold">ยี่ห้อ</span>
                                         </td>
                                         <td>
                                             {{ $record->car_brand }}
                                         </td>
-                                        <td class="fw-bold">รุ่นรถ</td>
+                                        <td style="background-color: #20d185;" class="fw-bold">รุ่นรถ</td>
                                         <td> {{ $record->car_model }} </td>
                                     </tr>
                                     <tr>
-                                        <td>
+                                        <td style="background-color: #20d185;">
                                             <span class="fw-bold">ทะเบียน</span>
                                         </td>
                                         <td>
                                             {{ $record->car_plate }}
                                         </td>
-                                        <td class="fw-bold">หมายเลขข้างรถ</td>
+                                        <td style="background-color: #20d185;" class="fw-bold">หมายเลขข้างรถ</td>
                                         <td> {{ $record->car_number_record }} </td>
                                     </tr>
 
                                     </tr>
                                     <tr>
-                                        <td>
+                                        <td style="background-color: #20d185;">
                                             <span class="fw-bold">ปีที่จดทะเบียน</span>
                                         </td>
                                         <td>
                                             {{ $record->car_age }}
                                         </td>
-                                        <td class="fw-bold">บริษัทผู้ขนส่ง</td>
+                                        <td style="background-color: #20d185;" class="fw-bold">บริษัทผู้ขนส่ง</td>
                                         <td> </td>
                                     </tr>
 
                                 </table>
-
-
-
-
-                                @foreach ($categories as $cat)
-                                    <span class="fs-18 fw-bold mt-4">{{ $cat->cates_no }}.
-                                        {{ $cat->chk_cats_name }}</span>
-
-                                    <table class="table table-bordered fixed-table mt-2 mb-4 report-table">
+                                <table class="table custom-table table-bordered fixed-table report-table">
+                                    @foreach ($categories as $cat)
                                         <thead>
                                             <tr>
-                                                <th>รายการตรวจประเมิน</th>
+                                                <th>
+                                                   รายการตรวจประเมิน {{ $cat->cates_no }}. {{ $cat->chk_cats_name }} 
+                                                </th>
                                                 <th>ผลการประเมิน</th>
                                                 <th>สิ่งที่ตรวจพบ</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+
                                             @foreach ($results[$cat->category_id] ?? [] as $r)
                                                 <tr>
+
                                                     <td class="text-left">{{ $r->item_name }}</td>
                                                     <td>
                                                         @if ($r->result_value == '1')
@@ -207,18 +208,17 @@
                                                 </tr>
                                             @endforeach
                                         </tbody>
-                                    </table>
-                                @endforeach
-
+                                    @endforeach
+                                </table>
                                 @php
                                     $get = fn($id, $field = 'result_value') => optional($rr->get($id))->{$field};
                                     $date_th = $get(43);
                                 @endphp
 
-                                <table class="table table-borderless report-table">
+                                <table class="table table-borderless fixed-table report-table">
                                     <tr>
-                                        <td>ข้อเสนอแนะ</td>
-                                        <td>{{ $get(42) ?? '-' }}</td>
+                                        <td colspan="4">ข้อเสนอแนะ : {{ $get(42) ?? '-' }} </td>
+                                      
                                     </tr>
                                     <tr>
                                         <td>ตรวจสอบวันที่ : {{ thai_date($date_th) ?? '-' }}</td>
@@ -226,24 +226,25 @@
                                         <td>
                                             <!--signature-->
                                             @if (empty($userdata->signature_image))
-                                                <div class="text-center text-dark mt-10">
+                                                <div class="text-center text-dark ">
                                                     .................................................</div>
                                             @else
                                                 <div class="text-center"><img src="{{ asset($userdata->signature_image) }}"
                                                         width="150px" alt=""></div>
                                                 <div class="text-center">..........................................</div>
                                             @endif
-                                            <div class="text-center text-dark fs-14 mt-2">ผู้ตรวจสอบ {{ $fullname }}</div>                                           
+                                            <div class="text-center text-dark fs-14 mt-2">ผู้ตรวจสอบ {{ $fullname }}
+                                            </div>
                                         </td>
-                                        <td>หน่วยงาน : {{ $get(46) ?? '-' }}</td>
+                                        <td >หน่วยงาน : {{ $get(46) ?? '-' }}</td>
                                     </tr>
                                     <tr>
-                                        <td>สถานที่ตรวจสอบ : {{ $get(45) ?? '-' }}</td>
+                                        <td colspan="4">สถานที่ตรวจสอบ : {{ $get(45) ?? '-' }}</td>
                                     </tr>
 
                                 </table>
 
-                                <div class="text-end text-dark fs-14 mt-2"></div>
+
 
 
                             </div>

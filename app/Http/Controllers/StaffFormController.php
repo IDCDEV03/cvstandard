@@ -221,6 +221,7 @@ class StaffFormController extends Controller
         return view('pages.staff.ItemCreate_plus', ['id' => $id], compact('cates_data', 'lastOrder','item_data'));
     }
 
+    //? เพิ่มข้อตรวจใหม่ยังบันทึกแบบนับ 1 ใหม่ ยังไม่ได้แก้ไข ?//
        public function item_insert(Request $request)
     {
         $uid = Auth::id();

@@ -54,7 +54,7 @@
 
 
 
-                            <form action="#" method="POST" enctype="multipart/form-data">
+                            <form action="{{route('staff.item_insert')}}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="cate_id" value="{{ request()->id }}">
 

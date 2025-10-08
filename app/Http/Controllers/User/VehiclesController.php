@@ -231,7 +231,7 @@ $exclude_cate10 = ['CAT-10-BAHDYHRW'];
     //local 
     //$excludeIds = [57, 58, 59, 60];
     //host
-    $excludeIds = [42,43,44,45];
+    $excludeIds = [42,43,44,45,46];
     // 5. ดึงผลการตรวจแยกตามหมวด
     $results = DB::table('check_records_result')
       ->join('check_items', 'check_records_result.item_id', '=', 'check_items.id')

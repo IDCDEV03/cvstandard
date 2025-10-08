@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ManageUserController;
 use App\Http\Controllers\Admin\ManageCompanyController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\User\ManageAccountController;
+use App\Http\Controllers\User\UserProfileController;
 use Database\Seeders\VehicleTypeSeeder;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Role;
@@ -190,7 +191,6 @@ Route::prefix('manager')->middleware(['auth', 'role:manager'])->group(function (
     Route::get('/company-list/{id}', [ManagerController::class, 'company_list'])->name('manager.company_list');
     Route::POST('/company-insert', [ManagerController::class, 'company_insert'])->name('manager.company_insert');
 });
-
 
 Route::prefix('company')->middleware(['auth', 'role:company'])->group(function () {
     // สำหรับบริษัทว่าจ้างฯ
