@@ -149,7 +149,7 @@
                                             {{ $record->car_age }}
                                         </td>
                                         <td class="fw-bold">บริษัทผู้ขนส่ง</td>
-                                        <td> </td>
+                                        <td> บริษัท ไอดีไดรฟ์ จำกัด </td>
                                     </tr>
 
                                 </table>
