@@ -36,6 +36,43 @@ class UserMainController extends Controller
         return view('pages.local.announce', compact('list_post'));
     }
 
+    public function veh_edit($id)
+    {
+        $vehicle = DB::table('vehicles_detail')
+            ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+            ->select('vehicles_detail.*', 'vehicle_types.vehicle_type as veh_type_name')
+            ->where('vehicles_detail.car_id', '=', $id)
+            ->first();
+
+        return view('pages.user.VehiclesEdit', ['id' => $id], compact('vehicle'));
+    }
+
+    public function veh_update(Request $request)
+    {
+
+        $car_id = $request->car_id;
+        $user_id = Auth::user()->user_id;
+
+        DB::table('vehicles_detail')->where('car_id', $car_id)->update([
+            'car_brand' => $request->car_brand,
+            'car_model' => $request->car_model,
+            'car_number_record' => $request->car_number_record,
+            'car_age' => $request->car_age,
+            'updated_at' => Carbon::now(),
+        ]);
+
+
+        DB::table('vehicles_update_log')->insert([
+            'user_update_id' => $user_id,
+            'car_id' => $car_id,
+            'update_remark' => 'user_update_data',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('local.home')->with('success', 'อัปเดตข้อมูลรถสำเร็จ');
+    }
+
 
     public function veh_regis()
     {
@@ -567,13 +604,12 @@ class UserMainController extends Controller
         }
 
         DB::table('chk_records')
-        ->where('record_id', $record)
-        ->update([
-            'chk_status'  => '1',        
-            'updated_at'  => now(),
-        ]);
+            ->where('record_id', $record)
+            ->update([
+                'chk_status'  => '1',
+                'updated_at'  => now(),
+            ]);
 
-    return redirect()->route('user.chk_list')->with('success', 'ยืนยันผลตรวจเรียบร้อย');
-
+        return redirect()->route('user.chk_list')->with('success', 'ยืนยันผลตรวจเรียบร้อย');
     }
 }

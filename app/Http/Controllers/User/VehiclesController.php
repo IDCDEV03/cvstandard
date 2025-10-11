@@ -229,7 +229,7 @@ $exclude_cate10 = ['CAT-10-BAHDYHRW'];
       ->get();
 
     //local 
-    //$excludeIds = [57, 58, 59, 60];
+    //$excludeIds = [57, 58, 59, 60, 61];
     //host
     $excludeIds = [42,43,44,45,46];
     // 5. ดึงผลการตรวจแยกตามหมวด

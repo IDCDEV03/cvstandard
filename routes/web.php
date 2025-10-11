@@ -101,6 +101,8 @@ Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,a
     Route::get('/form-report/{rec}', [VehiclesController::class, 'Form_report'])->name('form_report');
     Route::get('/form-image/{rec}', [VehiclesController::class, 'Form_Image8'])->name('form_image8');
     Route::get('/form-image-fail/{rec}', [VehiclesController::class, 'FormImage_Fail'])->name('form_imagefail');
+
+
 });
 
 Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
@@ -112,6 +114,9 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
     //ลงทะเบียนรถ
     Route::get('/veh-regis', [UserMainController::class, 'veh_regis'])->name('user.veh_regis');
     Route::POST('/veh-create', [UserMainController::class, 'veh_insert'])->name('user.veh_create');
+    //แก้ไขข้อมูลรถ
+     Route::get('/veh-edit/{id}', [UserMainController::class, 'veh_edit'])->name('user.veh_edit');
+     Route::POST('/veh-update', [UserMainController::class, 'veh_update'])->name('user.veh_update');
     //ระเบียนการตรวจ
     Route::get('/veh/{id}', [UserMainController::class, 'veh_detail'])->name('user.veh_detail');
 

@@ -22,8 +22,11 @@
                                                 <tr>
                                                     <th class="text-sm fw-bold">#</th>
                                                     <th class="text-sm fw-bold">ทะเบียนรถ</th>
+                                                    <th class="text-sm fw-bold">ยี่ห้อรถ</th>
+                                                    <th class="text-sm fw-bold">หมายเลขข้างรถ</th>
                                                     <th>ประเภทรถ</th>
                                                     <th class="text-sm fw-bold">วันที่ลงทะเบียน</th>
+                                                    <th>จัดการรถ</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -31,8 +34,11 @@
                                                     <tr>
                                                         <td> {{ $loop->iteration }} </td>
                                                         <td> <a href="{{route('user.veh_detail',[$item->car_id])}}"> {{ $item->car_plate }} </a></td>
+                                                        <td> {{$item->car_brand}} </td>
+                                                        <td> {{blank($item->car_number_record) ? '-' : $item->car_number_record}} </td>
                                                         <td> {{ $item->vehicle_type }} </td>
                                                         <td> {{ thai_date($item->created_at) }} </td>
+                                                        <td><a href="{{route('user.veh_edit',[$item->car_id])}}" class="btn btn-primary btn-xs">แก้ไข</a></td>
                                                     </tr>
                                                 @endforeach
 
