@@ -160,9 +160,12 @@ class UserMainController extends Controller
         return redirect()->route('local.home')->with('success', 'บันทึกสำเร็จ');
     }
 
-    public function chk_list()
+    public function chk_list(Request $request)
     {
         $user_id = Auth::user()->user_id;
+        $dateFrom = $request->input('date_from');
+        $dateTo   = $request->input('date_to');
+
         $record = DB::table('chk_records')
             ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
             ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
@@ -176,10 +179,22 @@ class UserMainController extends Controller
                 'chk_records.agency_id as chk_agent'
             )
             ->where('chk_records.user_id', '=', $user_id)
-            ->orderBy('chk_records.created_at', 'DESC')
-            ->get();
+            ->orderBy('chk_records.created_at', 'DESC');            
 
-        return view('pages.user.ChkList', compact('record'));
+        if ($dateFrom && $dateTo) {
+            $record->whereBetween('chk_records.created_at', [
+                Carbon::parse($dateFrom)->startOfDay(),
+                Carbon::parse($dateTo)->endOfDay(),
+            ]);
+        } elseif ($dateFrom) {
+            $record->where('chk_records.created_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+        } elseif ($dateTo) {
+            $record->where('chk_records.created_at', '<=', Carbon::parse($dateTo)->endOfDay());
+        }
+
+        $record_all = $record->get();
+
+        return view('pages.user.ChkList', compact('record_all'));
     }
 
     public function start_check($id)
@@ -611,5 +626,37 @@ class UserMainController extends Controller
             ]);
 
         return redirect()->route('user.chk_list')->with('success', 'ยืนยันผลตรวจเรียบร้อย');
+    }
+
+    public function chk_search(Request $request)
+    {
+        $hasSearch = $request->boolean('searched');
+
+        $checks = null;
+        if ($hasSearch) {
+            $dateFrom = $request->input('date_from');
+            $dateTo   = $request->input('date_to');
+
+            $q = DB::table('chk_records as r')
+                ->join('vehicles_detail as v', 'v.car_id', '=', 'r.veh_id')
+                ->select('r.record_id', 'r.updated_at', 'v.car_plate', 'v.car_brand', 'v.car_model', 'v.var_number_record')
+                ->orderByDesc('r.updated_at');
+
+            if ($dateFrom && $dateTo) {
+                $q->whereBetween('r.updated_at', [
+                    Carbon::parse($dateFrom)->startOfDay(),
+                    Carbon::parse($dateTo)->endOfDay(),
+                ]);
+            } elseif ($dateFrom) {
+                $q->where('r.updated_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+            } elseif ($dateTo) {
+                $q->where('r.updated_at', '<=', Carbon::parse($dateTo)->endOfDay());
+            }
+
+            $checks = $q->paginate(25);
+            $checks->appends($request->query());
+        }
+
+        return view('pages.user.ChkList', compact('checks', 'hasSearch'));
     }
 }
