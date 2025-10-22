@@ -143,7 +143,7 @@
                                             {{ $record->car_brand }}
                                         </td>
                                         <td style="background-color: #20d185;" class="fw-bold">รุ่นรถ</td>
-                                        <td> {{ $record->car_model }} </td>
+                                        <td>  {{ blank($record->car_model) ? '-' : $record->car_model }}</td>
                                     </tr>
                                     <tr>
                                         <td style="background-color: #20d185;">
@@ -162,7 +162,7 @@
                                             <span class="fw-bold">ปีที่จดทะเบียน</span>
                                         </td>
                                         <td>
-                                            {{ $record->car_age }}
+                                     {{ blank($record->car_age) ? '-' : $record->car_age }}
                                         </td>
                                         <td style="background-color: #20d185;" class="fw-bold">บริษัทผู้ขนส่ง</td>
                                         <td> บริษัท ไอดีไดรฟ์ จำกัด </td>

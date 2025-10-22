@@ -109,12 +109,9 @@
                                             
                                         </td>
                                     </tr>
+                                 
                                     <tr>
-                                        <td colspan="4" class="table-light"><strong>บันทึก (Record Form) :</strong>
-                                          </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4"><strong>ข้อมูลเบื้องต้น</strong></td>
+                                        <td colspan="4" style="background-color: #20d185;"><strong>ข้อมูลเบื้องต้น</strong></td>
                                     </tr>
                                    
                                     <tr>
@@ -125,7 +122,7 @@
                                             {{ $record->car_brand }}
                                         </td>
                                         <td class="fw-bold">รุ่นรถ</td>
-                                        <td> {{ $record->car_model }} </td>
+                                        <td> {{ blank($record->car_model) ? '-' : $record->car_model }} </td>
                                     </tr>
                                     <tr>
                                         <td>
@@ -144,7 +141,7 @@
                                             <span class="fw-bold">ปีที่จดทะเบียน</span>
                                         </td>
                                         <td>
-                                            {{ $record->car_age }} 
+                                           {{ blank($record->car_age) ? '-' : $record->car_age }}
                                         </td>
                                         <td class="fw-bold">บริษัทผู้ขนส่ง</td>
                                         <td>  บริษัท ไอดีไดรฟ์ จำกัด </td>
@@ -197,14 +194,6 @@
                                            </td>
                                     </tr>
                                  </table>
-
-
-
-
-
-                               
-
-                                <div class="text-end text-dark fs-14 mt-2">{{ thai_datetime($record->date_check) }}</div>
 
 
                             </div>
