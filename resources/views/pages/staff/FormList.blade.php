@@ -1,60 +1,66 @@
-@section('title', 'ระบบปฏิบัติการพนักงานขับรถราชการ')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
     <div class="container-fluid">
-        <div class="social-dash-wrap">
-            <div class="row">
-                <div class="col-md-12">
-                      <div class="card mt-20 mb-25 shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="fw-bold fs-20 ">
-                                รายการฟอร์มตรวจ
-                            </div>
-                           <a href="{{route('staff.form_new')}}" class="btn btn-sm btn-secondary">
-                               สร้างฟอร์มใหม่
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
 
-                            <table class="table table-bordered" id="forms-table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>รหัสฟอร์ม</th>
-                                        <th>ชื่อฟอร์ม</th>
-                                        <th>สถานะ</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($form_list as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $item->form_code }}</td>
-                                            <td><a href="{{route('staff.form_step3',['id'=>$item->form_id])}}">{{ $item->form_name }}</a></td>
-                                            <td>
-                                               **
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-
-
-
-                        </div>
+        <div class="col-md-12">
+            <div class="card mt-20  mb-25">
+                <div class="card-body">
+                    <div class="dm-button-list d-flex flex-wrap gap-2">
+                        <a href="#" class="btn btn-primary btn-transparent-primary fs-16">สร้างกลุ่มฟอร์ม</a>
+                        |
+                        <a href="{{ route('staff.form_new') }}"
+                            class="btn btn-secondary btn-transparent-secondary fs-16">สร้างฟอร์มใหม่</a>
+                        <a href="#" class="btn btn-info btn-transparent-info fs-16">สร้างส่วนหัวรายงาน</a>
+                        <a href="#" class="btn btn-warning btn-transparent-warning fs-16">สร้างส่วนท้ายรายงาน</a>
+                        <a href="#"
+                            class="btn btn-light btn-transparent-light fs-16">สร้างส่วนรูปถ่ายประเมินรอบคัน</a>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6> รายการฟอร์มตรวจ</h6>
+                    </div>
+                    <div class="card-body">
+
+                        <table class="table table-bordered" id="forms-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>รหัสฟอร์ม</th>
+                                    <th>ชื่อฟอร์ม</th>
+                                    <th>สถานะ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($form_list as $item)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->form_code }}</td>
+                                        <td><a
+                                                href="{{ route('staff.form_step3', ['id' => $item->form_id]) }}">{{ $item->form_name }}</a>
+                                        </td>
+                                        <td>
+                                            **
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 @endsection
 
