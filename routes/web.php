@@ -209,6 +209,10 @@ Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () 
     Route::get('/create_veh', [SupplyMainController::class, 'Vehicles_Create'])->name('supply.new_veh');
     Route::POST('/store-veh', [SupplyMainController::class, 'VehiclesInsert'])->name('supply.veh_store');
     Route::get('/list-veh', [SupplyMainController::class, 'VehiclesList'])->name('supply.veh_list');
+
+    //CRUD_ช่างตรวจ
+     Route::get('/inspector/{id}', [SupplyMainController::class, 'InspectorList'])->name('supply.inspector_list');
+      Route::get('/inspector-new', [SupplyMainController::class, 'Inspector_Create'])->name('supply.inspector_new');
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {

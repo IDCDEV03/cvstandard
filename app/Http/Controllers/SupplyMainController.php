@@ -92,4 +92,21 @@ class SupplyMainController extends Controller
 
         return view('pages.supply.CarList', compact('veh_list'));
     }
+
+        public function InspectorList($id)
+    {
+        $inst_list = DB::table('inspector_datas')
+        ->join('supply_datas','inspector_datas.sup_id','supply_datas.sup_id')
+        ->where('inspector_datas.ins_status','=','1')
+        ->where('inspector_datas.sup_id','=',$id)
+        ->get();
+
+        return view('pages.supply.InspectorList',compact('inst_list'));
+    }
+
+        public function Inspector_Create()
+    {
+        return view('pages.supply.InspectorCreate');
+    }
+
 }

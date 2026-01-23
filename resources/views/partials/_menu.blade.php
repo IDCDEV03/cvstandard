@@ -249,22 +249,29 @@
          @elseif ($role === Role::Supply)
              <li>
                  <a href="{{ route('supply.home') }}" class="">
-                     <span class="nav-icon uil uil-truck"></span>
-                     <span class="menu-text">รถที่ตรวจแล้ว</span>
+                     <span class="nav-icon uil uil-home-alt"></span>
+                     <span class="menu-text">หน้าหลัก</span>
                  </a>
-             </li>
+             </li>          
 
-              <li>
-                 <a href="{{ route('supply.new_veh') }}" class="">
+            <li>
+                 <a href="{{ route('supply.veh_list') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
-                     <span class="menu-text">ลงทะเบียนรถ</span>
+                     <span class="menu-text">รายการรถ</span>
                  </a>
              </li>
 
                 <li>
-                 <a href="{{ route('supply.veh_list') }}" class="">
-                     <span class="nav-icon uil uil-truck"></span>
-                     <span class="menu-text">รายการรถ</span>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-check-circle"></span>
+                     <span class="menu-text">รายการตรวจรถ</span>
+                 </a>
+             </li>
+
+                  <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-user-md"></span>
+                     <span class="menu-text">รายการช่างตรวจ</span>
                  </a>
              </li>
 
