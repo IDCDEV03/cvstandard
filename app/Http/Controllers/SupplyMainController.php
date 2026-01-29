@@ -109,4 +109,45 @@ class SupplyMainController extends Controller
         return view('pages.supply.InspectorCreate');
     }
 
+          public function Inspector_Store(Request $request)
+    {
+
+        $id = Auth::user()->user_id;
+        $ins_id = 'INS-' . Str::upper(Str::random(10));
+        $username = str_replace(' ', '', $request->company_user);
+
+        DB::table('inspector_datas')
+            ->insert([
+                'ins_id'=> $ins_id,
+                'sup_id' => $id,
+                'ins_prefix' => $request->prefix,
+                'ins_name'=> $request->name,
+                'ins_lastname' => $request->lastname,
+                'dl_number' => $request->dl_number,
+                'ins_phone'=>$request->ins_phone,
+                'ins_birthyear'=>$request->ins_birthyear,
+                'ins_experience'=>$request->ins_experience,
+                'ins_status' => '1',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+        DB::table('users')
+        ->insert([
+                'user_id'=>$ins_id,
+                'username'=>$request->company_user,
+                'prefix'=>$request->prefix,
+                'name'=>$request->name,
+                'lastname'=> $request->lastname,
+                'user_status'=>'1',
+                'password'=>Hash::make($request->inspector_password),
+                'role'=>'user',
+                'company_code' => $id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('supply.inspector_list', ['id' => $id])->with('success', 'บันทึกสำเร็จ');
+    }
+
 }

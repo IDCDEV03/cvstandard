@@ -269,7 +269,7 @@
              </li>
 
                   <li>
-                 <a href="#" class="">
+                 <a href="{{ route('supply.inspector_list',['id'=>Auth::user()->user_id]) }}" class="">
                      <span class="nav-icon uil uil-user-md"></span>
                      <span class="menu-text">รายการช่างตรวจ</span>
                  </a>
