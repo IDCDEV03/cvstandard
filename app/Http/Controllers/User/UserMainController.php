@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Enums\Role;
 use Illuminate\Support\Facades\File;
+use App\Services\CheckRecordNotifier;
 
 class UserMainController extends Controller
 {
@@ -605,27 +606,39 @@ class UserMainController extends Controller
         return view('pages.user.ChkResult', compact('agent_name', 'record', 'results', 'forms', 'categories', 'images', 'item_chk'));
     }
 
-    public function confirm($record)
+    public function confirm($record, CheckRecordNotifier $notifier)
     {
 
-        $rec = DB::table('chk_records')->where('record_id', $record)->first();
+        DB::transaction(function () use ($record, $notifier) {
+
+        $rec = DB::table('chk_records')
+            ->where('record_id', $record)
+            ->lockForUpdate()
+            ->first();
+
         if (!$rec) {
-            return back()->with('error', 'ไม่พบข้อมูลการตรวจ');
+            abort(404, 'ไม่พบข้อมูลการตรวจ');
         }
 
         if ($rec->chk_status === '1') {
-            return redirect()->route('user.chk_summary', $record)
-                ->with('error', 'การตรวจนี้ถูกยืนยันแล้ว');
+            return;
         }
-
+        
         DB::table('chk_records')
-            ->where('record_id', $record)
+            ->where('id', $rec->id)
             ->update([
-                'chk_status'  => '1',
-                'updated_at'  => now(),
+                'chk_status' => '1',
+                'updated_at' => now(),
             ]);
 
-        return redirect()->route('user.chk_list')->with('success', 'ยืนยันผลตรวจเรียบร้อย');
+        $updatedRec = DB::table('chk_records')->where('id', $rec->id)->first();
+        
+        $notifier->notifySupplyOnConfirmed((array) $updatedRec);
+    });
+
+    return redirect()
+        ->route('user.chk_list')
+        ->with('success', 'ยืนยันผลตรวจเรียบร้อย');
     }
 
     public function chk_search(Request $request)

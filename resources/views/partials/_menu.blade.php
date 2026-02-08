@@ -262,7 +262,7 @@
              </li>
 
                 <li>
-                 <a href="#" class="">
+                 <a href="{{ route('supply.chk_list') }}" class="">
                      <span class="nav-icon uil uil-check-circle"></span>
                      <span class="menu-text">รายการตรวจรถ</span>
                  </a>

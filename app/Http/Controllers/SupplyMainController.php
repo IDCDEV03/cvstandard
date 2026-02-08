@@ -150,4 +150,47 @@ class SupplyMainController extends Controller
         return redirect()->route('supply.inspector_list', ['id' => $id])->with('success', 'บันทึกสำเร็จ');
     }
 
+    public function chk_list(Request $request)
+    {
+        $user_id = Auth::user()->user_id;
+        $dateFrom = $request->input('date_from');
+        $dateTo   = $request->input('date_to');
+
+        $record = DB::table('chk_records')
+            ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+            ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+            ->leftJoin('inspector_datas', 'inspector_datas.ins_id', '=', 'chk_records.user_id')
+            ->select(
+                'vehicles_detail.*',
+                'vehicle_types.vehicle_type as veh_type_name',
+                'chk_records.created_at as date_check',
+                'chk_records.form_id',
+                'chk_records.record_id',
+                'chk_records.user_id as chk_user',
+                'chk_records.agency_id as chk_agent',
+                'inspector_datas.ins_prefix',
+                'inspector_datas.ins_name',  
+                'inspector_datas.ins_lastname' 
+            )
+            ->where('chk_records.agency_id', '=', $user_id)
+            ->orderBy('chk_records.created_at', 'DESC');  
+            
+        
+
+        if ($dateFrom && $dateTo) {
+            $record->whereBetween('chk_records.created_at', [
+                Carbon::parse($dateFrom)->startOfDay(),
+                Carbon::parse($dateTo)->endOfDay(),
+            ]);
+        } elseif ($dateFrom) {
+            $record->where('chk_records.created_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+        } elseif ($dateTo) {
+            $record->where('chk_records.created_at', '<=', Carbon::parse($dateTo)->endOfDay());
+        }
+
+        $record_all = $record->get();
+
+        return view('pages.supply.Veh_ChkList', compact('record_all'));
+    }
+
 }

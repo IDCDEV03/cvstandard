@@ -62,94 +62,151 @@
      <div class="navbar-right">
          <ul class="navbar-right__menu">
 
-             <li class="nav-author">
-                 <div class="dropdown-custom">
-                     <a href="javascript:;" class="nav-item-toggle">
-                         <img src="{{ asset('settings.png') }}" alt="" class="rounded-circle">
+             @if ($role === Role::Supply)
+                 <li class="nav-notification dropdown">
+                     <a href="#" class="nav-link dropdown-toggle" id="notificationDropdown" role="button"
+                         data-bs-toggle="dropdown" aria-expanded="false">
+
+                        <img class="svg" src="{{ asset('assets/img/svg/alarm.svg') }}" alt="alarm">
 
 
-                         @if (Auth::check())
-                             <label class="nav-item__title">{{ Auth::user()->name }} {{ Auth::user()->lastname }}<i
-                                     class="las la-angle-down nav-item__arrow"></i></label>
+                         @if ($navUnreadCount > 0)
+                             <span class="badge badge-danger notification-count">
+                                 {{ $navUnreadCount }}
+                             </span>
                          @endif
                      </a>
-                     <div class="dropdown-wrapper">
-                         <div class="nav-author__info">
-                             <div>
-                                 @if (Auth::check())
-                                     <span class="fs-14 fw-bold text-capitalize">{{ Auth::user()->name }}
-                                         {{ Auth::user()->lastname }}</span>
-                                 @endif
+
+                     <div class="dropdown-menu dropdown-menu-end notification-dropdown"
+                         aria-labelledby="notificationDropdown">
+
+                     <h2 class="dropdown-wrapper__title">การแจ้งเตือน <span class="badge-circle badge-warning ms-1">{{ $navUnreadCount }}</span></h2>
+
+                         @forelse($navNotifications as $noti)
+                        
+                             <a class="dropdown-item d-flex align-items-start {{ $noti->read_at ? '' : 'fw-bold' }}"
+                                 href="{{ route('notifications.read', $noti->id) }}">
+
+                                 <div class="notification-icon bg-primary text-white">
+                                     <i class="uil uil-file-check"></i>
+                                 </div>
+
+                                 <div class="notification-text ms-2">
+                                     <p class="mb-0">
+                                         {{ $noti->data['title'] ?? 'มีการแจ้งเตือนใหม่' }}
+                                     </p>
+                                     <small class="text-muted">
+                                         {{ $noti->created_at->diffForHumans() }}
+                                     </small>
+                                 </div>
+                             </a>
+                         @empty
+                             <div class="dropdown-item text-center text-muted">
+                                 ไม่มีการแจ้งเตือน
+                             </div>
+                         @endforelse
+
+                         <div class="dropdown-divider"></div>
+
+                         <a href="{{ route('notifications.index') }}" class="dropdown-item text-center">
+                             ดูการแจ้งเตือนทั้งหมด
+                         </a>
+                     </div>
+                 </li>
+
+@endif
+                 <li class="nav-author">
+                     <div class="dropdown-custom">
+                         <a href="javascript:;" class="nav-item-toggle">
+                             <img src="{{ asset('settings.png') }}" alt="" class="rounded-circle">
+
+
+                             @if (Auth::check())
+                                 <label class="nav-item__title">{{ Auth::user()->name }}
+                                     {{ Auth::user()->lastname }}<i
+                                         class="las la-angle-down nav-item__arrow"></i></label>
+                             @endif
+                         </a>
+                         <div class="dropdown-wrapper">
+                             <div class="nav-author__info">
+                                 <div>
+                                     @if (Auth::check())
+                                         <span class="fs-14 fw-bold text-capitalize">{{ Auth::user()->name }}
+                                             {{ Auth::user()->lastname }}</span>
+                                     @endif
+
+                                     @if ($role === Role::User)
+                                         <br> <span>เจ้าหน้าที่</span>
+                                     @elseif($role === Role::Agency)
+                                         <br> <span>หน่วยงาน</span>
+                                     @elseif($role === Role::Staff)
+                                         <br> <span>ผู้ดูแล</span>
+                                     @elseif($role === Role::Supply)
+                                         <br> <span>บริษัท Supply</span>
+                                     @endif
+
+                                 </div>
+                             </div>
+                             <div class="nav-author__options">
 
                                  @if ($role === Role::User)
-                                     <br> <span>เจ้าหน้าที่</span>
-                                 @elseif($role === Role::Agency)
-                                     <br> <span>หน่วยงาน</span>
-                                 @elseif($role === Role::Staff)
-                                     <br> <span>ผู้ดูแล</span>
+                                     <ul>
+                                         <li>
+                                             <a href="{{ route('user.profile') }}">
+                                                 <img src="{{ asset('assets/img/svg/user.svg') }}" alt="user"
+                                                     class="svg"> บัญชีผู้ใช้</a>
+                                         </li>
+                                         <li>
+                                             <a href="#">
+                                                 <img src="{{ asset('assets/img/svg/settings.svg') }}" alt="settings"
+                                                     class="svg"> ตั้งค่า</a>
+                                         </li>
+
+
+                                     </ul>
+                                 @elseif ($role === Role::Agency)
+                                     <ul>
+                                         <li>
+                                             <a href="">
+                                                 <img src="{{ asset('assets/img/svg/user.svg') }}" alt="user"
+                                                     class="svg"> Profile</a>
+                                         </li>
+                                         <li>
+                                             <a href="">
+                                                 <img src="{{ asset('assets/img/svg/settings.svg') }}" alt="settings"
+                                                     class="svg"> Settings</a>
+                                         </li>
+                                     </ul>
+                                 @elseif ($role === Role::Staff)
+                                     <ul>
+                                         <li>
+                                             <a href="">
+                                                 <img src="{{ asset('assets/img/svg/user.svg') }}" alt="user"
+                                                     class="svg"> Profile</a>
+                                         </li>
+                                         <li>
+                                             <a href="">
+                                                 <img src="{{ asset('assets/img/svg/settings.svg') }}" alt="settings"
+                                                     class="svg"> Settings</a>
+                                         </li>
+                                     </ul>
                                  @endif
 
+                                 <a href="#" class="nav-author__signout"
+                                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                                     <img src="{{ asset('assets/img/svg/log-out.svg') }}" alt="log-out"
+                                         class="svg">
+                                     ออกจากระบบ
+                                 </a>
+
+                                 <form id="logout" action="{{ route('logout') }}" method="POST"
+                                     style="display: none;">
+                                     @csrf
+                                 </form>
                              </div>
                          </div>
-                         <div class="nav-author__options">
-
-                             @if ($role === Role::User)
-                                 <ul>
-                                     <li>
-                                         <a href="{{ route('user.profile') }}">
-                                             <img src="{{ asset('assets/img/svg/user.svg') }}" alt="user"
-                                                 class="svg"> บัญชีผู้ใช้</a>
-                                     </li>
-                                     <li>
-                                         <a href="#">
-                                             <img src="{{ asset('assets/img/svg/settings.svg') }}" alt="settings"
-                                                 class="svg"> ตั้งค่า</a>
-                                     </li>
-
-
-                                 </ul>
-                             @elseif ($role === Role::Agency)
-                                 <ul>
-                                     <li>
-                                         <a href="">
-                                             <img src="{{ asset('assets/img/svg/user.svg') }}" alt="user"
-                                                 class="svg"> Profile</a>
-                                     </li>
-                                     <li>
-                                         <a href="">
-                                             <img src="{{ asset('assets/img/svg/settings.svg') }}" alt="settings"
-                                                 class="svg"> Settings</a>
-                                     </li>
-                                 </ul>
-                                
-                                 @elseif ($role === Role::Staff)
-                                 <ul>
-                                     <li>
-                                         <a href="">
-                                             <img src="{{ asset('assets/img/svg/user.svg') }}" alt="user"
-                                                 class="svg"> Profile</a>
-                                     </li>
-                                     <li>
-                                         <a href="">
-                                             <img src="{{ asset('assets/img/svg/settings.svg') }}" alt="settings"
-                                                 class="svg"> Settings</a>
-                                     </li>
-                                 </ul>
-                             @endif
-
-                             <a href="#" class="nav-author__signout"
-                                 onclick="event.preventDefault(); document.getElementById('logout').submit();">
-                                 <img src="{{ asset('assets/img/svg/log-out.svg') }}" alt="log-out" class="svg">
-                                 ออกจากระบบ
-                             </a>
-
-                             <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                 @csrf
-                             </form>
-                         </div>
                      </div>
-                 </div>
-             </li>
+                 </li>
          </ul>
          <div class="navbar-right__mobileAction d-md-none">
              <a href="#" class="btn-search">

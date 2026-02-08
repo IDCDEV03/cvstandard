@@ -25,7 +25,7 @@ class NewCheckRecordConfirmed extends Notification
             'record_id'  => $this->payload['record_id'],   // Str::random
             'veh_id'     => $this->payload['veh_id'],
             'form_id'    => $this->payload['form_id'],
-            'supply_id'  => $this->payload['supply_id'],
+            'agency_id'  => $this->payload['agency_id'],
             'user_id'    => $this->payload['user_id'],
             'url'        => $this->payload['url'],
             'created_at' => $this->payload['created_at'],

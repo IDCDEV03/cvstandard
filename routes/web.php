@@ -21,6 +21,7 @@ use App\Http\Controllers\User\ManagerController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StaffFormController;
 use App\Http\Controllers\SupplyMainController;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -212,6 +213,9 @@ Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () 
     Route::get('/inspector/{id}', [SupplyMainController::class, 'InspectorList'])->name('supply.inspector_list');
     Route::get('/inspector-new', [SupplyMainController::class, 'Inspector_Create'])->name('supply.inspector_new');
     Route::POST('/ins-store', [SupplyMainController::class, 'Inspector_Store'])->name('supply.inspector_store');
+
+    //รายการตรวจ
+     Route::get('/check/all', [SupplyMainController::class, 'chk_list'])->name('supply.chk_list');
 });
 
 
@@ -264,6 +268,17 @@ Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
 
     //group_form
 
+});
+
+Route::middleware('auth')->group(function () {
+   Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+
+    Route::get('/notifications/read/{id}', [NotificationController::class, 'read'])
+        ->name('notifications.read');
+
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])
+        ->name('notifications.readAll');
 });
 
 
