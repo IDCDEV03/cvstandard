@@ -22,6 +22,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StaffFormController;
 use App\Http\Controllers\SupplyMainController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Agency\AgentCompanyController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -184,6 +185,15 @@ Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () 
     Route::get('/item-edit/{id}', [AgencyMainController::class, 'item_edit'])->name('agency.item_edit');
     Route::post('/item-update', [AgencyMainController::class, 'item_update'])->name('agency.item_update');
     Route::get('/item-delete/{id}/image', [AgencyMainController::class, 'item_delete_image'])->name('agency.item_delete_image');
+
+    //CRUD บริษัทว่าจ้าง
+    Route::get('/companies', [AgentCompanyController::class, 'index'])->name('companies.index');
+    Route::get('/companies/create', [AgentCompanyController::class, 'create'])->name('companies.create');
+    Route::post('/companies', [AgentCompanyController::class, 'store'])->name('companies.store');
+
+    Route::get('/companies/{id}/edit', [AgentCompanyController::class, 'edit'])->name('companies.edit');
+    Route::post('/companies/{id}', [AgentCompanyController::class, 'update'])->name('companies.update');
+    Route::post('/companies/{id}/delete', [AgentCompanyController::class, 'destroy'])->name('companies.destroy');
 });
 
 Route::prefix('manager')->middleware(['auth', 'role:manager'])->group(function () {

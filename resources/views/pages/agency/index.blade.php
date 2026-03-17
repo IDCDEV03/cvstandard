@@ -19,10 +19,9 @@
         <div class="row">
             <!-- รายการบริษัทฯ -->
             <div class="col-md-4 mb-4">
-                <a href="#}" class="text-decoration-none">
+                <a href="{{route('companies.index')}}" class="text-decoration-none">
                     <div class="card shadow-sm" style="border: 2px solid 	#ffd6b5; background-color: #fff1e6;">
-                        <div class="card-body text-center">
-                          
+                        <div class="card-body text-center">                          
                             <h5 class="card-title">รายการบริษัทฯว่าจ้าง</h5>
                             <p class="card-text text-muted">สร้างและจัดการข้อมูลบริษัทฯว่าจ้าง</p>
                         </div>
@@ -41,14 +40,9 @@
                     </div>
                 </a>
             </div>
-
         </div>
 
         <div class="border-top border-light my-4"></div>
-
-
-
-
 
     </div>
 @endsection
