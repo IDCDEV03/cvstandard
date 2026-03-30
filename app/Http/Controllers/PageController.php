@@ -26,6 +26,7 @@ class PageController extends Controller
             Role::Admin => 'layout.LayoutAdmin',
             Role::Manager => 'layout.app',
             Role::Agency => 'layout.app',
+              Role::Company => 'layout.app',
             Role::User => 'layout.app',
             Role::Staff => 'layout.app',
              Role::Supply => 'layout.app',
@@ -35,6 +36,7 @@ class PageController extends Controller
             Role::Admin => 'ผู้ดูแลระบบ',
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'หน้าหลักหน่วยงาน',
+             Role::Company => 'หน้าหลักหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
              Role::Supply => 'หน้าหลักเจ้าหน้าที่',
@@ -44,6 +46,7 @@ class PageController extends Controller
             Role::Admin => 'ผู้ดูแลระบบ',
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'สำหรับหน่วยงาน',
+             Role::Company => 'lสำหรับหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
             Role::Supply => 'หน้าหลักเจ้าหน้าที่',
@@ -87,10 +90,26 @@ class PageController extends Controller
         elseif ($role === Role::Manager) {
             $id = Auth::id();
             $manager = DB::table('users')->where('id', Auth::id())->first();
-
            
             return view('pages.manager.index', compact('manager'));
         }
+        elseif ($role === Role::Company) {
+     
+        $user = Auth::user();
+        $companyCode = $user->company_code; 
+        $companyDetails = DB::table('company_details')
+            ->where('company_id', $companyCode)
+            ->first();
+      
+        $supplyCount = DB::table('users') 
+            ->where('company_code', $companyCode)
+            ->where('role', 'supply')
+            ->count();
+        
+        $formCount = 0; 
+        return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount'));
+    }
+        
           elseif ($role === Role::Staff) {
             $id = Auth::id();
             $staff = DB::table('users')->where('id', Auth::id())->first();

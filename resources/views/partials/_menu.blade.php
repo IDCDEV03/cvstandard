@@ -39,7 +39,11 @@
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับบุคลากร</span>
-                   @elseif ($role === Role::Supply)
+                  @elseif ($role === Role::Company)
+                 <span>ระบบตรวจมาตรฐานรถ</span>
+                 <div class="border-top my-3"></div>
+                 <span>เมนูสำหรับหน่วยงาน</span>
+             @elseif ($role === Role::Supply)
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับบุคลากร</span>
@@ -233,6 +237,64 @@
                      </li>
 
                  </ul>
+             </li>
+
+             <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
+               @elseif ($role === Role::Company)
+             <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-home-alt"></span>
+                     <span class="menu-text">หน้าหลัก</span>
+                 </a>
+             </li>    
+              <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">ประกาศ</span>
+                 </a>
+             </li> 
+              <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">รายการบริษัทในเครือ</span>
+                 </a>
+             </li>     
+              <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">รายการฟอร์ม</span>
+                 </a>
+             </li>
+
+            <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-truck"></span>
+                     <span class="menu-text">รายการรถ</span>
+                 </a>
+             </li>
+
+                <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-check-circle"></span>
+                     <span class="menu-text">รายการตรวจรถ</span>
+                 </a>
+             </li>
+
+                  <li>
+                 <a href="#" class="">
+                     <span class="nav-icon uil uil-user-md"></span>
+                     <span class="menu-text">รายการช่างตรวจ</span>
+                 </a>
              </li>
 
              <li>

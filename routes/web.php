@@ -23,6 +23,7 @@ use App\Http\Controllers\StaffFormController;
 use App\Http\Controllers\SupplyMainController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Agency\AgentCompanyController;
+use App\Http\Controllers\CompanySupplyController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -192,8 +193,8 @@ Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () 
     Route::post('/companies', [AgentCompanyController::class, 'store'])->name('companies.store');
 
     Route::get('/companies/{id}/edit', [AgentCompanyController::class, 'edit'])->name('companies.edit');
-    Route::post('/companies/{id}', [AgentCompanyController::class, 'update'])->name('companies.update');
-    Route::post('/companies/{id}/delete', [AgentCompanyController::class, 'destroy'])->name('companies.destroy');
+    Route::put('/companies/{id}', [AgentCompanyController::class, 'update'])->name('companies.update');
+    Route::delete('/companies/{id}/delete', [AgentCompanyController::class, 'destroy'])->name('companies.destroy');
 });
 
 Route::prefix('manager')->middleware(['auth', 'role:manager'])->group(function () {
@@ -208,6 +209,12 @@ Route::prefix('manager')->middleware(['auth', 'role:manager'])->group(function (
 
 Route::prefix('company')->middleware(['auth', 'role:company'])->group(function () {
     // สำหรับบริษัทว่าจ้างฯ
+    Route::get('/index', [PageController::class, 'home'])->name('company.index');
+
+// CRUD สำหรับ Supply
+    Route::get('/supplies', [CompanySupplyController::class, 'index'])->name('company.supplies.index');
+    Route::get('/supplies/create', [CompanySupplyController::class, 'create'])->name('company.supplies.create');
+    Route::post('/supplies', [CompanySupplyController::class, 'store'])->name('company.supplies.store');
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
