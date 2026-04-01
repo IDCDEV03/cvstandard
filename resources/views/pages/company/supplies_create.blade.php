@@ -112,7 +112,7 @@
     function generateRandom(fieldId) {
         const chars = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789';
         let result = 'SUP-';
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 6; i++) {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         document.getElementById(fieldId).value = result;

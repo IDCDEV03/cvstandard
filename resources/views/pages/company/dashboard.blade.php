@@ -195,7 +195,7 @@
         <div class="col-md-4 mb-3">
             <div class="bottom-card">
                 <i class="uil uil-building icon-top-right text-info"></i>
-                <h2>{{ $supplyCount ?? 0 }}</h2>
+                <h2> <a href="{{route('company.supplies.index')}}"> {{ $supplyCount ?? 0 }} </a></h2>
                 <p class="mb-2">บริษัทในเครือ (Supply)</p>
                 <div>
                     <a href="{{ route('company.supplies.create') }}" class="btn btn-xs btn-outline-secondary rounded-pill">

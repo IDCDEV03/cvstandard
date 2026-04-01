@@ -23,33 +23,30 @@ class CompanySupplyController extends Controller
         return view('pages.company.supplies_create');
     }
 
-    // ฟังก์ชันบันทึกข้อมูล Supply
+   //บันทึกข้อมูล supply
     public function store(Request $request)
     {
-        // 1. ดึงข้อมูลบริษัทแม่ที่ล็อกอินอยู่
+        
         $user = Auth::user();
-        $companyCode = $user->company_code; // รหัสบริษัทแม่
-        $agencyId = $user->agency_user_id ?? $user->agency_id; // รหัส Agency ต้นสังกัด
+        $companyCode = $user->company_code; 
+        $agencyId = $user->agency_user_id ?? $user->agency_id; 
 
-        // 2. Validate ข้อมูล
         $request->validate([
             'supply_name' => 'required|string|max:200',
             'supply_address' => 'required|string',
-            'vehicle_limit' => 'nullable|integer|min:0', // โควตารถของสาขานี้
+            'vehicle_limit' => 'nullable|integer|min:0', 
             'start_date' => 'nullable|date',
             'expire_date' => 'nullable|date|after_or_equal:start_date',
             'supply_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'supply_user' => 'required|string|unique:users,username', // เช็ค Username ไม่ให้ซ้ำ
+            'supply_user' => 'required|string|unique:users,username', 
             'supply_password' => 'required|string|min:6',
         ]);
 
-        // 3. สุ่มรหัส Supply (sup_id)
-        do {
+       do {
             $supId = 'SUP-' . strtoupper(Str::random(6));
             $exists = DB::table('supply_datas')->where('sup_id', $supId)->exists();
         } while ($exists);
-
-        // 4. จัดการรูปภาพโลโก้
+   
         $logoPath = null;
         if ($request->hasFile('supply_logo')) {
             $file = $request->file('supply_logo');
@@ -58,11 +55,10 @@ class CompanySupplyController extends Controller
             $logoPath = 'logo/supply/' . $filename;
         }
 
-        // 5. บันทึกลงฐานข้อมูลแบบ Transaction (2 ตาราง)
+     
         DB::beginTransaction();
 
         try {
-            // บันทึกลงตาราง supply_datas
             DB::table('supply_datas')->insert([
                 'company_code' => $companyCode,
                 'agency_user_id' => $agencyId,
@@ -72,7 +68,7 @@ class CompanySupplyController extends Controller
                 'supply_address' => $request->supply_address,
                 'supply_phone' => $request->supply_phone,
                 'supply_email' => $request->supply_email,
-                'supply_status' => 'active', // ค่าเริ่มต้น
+                'supply_status' => '1', 
                 'vehicle_limit' => $request->vehicle_limit ?? 0,
                 'require_user_approval' => $request->has('require_user_approval') ? 1 : 0,
                 'start_date' => $request->start_date,
@@ -81,7 +77,6 @@ class CompanySupplyController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
 
-            // บันทึกลงตาราง users สำหรับล็อกอิน
             DB::table('users')->insert([
                 'user_id' => $supId,
                 'username' => $request->supply_user,
@@ -105,11 +100,24 @@ class CompanySupplyController extends Controller
 
             return redirect()
                 ->route('company.supplies.index')
-                ->with('success', 'สร้างสาขา (Supply) เรียบร้อยแล้ว');
+                ->with('success', 'สร้างบริษัทในเครือ(Supply) เรียบร้อยแล้ว');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage())->withInput();
         }
     }
+
+    public function SupIndex()
+    {
+        $companyCode = Auth::user()->company_code;
+
+      $supplies = DB::table('supply_datas')
+        ->where('company_code', $companyCode)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('pages.company.supplies_index', compact('supplies'));
+    }
+
 }

@@ -212,7 +212,7 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
     Route::get('/index', [PageController::class, 'home'])->name('company.index');
 
 // CRUD สำหรับ Supply
-    Route::get('/supplies', [CompanySupplyController::class, 'index'])->name('company.supplies.index');
+    Route::get('/supplies', [CompanySupplyController::class, 'SupIndex'])->name('company.supplies.index');
     Route::get('/supplies/create', [CompanySupplyController::class, 'create'])->name('company.supplies.create');
     Route::post('/supplies', [CompanySupplyController::class, 'store'])->name('company.supplies.store');
 });
