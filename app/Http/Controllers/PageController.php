@@ -107,7 +107,16 @@ class PageController extends Controller
             ->count();
         
         $formCount = 0; 
-        return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount'));
+       
+        $totalVehicleLimit = DB::table('supply_datas')
+            ->where('company_code', $companyCode)
+            ->sum('vehicle_limit');
+   
+        $registeredVehicleCount = DB::table('vehicles_detail')
+            ->where('company_code', $companyCode)
+            ->count();
+    
+        return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount','totalVehicleLimit','registeredVehicleCount'));
     }
         
           elseif ($role === Role::Staff) {

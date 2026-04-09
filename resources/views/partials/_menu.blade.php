@@ -252,7 +252,7 @@
              </li>
                @elseif ($role === Role::Company)
              <li>
-                 <a href="#" class="">
+                 <a href="{{route('company.index')}}" class="">
                      <span class="nav-icon uil uil-home-alt"></span>
                      <span class="menu-text">หน้าหลัก</span>
                  </a>
@@ -264,7 +264,7 @@
                  </a>
              </li> 
               <li>
-                 <a href="#" class="">
+                 <a href="{{route('company.supplies.index')}}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการบริษัทในเครือ</span>
                  </a>

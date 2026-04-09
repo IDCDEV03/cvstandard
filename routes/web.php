@@ -212,9 +212,13 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
     Route::get('/index', [PageController::class, 'home'])->name('company.index');
 
 // CRUD สำหรับ Supply
+ Route::get('/supplies/show/{id}', [CompanySupplyController::class, 'SupShow'])->name('company.supplies.show');
     Route::get('/supplies', [CompanySupplyController::class, 'SupIndex'])->name('company.supplies.index');
     Route::get('/supplies/create', [CompanySupplyController::class, 'create'])->name('company.supplies.create');
     Route::post('/supplies', [CompanySupplyController::class, 'store'])->name('company.supplies.store');
+    Route::get('/supplies/{id}/edit', [CompanySupplyController::class, 'edit'])->name('company.supplies.edit');    
+    Route::put('/supplies/{id}', [CompanySupplyController::class, 'update'])->name('company.supplies.update');
+    Route::delete('/company/supplies/{id}', [CompanySupplyController::class, 'destroy'])->name('company.supplies.destroy');
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {

@@ -44,7 +44,8 @@
                                         <th><span class="userDatatable-title">โควตารถ</span></th>
                                         <th><span class="userDatatable-title">วันที่เริ่ม - หมดอายุ</span></th>
                                         <th><span class="userDatatable-title">สถานะ</span></th>
-                                        <th class="text-center"><span class="userDatatable-title text-end">จัดการ</span></th>
+                                        <th class="text-center"><span class="userDatatable-title text-end">จัดการ</span>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,9 +66,9 @@
                                             </td>
                                             <td>
                                                 <div class="userDatatable-content">
-                                                    <span
-                                                        class="d-block fw-bold fs-16 text-dark">{{ $item->supply_name }}</span>
-
+                                                    <a href="{{ route('company.supplies.show', $item->sup_id) }}">
+                                                        <span class="d-block fw-bold fs-16">{{ $item->supply_name }}</span>
+                                                    </a>
                                                 </div>
                                             </td>
                                             <td>
@@ -97,12 +98,12 @@
                                             </td>
                                             <td>
                                                 <div class="userDatatable-content d-inline-block">
-                                                    @if ($item->supply_status == 'active')
+                                                    @if ($item->supply_status == '1')
                                                         <span
-                                                            class="bg-opacity-success color-success rounded-pill userDatatable-content-status active">เปิดใช้งาน</span>
+                                                            class="bg-opacity-success color-success rounded-pill userDatatable-content-status active">Active</span>
                                                     @else
                                                         <span
-                                                            class="bg-opacity-danger color-danger rounded-pill userDatatable-content-status active">ปิดใช้งาน</span>
+                                                            class="bg-opacity-danger color-danger rounded-pill userDatatable-content-status active">Close</span>
                                                     @endif
                                                 </div>
                                             </td>
@@ -110,13 +111,21 @@
                                                 <ul
                                                     class="orderDatatable_actions mb-0 d-flex flex-wrap justify-content-center">
                                                     <li>
-                                                        <a href="#" class="edit">
+                                                        <a href="{{ route('company.supplies.show', $item->sup_id) }}"
+                                                            class="view text-info" title="จัดการรถและพนักงาน">
+                                                            <i class="uil uil-eye fs-20"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('company.supplies.edit', $item->sup_id) }}"
+                                                            class="edit">
                                                             <i class="uil uil-edit"></i>
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="#" class="remove"
-                                                            onclick="return confirm('ยืนยันการลบสาขานี้?')">
+                                                        <a href="javascript:void(0)" class="remove btn-delete-supply"
+                                                            data-id="{{ $item->sup_id }}"
+                                                            data-url="{{ route('company.supplies.destroy', $item->sup_id) }}">
                                                             <i class="uil uil-trash-alt"></i>
                                                         </a>
                                                     </li>
@@ -141,6 +150,76 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.btn-delete-supply');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // ดึง URL และ Token 
+                    const url = this.getAttribute('data-url');
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')
+                        .getAttribute('content');
+
+                    Swal.fire({
+                        title: 'ยืนยันการลบข้อมูล?',
+                        text: "ข้อมูล Supply และ User ผู้ใช้งาน จะถูกลบอย่างถาวร",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'ใช่',
+                        cancelButtonText: 'ยกเลิก'
+                    }).then((result) => {
+
+
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'กำลังลบข้อมูล...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            fetch(url, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrfToken,
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'ลบสำเร็จ!',
+                                            text: data.message,
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire('ล้มเหลว!', data.message, 'error');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    Swal.fire('ข้อผิดพลาด!',
+                                        'เกิดปัญหาในการเชื่อมต่อกับเซิร์ฟเวอร์',
+                                        'error');
+                                });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function() {

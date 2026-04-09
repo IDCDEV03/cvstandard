@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="@yield('description')" />
     <title>ID Check Vehicles Standard | @yield('title')</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Sarabun:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -16,5 +17,6 @@
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v3.0.0/css/line.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
+   
     
 </head>
