@@ -46,7 +46,7 @@ class PageController extends Controller
             Role::Admin => 'ผู้ดูแลระบบ',
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'สำหรับหน่วยงาน',
-             Role::Company => 'lสำหรับหน่วยงาน',
+             Role::Company => 'สำหรับหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
             Role::Supply => 'หน้าหลักเจ้าหน้าที่',

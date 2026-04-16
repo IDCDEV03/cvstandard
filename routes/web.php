@@ -14,8 +14,6 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\User\ManageAccountController;
 use App\Http\Controllers\User\UserProfileController;
 use Database\Seeders\VehicleTypeSeeder;
-use Illuminate\Support\Facades\Auth;
-use App\Enums\Role;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\User\ManagerController;
 use App\Http\Controllers\StaffController;
@@ -24,6 +22,8 @@ use App\Http\Controllers\SupplyMainController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Agency\AgentCompanyController;
 use App\Http\Controllers\CompanySupplyController;
+use App\Http\Controllers\CompanyVehicleController;
+use App\Http\Controllers\CompanyDashboardController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -211,14 +211,27 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
     // สำหรับบริษัทว่าจ้างฯ
     Route::get('/index', [PageController::class, 'home'])->name('company.index');
 
-// CRUD สำหรับ Supply
- Route::get('/supplies/show/{id}', [CompanySupplyController::class, 'SupShow'])->name('company.supplies.show');
+    // CRUD สำหรับ Supply
+    Route::get('/supplies/show/{id}', [CompanySupplyController::class, 'SupShow'])->name('company.supplies.show');
     Route::get('/supplies', [CompanySupplyController::class, 'SupIndex'])->name('company.supplies.index');
     Route::get('/supplies/create', [CompanySupplyController::class, 'create'])->name('company.supplies.create');
     Route::post('/supplies', [CompanySupplyController::class, 'store'])->name('company.supplies.store');
-    Route::get('/supplies/{id}/edit', [CompanySupplyController::class, 'edit'])->name('company.supplies.edit');    
+    Route::get('/supplies/{id}/edit', [CompanySupplyController::class, 'edit'])->name('company.supplies.edit');
     Route::put('/supplies/{id}', [CompanySupplyController::class, 'update'])->name('company.supplies.update');
     Route::delete('/company/supplies/{id}', [CompanySupplyController::class, 'destroy'])->name('company.supplies.destroy');
+
+    //CRUD จัดการรถ Supply
+    Route::get('/company/supplies/{supply_id}/vehicles/create', [CompanyVehicleController::class, 'create'])->name('company.vehicles.create');
+    Route::post('/company/supplies/{supply_id}/vehicles', [CompanyVehicleController::class, 'store'])->name('company.vehicles.store');
+
+    Route::get('/company/vehicles/{id}/edit', [CompanyVehicleController::class, 'edit'])->name('company.vehicles.edit');
+    Route::put('/company/vehicles/{id}/update', [CompanyVehicleController::class, 'car_update'])->name('company.vehicles.update');
+
+    Route::delete('/company/vehicles/{id}', [CompanyVehicleController::class, 'car_destroy'])->name('company.vehicles.destroy');
+
+    //CRUD ฟอร์มเช็ค
+    Route::get('/form', [CompanyDashboardController::class, 'company_form'])->name('company.form.index');
+
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
@@ -236,7 +249,7 @@ Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () 
     Route::POST('/ins-store', [SupplyMainController::class, 'Inspector_Store'])->name('supply.inspector_store');
 
     //รายการตรวจ
-     Route::get('/check/all', [SupplyMainController::class, 'chk_list'])->name('supply.chk_list');
+    Route::get('/check/all', [SupplyMainController::class, 'chk_list'])->name('supply.chk_list');
 });
 
 
@@ -292,7 +305,7 @@ Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-   Route::get('/notifications', [NotificationController::class, 'index'])
+    Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
 
     Route::get('/notifications/read/{id}', [NotificationController::class, 'read'])

@@ -24,30 +24,30 @@ class CompanySupplyController extends Controller
         return view('pages.company.supplies_create');
     }
 
-   //บันทึกข้อมูล supply
+    //บันทึกข้อมูล supply
     public function store(Request $request)
     {
-        
+
         $user = Auth::user();
-        $companyCode = $user->company_code; 
-        $agencyId = $user->agency_user_id ?? $user->agency_id; 
+        $companyCode = $user->company_code;
+        $agencyId = $user->agency_user_id ?? $user->agency_id;
 
         $request->validate([
             'supply_name' => 'required|string|max:200',
             'supply_address' => 'required|string',
-            'vehicle_limit' => 'nullable|integer|min:0', 
+            'vehicle_limit' => 'nullable|integer|min:0',
             'start_date' => 'nullable|date',
             'expire_date' => 'nullable|date|after_or_equal:start_date',
             'supply_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'supply_user' => 'required|string|unique:users,username', 
+            'supply_user' => 'required|string|unique:users,username',
             'supply_password' => 'required|string|min:6',
         ]);
 
-       do {
+        do {
             $supId = 'SUP-' . strtoupper(Str::random(6));
             $exists = DB::table('supply_datas')->where('sup_id', $supId)->exists();
         } while ($exists);
-   
+
         $logoPath = null;
         if ($request->hasFile('supply_logo')) {
             $file = $request->file('supply_logo');
@@ -55,7 +55,7 @@ class CompanySupplyController extends Controller
             $file->move(public_path('logo/supply'), $filename); // เก็บแยกโฟลเดอร์ให้เป็นระเบียบ
             $logoPath = 'logo/supply/' . $filename;
         }
-     
+
         DB::beginTransaction();
 
         try {
@@ -68,7 +68,7 @@ class CompanySupplyController extends Controller
                 'supply_address' => $request->supply_address,
                 'supply_phone' => $request->supply_phone,
                 'supply_email' => $request->supply_email,
-                'supply_status' => '1', 
+                'supply_status' => '1',
                 'vehicle_limit' => $request->vehicle_limit ?? 0,
                 'require_user_approval' => $request->has('require_user_approval') ? 1 : 0,
                 'start_date' => $request->start_date,
@@ -88,7 +88,7 @@ class CompanySupplyController extends Controller
                 'password' => Hash::make($request->supply_password),
                 'user_phone' => $request->supply_phone,
                 'logo_agency' => $logoPath,
-                'role' => 'supply', 
+                'role' => 'supply',
                 'company_code' => $companyCode,
                 'agency_user_id' => $agencyId,
                 'agency_id' => $agencyId,
@@ -101,7 +101,6 @@ class CompanySupplyController extends Controller
             return redirect()
                 ->route('company.supplies.index')
                 ->with('success', 'สร้างบริษัทในเครือ(Supply) เรียบร้อยแล้ว');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage())->withInput();
@@ -112,12 +111,12 @@ class CompanySupplyController extends Controller
     {
         $companyCode = Auth::user()->company_code;
 
-      $supplies = DB::table('supply_datas')
-        ->where('company_code', $companyCode)
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $supplies = DB::table('supply_datas')
+            ->where('company_code', $companyCode)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    return view('pages.company.supplies_index', compact('supplies'));
+        return view('pages.company.supplies_index', compact('supplies'));
     }
 
     public function edit($id)
@@ -158,7 +157,7 @@ class CompanySupplyController extends Controller
             'start_date' => 'nullable|date',
             'expire_date' => 'nullable|date|after_or_equal:start_date',
             'supply_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5048',
-            'supply_user' => 'required|string', 
+            'supply_user' => 'required|string',
             'supply_password' => 'nullable|string|min:4',
         ]);
 
@@ -189,7 +188,7 @@ class CompanySupplyController extends Controller
                     'supply_address' => $request->supply_address,
                     'supply_phone' => $request->supply_phone,
                     'supply_email' => $request->supply_email,
-                   'supply_status' => $request->input('supply_status') == 1 ? '1' : '0',
+                    'supply_status' => $request->input('supply_status') == 1 ? '1' : '0',
                     'vehicle_limit' => $request->vehicle_limit ?? 0,
                     'start_date' => $request->start_date,
                     'expire_date' => $request->expire_date,
@@ -220,7 +219,6 @@ class CompanySupplyController extends Controller
             return redirect()
                 ->route('company.supplies.index')
                 ->with('success', 'อัปเดตข้อมูล Supply เรียบร้อยแล้ว');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage())->withInput();
@@ -240,7 +238,7 @@ class CompanySupplyController extends Controller
             return redirect()->route('company.index')->with('error', 'ไม่พบข้อมูลสาขา หรือไม่มีสิทธิ์เข้าถึง');
         }
 
-       DB::beginTransaction();
+        DB::beginTransaction();
 
         try {
             $logoPath = $supply->supply_logo;
@@ -252,43 +250,48 @@ class CompanySupplyController extends Controller
             DB::table('users')->where('user_id', $id)->delete();
 
             DB::commit();
-         
+
             return response()->json([
                 'success' => true,
                 'message' => 'ลบข้อมูล Supply เรียบร้อยแล้ว'
             ]);
-
         } catch (\Exception $e) {
-            DB::rollBack();       
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'เกิดข้อผิดพลาดในการลบข้อมูล: ' . $e->getMessage()
             ], 500);
         }
     }
+
     public function SupShow($id)
     {
-$companyCode = auth()->user()->company_code;
+        $companyCode = auth()->user()->company_code;
 
-    // 1. ดึงข้อมูล Supply
-    $supply = DB::table('supply_datas')
-        ->where('sup_id', $id)
-        ->where('company_code', $companyCode)
-        ->first();
+        // 1. ข้อมูล Supply
+        $supply = DB::table('supply_datas')
+            ->where('sup_id', $id)
+            ->where('company_code', $companyCode)
+            ->first();
 
-    if (!$supply) abort(404);
+        if (!$supply) abort(404);
 
-    // 2. ดึงข้อมูลรถ (อ้างอิงจาก supply_id)
-    $vehicles = DB::table('vehicles_detail')
-        ->where('supply_id', $id) // ตรวจสอบชื่อคอลัมน์ของคุณอีกครั้ง
+        // 2. ข้อมูลรถ 
+      $vehicles = DB::table('vehicles_detail')
+        ->leftJoin('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+        ->where('vehicles_detail.supply_id', $id)
+        ->select(
+            'vehicles_detail.*', 
+            'vehicle_types.vehicle_type as type_name' 
+        )
+        ->orderBy('vehicles_detail.updated_at', 'DESC')
         ->get();
 
-    // 3. ดึงข้อมูลพนักงาน (อ้างอิงจาก sup_id ตามรูปที่คุณแนบมา)
-    $drivers = DB::table('inspector_datas')
-        ->where('sup_id', $id) 
-        ->get();
+        // 3. ข้อมูลพนักงาน 
+        $drivers = DB::table('inspector_datas')
+            ->where('sup_id', $id)
+            ->get();
 
-    return view('pages.company.supplies_show', compact('supply', 'vehicles', 'drivers'));
+        return view('pages.company.supplies_show', compact('supply', 'vehicles', 'drivers'));
     }
-
 }

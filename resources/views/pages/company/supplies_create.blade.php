@@ -18,7 +18,7 @@
             <div class="card mb-25">
                 <div class="card-body">
                     @if (session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
+                        <div class="alert alert-alert">{{ session('error') }}</div>
                     @endif
 
                     <form action="{{ route('company.supplies.store') }}" method="POST" enctype="multipart/form-data">

@@ -210,7 +210,7 @@
                                 <img class="svg" src="{{ asset('assets/img/svg/check-clipboard.svg') }}" alt="">
                             </div>
                             <div class="application-task-content">
-                                <h2><a href="#"> {{ $formCount ?? 0 }}/{{ $companyDetails->form_limit ?? 5 }} </a>
+                                <h2><a href="{{route('company.form.index')}}"> {{ $formCount ?? 0 }}/{{ $companyDetails->form_limit ?? 5 }} </a>
                                 </h2>
                                 <span class="text-light fs-14 mt-1 text-capitalize">ฟอร์มตรวจที่สร้างแล้ว</span>
                             </div>

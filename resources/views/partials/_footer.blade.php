@@ -7,7 +7,7 @@
         </div>
         <div class="col-md-6">
             <div class="footer-menu text-end">
-                <p>v1.2.1</p>
+                <p>v1.3.00260416</p>
             </div>
         </div>
     </div>

@@ -41,7 +41,7 @@
                                         <th class="text-center"><span class="userDatatable-title">Logo</span></th>
                                         <th><span class="userDatatable-title">ชื่อบริษัทในเครือ</span></th>
                                         <th><span class="userDatatable-title">เบอร์โทร / อีเมล</span></th>
-                                        <th><span class="userDatatable-title">โควตารถ</span></th>
+                                        <th><span class="userDatatable-title">จำนวนรถ</span></th>
                                         <th><span class="userDatatable-title">วันที่เริ่ม - หมดอายุ</span></th>
                                         <th><span class="userDatatable-title">สถานะ</span></th>
                                         <th class="text-center"><span class="userDatatable-title text-end">จัดการ</span>

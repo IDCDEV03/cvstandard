@@ -44,4 +44,9 @@ class CompanyDashboardController extends Controller
         return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount'));
     }
 
+    public function company_form()
+    {
+        return view('pages.company.form_index');
+    }
+
 }

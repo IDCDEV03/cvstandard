@@ -1,0 +1,90 @@
+@section('title', 'ระบบตรวจมาตรฐานรถ')
+@section('description', 'ID Drives')
+@extends('layout.app')
+@section('content')
+    <div class="container-fluid">
+
+        <div class="col-md-12">
+            <div class="card mt-20  mb-25">
+                <div class="card-body">
+                    <div class="dm-button-list d-flex flex-wrap gap-2">
+                        <a href="#" class="btn btn-primary btn-transparent-primary fs-16">สร้างกลุ่มฟอร์ม (Form Group)</a>
+                        |
+                        <a href="#"
+                            class="btn btn-secondary btn-transparent-secondary fs-16">สร้างฟอร์มใหม่</a>
+                        <a href="#" class="btn btn-info btn-transparent-info fs-16">สร้างส่วนหัวรายงาน</a>
+                        <a href="#" class="btn btn-warning btn-transparent-warning fs-16">สร้างส่วนท้ายรายงาน</a>
+                        <a href="#"
+                            class="btn btn-light btn-transparent-light fs-16">สร้างส่วนข้อมูลก่อนตรวจรถ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6> รายการฟอร์มตรวจ</h6>
+                    </div>
+                    <div class="card-body">
+
+                        <table class="table table-bordered" id="forms-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>รหัสฟอร์ม</th>
+                                    <th>ชื่อฟอร์ม</th>
+                                    <th>สถานะ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               
+                                    <tr>
+                                        <td>*</td>
+                                        <td>*</td>
+                                        <td>*</a>
+                                        </td>
+                                        <td>
+                                            **
+                                        </td>
+                                    </tr>
+                             
+                            </tbody>
+                        </table>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+@endsection
+
+@push('scripts')
+    <!-- DataTables  -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#forms-table').DataTable({
+                responsive: true,
+                pageLength: 25,
+                language: {
+                    search: "ค้นหา:",
+                    lengthMenu: "แสดง _MENU_ รายการ",
+                    info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                    paginate: {
+                        next: "ถัดไป",
+                        previous: "ก่อนหน้า"
+                    }
+                }
+            });
+        });
+    </script>
+@endpush

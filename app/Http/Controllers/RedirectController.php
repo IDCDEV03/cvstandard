@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Role;
-
+use Illuminate\Support\Facades\Log; 
 class RedirectController extends Controller
 {
 
     public function handleRoot()
-    {
+    {  
 
         if (!Auth::check()) {
             return redirect()->route('login')->withHeaders([
@@ -22,7 +22,7 @@ class RedirectController extends Controller
         }
 
         $user = Auth::user();
-
+     
         if (!$user || empty($user->role)) {
             return redirect()->route('login')->withHeaders([
                 'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
@@ -31,6 +31,8 @@ class RedirectController extends Controller
             ]);
         }
 
+
+        Log::info('Redirect to role: ' . $user->role->value);
         // redirect ตาม role
         switch ($user?->role) {
             case Role::Admin:
@@ -44,6 +46,9 @@ class RedirectController extends Controller
 
             case Role::User:
                 return redirect()->route('local.home');
+
+            case Role::Company:
+                return redirect()->route('company.index');
 
             case Role::Staff:
                 return redirect()->route('staff.index');
