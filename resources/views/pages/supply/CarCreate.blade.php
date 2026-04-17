@@ -90,8 +90,8 @@
                             <div class="mb-3">
                                 <label class="il-gray fs-16 fw-500 align-center mb-10">ประเภทรถ <span
                                         class="text-danger">*</span></label>
-                                <select class="form-control px-15" name="car_type" id="car_type" >
-                                    <option value="6" selected>-รถโม่</option>
+                                  <select class="form-control px-15" name="car_type" id="car_type" required>
+                                    <option value="0" selected disabled>--เลือกประเภทรถ--</option>
                                     @foreach ($car_type as $data)
                                         <option value="{{ $data->id }}">{{ $data->vehicle_type }}</option>
                                     @endforeach

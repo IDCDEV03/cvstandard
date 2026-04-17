@@ -100,13 +100,13 @@ class PageController extends Controller
         $companyDetails = DB::table('company_details')
             ->where('company_id', $companyCode)
             ->first();
-      
+
+        $formCount = DB::table('forms')->where('user_id', $companyCode)->count();
+
         $supplyCount = DB::table('users') 
             ->where('company_code', $companyCode)
             ->where('role', 'supply')
-            ->count();
-        
-        $formCount = 0; 
+            ->count();               
        
         $totalVehicleLimit = DB::table('supply_datas')
             ->where('company_code', $companyCode)

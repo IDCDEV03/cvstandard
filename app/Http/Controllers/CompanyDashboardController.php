@@ -22,7 +22,7 @@ class CompanyDashboardController extends Controller
     {
         // 1. ดึงข้อมูล User ที่ล็อกอินอยู่
         $user = Auth::user();
-        $companyCode = $user->company_code; // อ้างอิงจากตาราง users ที่คุณเก็บค่า company_id ไว้ที่นี่
+        $companyCode = $user->company_code; 
 
         // 2. ดึงข้อมูลรายละเอียดของ Company ตัวเอง
         $companyDetails = DB::table('company_details')
@@ -37,8 +37,8 @@ class CompanyDashboardController extends Controller
             ->count();
 
         // จำนวนฟอร์มที่สร้างไปแล้ว (สมมติว่าคุณมีตาราง forms)
-        // $formCount = DB::table('forms')->where('company_id', $companyCode)->count();
-        $formCount = 0; // ใส่ 0 ไว้ก่อนรอทำระบบฟอร์ม
+         $formCount = DB::table('forms')->where('user_id','=', $companyCode)->count();
+        //$formCount = 0; // ใส่ 0 ไว้ก่อนรอทำระบบฟอร์ม
 
         // 4. ส่งข้อมูลไปที่หน้า View
         return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount'));

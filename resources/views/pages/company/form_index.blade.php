@@ -13,9 +13,8 @@
                         |
                         <a href="{{ route('company.form.create') }}"
                             class="btn btn-secondary btn-transparent-secondary fs-16">สร้างฟอร์มใหม่</a>
-                        <a href="#" class="btn btn-info btn-transparent-info fs-16">สร้างส่วนหัวรายงาน</a>
-                        <a href="#" class="btn btn-warning btn-transparent-warning fs-16">สร้างส่วนท้ายรายงาน</a>
-                        <a href="#" class="btn btn-light btn-transparent-light fs-16">สร้างส่วนข้อมูลก่อนตรวจรถ</a>
+                        <a href="#" class="btn btn-info btn-transparent-info fs-16">จัดการ Template รายงาน</a>                      
+                        <a href="{{route('company.pre_inspection.create')}}" class="btn btn-warning btn-transparent-warning fs-16">จัดการ Template ก่อนตรวจ</a>
                     </div>
                 </div>
             </div>

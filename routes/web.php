@@ -25,6 +25,7 @@ use App\Http\Controllers\CompanySupplyController;
 use App\Http\Controllers\CompanyVehicleController;
 use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\CompanyFormController;
+use App\Http\Controllers\CompanyPreInspectionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -249,6 +250,12 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 
     Route::get('/form/item-create/{id}', [CompanyFormController::class, 'item_create'])->name('company.form.ItemCreate');
     Route::post('/form/item-store', [CompanyFormController::class, 'item_store'])->name('company.form.ItemStore');
+
+    //CRUD Template Report
+    Route::prefix('company/pre-inspection')->name('company.pre_inspection.')->group(function () {
+    Route::get('/create', [CompanyPreInspectionController::class, 'create'])->name('create');
+    Route::post('/store', [CompanyPreInspectionController::class, 'store'])->name('store');
+});
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {

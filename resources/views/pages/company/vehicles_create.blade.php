@@ -80,8 +80,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="a9"
-                                            class="il-gray fs-16 fw-500 align-center mb-10">อายุการใช้งานรถ
-                                            (ระบุเป็นจำนวนปี)</label>
+                                            class="il-gray fs-16 fw-500 align-center mb-10">ปีที่เริ่มใช้งานครั้งแรกหรือจดทะเบียนครั้งแรก
+                                            (ระบุ ปี พ.ศ. ถ้าไม่มีให้ใส่ -)</label>
                                         <input type="text" name="car_age"
                                             class="form-control ">
                                     </div>
