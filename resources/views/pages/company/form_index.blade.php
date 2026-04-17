@@ -10,7 +10,7 @@
                     <div class="dm-button-list d-flex flex-wrap gap-2">
                         <a href="#" class="btn btn-primary btn-transparent-primary fs-16">สร้างกลุ่มฟอร์ม (Form Group)</a>
                         |
-                        <a href="#"
+                        <a href="{{route('company.form.create')}}"
                             class="btn btn-secondary btn-transparent-secondary fs-16">สร้างฟอร์มใหม่</a>
                         <a href="#" class="btn btn-info btn-transparent-info fs-16">สร้างส่วนหัวรายงาน</a>
                         <a href="#" class="btn btn-warning btn-transparent-warning fs-16">สร้างส่วนท้ายรายงาน</a>

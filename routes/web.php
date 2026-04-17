@@ -24,6 +24,7 @@ use App\Http\Controllers\Agency\AgentCompanyController;
 use App\Http\Controllers\CompanySupplyController;
 use App\Http\Controllers\CompanyVehicleController;
 use App\Http\Controllers\CompanyDashboardController;
+use App\Http\Controllers\CompanyFormController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -231,7 +232,23 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 
     //CRUD ฟอร์มเช็ค
     Route::get('/form', [CompanyDashboardController::class, 'company_form'])->name('company.form.index');
+    Route::get('/form/create', [CompanyFormController::class, 'create'])->name('company.form.create');
+    Route::POST('/form/store', [CompanyFormController::class, 'FormStore1'])->name('company.form_store1');
 
+    Route::get('/form/create/step2/{id}/{order}', [CompanyFormController::class, 'FormNew_Step2'])->name('company.form.create2');
+
+    Route::POST('/form/store/step2/{id}', [CompanyFormController::class, 'FormStep2_Store'])->name('company.form.store2');
+
+    Route::get('/form/create/step3/{id}', [CompanyFormController::class, 'FormNew_Step3'])->name('company.form.create3');
+
+    //back แบบเคลียร์ session
+    Route::get('/form/back-to-create3/{id}', [CompanyFormController::class, 'backToCreate3'])
+    ->name('company.form.back_to_create3');
+
+    Route::get('/form/categories/{cates_id}', [CompanyFormController::class, 'categories_list'])->name('company.form.categories_list');
+
+    Route::get('/form/item-create/{id}', [CompanyFormController::class, 'item_create'])->name('company.form.ItemCreate');
+    Route::post('/form/item-store', [CompanyFormController::class, 'item_store'])->name('company.form.ItemStore');
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
