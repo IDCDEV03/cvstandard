@@ -13,8 +13,8 @@
                         |
                         <a href="{{ route('company.form.create') }}"
                             class="btn btn-secondary btn-transparent-secondary fs-16">สร้างฟอร์มใหม่</a>
-                        <a href="#" class="btn btn-info btn-transparent-info fs-16">จัดการ Template รายงาน</a>                      
-                        <a href="{{route('company.pre_inspection.create')}}" class="btn btn-warning btn-transparent-warning fs-16">จัดการ Template ก่อนตรวจ</a>
+                        <a href="{{route('company.report_template.index')}}" class="btn btn-info btn-transparent-info fs-16">จัดการ Template รายงาน</a>                      
+                        <a href="{{route('company.pre_inspection.index')}}" class="btn btn-warning btn-transparent-warning fs-16">จัดการ Template ก่อนตรวจ</a>
                     </div>
                 </div>
             </div>
@@ -22,6 +22,17 @@
 
         <div class="row">
             <div class="col-md-12">
+                  @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert-content">
+                            <p>{{ session('success') }}</p>
+                            <button type="button" class="btn-close text-capitalize" data-bs-dismiss="alert"
+                                aria-label="Close">
+                                <i class="uil uil-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h6> รายการฟอร์มตรวจ</h6>

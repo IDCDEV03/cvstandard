@@ -26,6 +26,7 @@ use App\Http\Controllers\CompanyVehicleController;
 use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\CompanyFormController;
 use App\Http\Controllers\CompanyPreInspectionController;
+use App\Http\Controllers\CompanyReportTemplateController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -244,7 +245,7 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 
     //back แบบเคลียร์ session
     Route::get('/form/back-to-create3/{id}', [CompanyFormController::class, 'backToCreate3'])
-    ->name('company.form.back_to_create3');
+        ->name('company.form.back_to_create3');
 
     Route::get('/form/categories/{cates_id}', [CompanyFormController::class, 'categories_list'])->name('company.form.categories_list');
 
@@ -253,9 +254,19 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 
     //CRUD Template Report
     Route::prefix('company/pre-inspection')->name('company.pre_inspection.')->group(function () {
-    Route::get('/create', [CompanyPreInspectionController::class, 'create'])->name('create');
-    Route::post('/store', [CompanyPreInspectionController::class, 'store'])->name('store');
-});
+        Route::get('/', [CompanyPreInspectionController::class, 'index'])->name('index');
+        Route::get('/create', [CompanyPreInspectionController::class, 'create'])->name('create');
+        Route::post('/store', [CompanyPreInspectionController::class, 'pre_ins_store'])->name('store');
+
+        Route::get('/{id}', [CompanyPreInspectionController::class, 'show'])->name('show');
+    });
+
+    Route::prefix('company/report-template')->name('company.report_template.')->group(function () {
+        Route::get('/', [CompanyReportTemplateController::class, 'index'])->name('index');
+        Route::get('/create', [CompanyReportTemplateController::class, 'create'])->name('create');
+        Route::post('/store', [CompanyReportTemplateController::class, 'store'])->name('store');
+        Route::get('/show/{id}', [CompanyReportTemplateController::class, 'show'])->name('show');
+    });
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {

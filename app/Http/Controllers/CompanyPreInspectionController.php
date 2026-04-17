@@ -19,13 +19,60 @@ class CompanyPreInspectionController extends Controller
         $this->middleware(['auth', 'role:company']);
     }
 
+    public function index()
+    {
+        $company_id = Auth::user()->company_id ?? Auth::user()->user_id;
+
+        // ดึงข้อมูลแม่แบบ พร้อมนับจำนวนฟิลด์ย่อย (field_count) ที่อยู่ในแม่แบบนั้น
+        $templates = DB::table('pre_inspection_templates')
+            ->leftJoin('pre_inspection_fields', 'pre_inspection_templates.id', '=', 'pre_inspection_fields.template_id')
+            ->select(
+                'pre_inspection_templates.id',
+                'pre_inspection_templates.template_name',
+                'pre_inspection_templates.is_active',
+                DB::raw('COUNT(pre_inspection_fields.id) as field_count')
+            )
+            ->where('pre_inspection_templates.company_id', $company_id)
+            ->groupBy('pre_inspection_templates.id', 'pre_inspection_templates.template_name', 'pre_inspection_templates.is_active')
+            ->orderBy('pre_inspection_templates.id', 'desc')
+            ->get();
+
+        return view('pages.company.pre_inspection_index', compact('templates'));
+    }
+
+    public function show($id)
+    {
+        $company_id = Auth::user()->company_id ?? Auth::user()->user_id;
+
+        // 1. ดึงข้อมูลแม่แบบหลัก และเช็คสิทธิ์ว่าเป็นของบริษัทนี้หรือไม่
+        $template = DB::table('pre_inspection_templates')
+            ->where('id', $id)
+            ->where('company_id', $company_id)
+            ->first();
+
+        // ถ้าไม่มีข้อมูล หรือไม่ใช่ของบริษัทตัวเอง ให้เตะกลับ
+        if (!$template) {
+            return redirect()->route('company.pre_inspection.index')
+                             ->with('error', 'ไม่พบข้อมูลแม่แบบ หรือคุณไม่มีสิทธิ์เข้าถึง');
+        }
+
+        // 2. ดึงข้อมูลหัวข้อย่อยทั้งหมด เรียงตามลำดับ (sort_order)
+        $fields = DB::table('pre_inspection_fields')
+            ->where('template_id', $id)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return view('pages.company.pre_inspection_show', compact('template', 'fields'));
+    }
+
     public function create()
     {
         return view('pages.company.pre_inspection_create');
     }
 
-    // บันทึกข้อมูลลง Database
-    public function store(Request $request)
+   
+    public function pre_ins_store(Request $request)
     {
         // 1. Validation
         $request->validate([
@@ -36,7 +83,7 @@ class CompanyPreInspectionController extends Controller
             'fields.*.is_required' => 'required|in:0,1',
         ]);
 
-        $company_id = Auth::user()->company_id ?? Auth::user()->user_id; // ปรับให้ตรงกับฟิลด์ที่เก็บ ID บริษัทของคุณ
+        $company_id = Auth::user()->company_id ?? Auth::user()->user_id; 
 
         DB::beginTransaction();
 
@@ -73,7 +120,7 @@ class CompanyPreInspectionController extends Controller
             DB::commit();
 
             // เปลี่ยน Route ปลายทางกลับไปยังหน้ารายการที่คุณต้องการ
-            return redirect()->back()->with('success', 'สร้างแม่แบบก่อนตรวจรถเรียบร้อยแล้ว');
+            return redirect()->route('company.form.index')->with('success', 'สร้างเทมเพลตก่อนตรวจรถเรียบร้อยแล้ว');
 
         } catch (\Exception $e) {
             DB::rollBack();

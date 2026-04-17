@@ -138,12 +138,12 @@
                                     </div>
                                     <div class="table-responsive">
                                         <table id="driversTable" class="table table-bordered text-center w-100">
-                                            <thead class="bg-light">
+                                            <thead>
                                                 <tr>
                                                     <th>ชื่อ-นามสกุล</th>
                                                     <th>เบอร์โทรศัพท์</th>
                                                     <th>เลขที่ใบขับขี่</th>
-                                                    <th>อายุ / ประสบการณ์</th>
+                                                    
                                                     <th>สถานะ</th>
                                                     <th>จัดการ</th>
                                                 </tr>
@@ -157,11 +157,7 @@
                                                         </td>
                                                         <td>{{ $driver->ins_phone ?? '-' }}</td>
                                                         <td>{{ $driver->dl_number ?? '-' }}</td>
-                                                        <td>
-                                                            ปีเกิด: {{ $driver->ins_birthyear ?? '-' }} <br>
-                                                            <small class="text-muted">ประสบการณ์:
-                                                                {{ $driver->ins_experience ?? '-' }} ปี</small>
-                                                        </td>
+                                                      
                                                         <td>
                                                             @if ($driver->ins_status == '1' || $driver->ins_status == 'active')
                                                                 <span class="badge bg-success rounded-pill">Active</span>
@@ -334,7 +330,7 @@
                 order: [],
                 columnDefs: [{
                     "orderable": false,
-                    "targets": [5]
+                    "targets": [4]
                 }],
                 language: {
                     search: "ค้นหา:",
