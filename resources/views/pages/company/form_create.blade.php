@@ -45,7 +45,20 @@
                                     </div>
                                 </div>
                            
-
+     <div class="form-group row mb-25">
+                                    <div class="col-sm-3 d-flex aling-items-center">
+                                        <label class="col-form-label color-dark align-center">ประเภทรถ<span
+                                                class="text-danger">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select name="vehicle_type_id" id="vehicle_type_id" class="form-select ih-medium ip-gray radius-xs" required>
+                                            <option value="" disabled selected>-- เลือกประเภทรถ --</option>
+                                            @foreach($vehicle_types as $vtype)
+                                                <option value="{{ $vtype->id }}">{{ $vtype->vehicle_type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 
                                 <div class="form-group row mb-25">
                                     <div class="col-sm-3 d-flex aling-items-center">
@@ -67,6 +80,8 @@
                                         </div>
                                     </div>
                                 </div>
+
+                           
 
 
                                 <div class="form-group row mb-25">

@@ -270,7 +270,7 @@
                  </a>
              </li>     
               <li>
-                 <a href="#" class="">
+                 <a href="{{route('company.form.index')}}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการฟอร์ม</span>
                  </a>

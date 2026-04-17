@@ -30,7 +30,9 @@ class CompanyFormController extends Controller
             ->orderBy('supply_name', 'ASC')
             ->get();
 
-        return view('pages.company.form_create', compact('car_type', 'supply_list'));
+            $vehicle_types = DB::table('vehicle_types')->get();
+
+        return view('pages.company.form_create', compact('car_type', 'supply_list','vehicle_types'));
     }
 
     public function FormStore1(Request $request)
@@ -55,7 +57,8 @@ class CompanyFormController extends Controller
                 'form_code'     => $request->input('form_code'),
                 'form_name'     => $request->form_name,
                 'form_status'   => $request->form_setting,
-                'form_open'     => $request->form_scope, // ใช้ค่า public หรือ specific ตามที่ส่งมา
+                'form_open'     => $request->form_scope, 
+                'car_type'      => $request->vehicle_type_id,
                 'created_at'    => Carbon::now(),
                 'updated_at'    => Carbon::now()
             ]);

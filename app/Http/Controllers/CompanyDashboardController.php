@@ -13,7 +13,7 @@ use App\Enums\Role;
 
 class CompanyDashboardController extends Controller
 {
-       public function __construct()
+    public function __construct()
     {
         $this->middleware(['auth', 'role:company']);
     }
@@ -46,7 +46,15 @@ class CompanyDashboardController extends Controller
 
     public function company_form()
     {
-        return view('pages.company.form_index');
-    }
+        $user = Auth::user()->user_id;      
 
+        $form_list = DB::table('forms')
+            ->leftJoin('vehicle_types', 'forms.car_type', '=', 'vehicle_types.id')
+            ->select('forms.*', 'vehicle_types.vehicle_type')
+            ->where('forms.user_id', $user)
+            ->orderBy('forms.updated_at','DESC')
+            ->get();
+
+        return view('pages.company.form_index', compact('form_list'));
+    }
 }

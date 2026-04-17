@@ -8,14 +8,14 @@
             <div class="card mt-20  mb-25">
                 <div class="card-body">
                     <div class="dm-button-list d-flex flex-wrap gap-2">
-                        <a href="#" class="btn btn-primary btn-transparent-primary fs-16">สร้างกลุ่มฟอร์ม (Form Group)</a>
+                        <a href="#" class="btn btn-primary btn-transparent-primary fs-16">สร้างกลุ่มฟอร์ม (Form
+                            Group)</a>
                         |
-                        <a href="{{route('company.form.create')}}"
+                        <a href="{{ route('company.form.create') }}"
                             class="btn btn-secondary btn-transparent-secondary fs-16">สร้างฟอร์มใหม่</a>
                         <a href="#" class="btn btn-info btn-transparent-info fs-16">สร้างส่วนหัวรายงาน</a>
                         <a href="#" class="btn btn-warning btn-transparent-warning fs-16">สร้างส่วนท้ายรายงาน</a>
-                        <a href="#"
-                            class="btn btn-light btn-transparent-light fs-16">สร้างส่วนข้อมูลก่อนตรวจรถ</a>
+                        <a href="#" class="btn btn-light btn-transparent-light fs-16">สร้างส่วนข้อมูลก่อนตรวจรถ</a>
                     </div>
                 </div>
             </div>
@@ -35,21 +35,30 @@
                                     <th>#</th>
                                     <th>รหัสฟอร์ม</th>
                                     <th>ชื่อฟอร์ม</th>
+                                    <th>ประเภทรถ</th>
                                     <th>สถานะ</th>
                                 </tr>
                             </thead>
                             <tbody>
-                               
+
+                                @foreach ($form_list as $item)
                                     <tr>
-                                        <td>*</td>
-                                        <td>*</td>
-                                        <td>*</a>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->form_code }}</td>
+                                        <td><a
+                                                href="{{ route('company.form.create3', ['id' => $item->form_id]) }}">{{ $item->form_name }}</a>
                                         </td>
+                                        <td>{{ $item->vehicle_type ?? '-' }}</td>
                                         <td>
-                                            **
+                                            @if ($item->form_status == 1)
+                                                <span class="badge bg-success rounded-pill">Active</span>
+                                            @else
+                                                <span class="badge bg-danger rounded-pill">InActive</span>
+                                            @endif
                                         </td>
                                     </tr>
-                             
+                                @endforeach
+
                             </tbody>
                         </table>
 
