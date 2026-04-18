@@ -51,8 +51,8 @@
                                 <div class="col-md-3">
                                     <label class="form-label">การบังคับกรอก</label>
                                     <select name="fields[0][is_required]" class="form-select ih-medium ip-gray radius-xs">
-                                        <option value="1">บังคับ (Required)</option>
-                                        <option value="0">ไม่บังคับ (Optional)</option>
+                                        <option value="1">บังคับ</option>
+                                        <option value="0">ไม่บังคับ</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -106,8 +106,8 @@
                     <div class="col-md-3">
                         <label class="form-label">การบังคับกรอก</label>
                         <select name="fields[${fieldIndex}][is_required]" class="form-select ih-medium ip-gray radius-xs">
-                            <option value="1">บังคับ (Required)</option>
-                            <option value="0">ไม่บังคับ (Optional)</option>
+                            <option value="1">บังคับ</option>
+                            <option value="0">ไม่บังคับ</option>
                         </select>
                     </div>
                     <div class="col-md-2">

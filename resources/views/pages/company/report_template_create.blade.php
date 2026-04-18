@@ -208,7 +208,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">การบังคับ</label>
+                        <label class="form-label">การบังคับกรอก</label>
                         <select name="fields[${fieldIndex}][is_required]" class="form-select">
                             <option value="1">บังคับ</option>
                             <option value="0">ไม่บังคับ</option>
