@@ -23,7 +23,7 @@
                         
                         <div class="form-group row mb-4">
                             <div class="col-sm-3 d-flex align-items-center">
-                                <label class="col-form-label color-dark">ชื่อแม่แบบ (Template) <span class="text-danger">*</span></label>
+                                <label class="col-form-label color-dark">ชื่อแบบ (Template) <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control ih-medium ip-gray radius-xs" 
