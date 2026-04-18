@@ -198,7 +198,6 @@
                     <div class="col-md-3">
                         <label class="form-label">รหัสตัวแปร (อักษรภาษาอังกฤษเท่านั้น) <span class="text-danger">*</span></label>
                         <input type="text" name="fields[${fieldIndex}][field_key]" class="form-control" placeholder="เช่น driver_age" required pattern="[A-Za-z0-9_]+">
-                        <small class="text-muted">นำไปใช้เป็น: <code>[รหัส]</code></small>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">ประเภทข้อมูล</label>

@@ -117,7 +117,7 @@
                                         <td colspan="6" class="text-center text-muted py-5">
                                             <i class="fas fa-file-alt text-light mb-3" style="font-size: 40px;"></i><br>
                                             ยังไม่มีข้อมูลแบบรายงาน<br>
-                                            <a href="{{ route('company.report_template.create') }}" class="btn btn-sm btn-outline-primary mt-2">คลิกเพื่อสร้างใหม่</a>
+                                         
                                         </td>
                                     </tr>
                                 @endforelse
