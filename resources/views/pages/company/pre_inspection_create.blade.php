@@ -96,7 +96,7 @@
                         <input type="text" name="fields[${fieldIndex}][field_label]" class="form-control ih-medium ip-gray radius-xs" placeholder="เช่น ถ่ายรูปด้านหน้ารถ" required>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">ประเภทการรับข้อมูล</label>
+                        <label class="form-label">ประเภทการกรอกข้อมูล</label>
                         <select name="fields[${fieldIndex}][field_type]" class="form-select ih-medium ip-gray radius-xs" required>
                             <option value="text">ข้อความ</option>
                             <option value="image">รูปภาพ</option>
