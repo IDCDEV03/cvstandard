@@ -267,6 +267,13 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
         Route::post('/store', [CompanyReportTemplateController::class, 'store'])->name('store');
         Route::get('/show/{id}', [CompanyReportTemplateController::class, 'show'])->name('show');
     });
+
+    Route::prefix('company/form-groups')->name('company.form-groups.')->group(function () {
+    Route::get('/', [CompanyReportTemplateController::class, 'indexFormGroup'])->name('index');
+    Route::get('/create', [CompanyReportTemplateController::class, 'createFormGroup'])->name('create');
+    Route::post('/store', [CompanyReportTemplateController::class, 'storeFormGroup'])->name('store');
+    Route::get('/{id}', [CompanyReportTemplateController::class, 'showFormGroup'])->name('show');
+});
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
@@ -314,6 +321,8 @@ Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/list', [StaffFormController::class, 'FormList'])->name('staff.form_list');
     Route::get('/new-form', [StaffFormController::class, 'FormNew'])->name('staff.form_new');
     Route::POST('/save-form', [StaffFormController::class, 'FormStore'])->name('staff.form_store');
+
+    Route::get('/preview-form/{form_id}', [StaffFormController::class, 'PreviewForm'])->name('staff.preview_form');
 
     Route::get('/new-form-2/{id}/{order}', [StaffFormController::class, 'FormNew_Step2'])->name('staff.form_new2');
     Route::POST('/save-form-step2/{id}', [StaffFormController::class, 'FormStep2_Insert'])->name('staff.form_store2');

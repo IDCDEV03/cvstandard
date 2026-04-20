@@ -7,8 +7,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb-main">
-                        <h4 class="text-capitalize breadcrumb-title">เพิ่มข้อตรวจ</h4>
-
+                        <h4 class="text-capitalize breadcrumb-title">เพิ่มข้อตรวจ : {{ $cates_data->form_name }}</h4>
                     </div>
                 </div>
             </div>
@@ -16,8 +15,7 @@
                 <div class="col-md-12">
                     <div class=" alert alert-success " role="alert">
                         <div class="alert-content">
-                            <span class="fs-20 fw-bold">แบบฟอร์ม : {{ $cates_data->form_name }}</span>
-                            <br>
+                          
                             <span class="fs-20 fw-bold">หมวดหมู่ : {{ $cates_data->chk_cats_name }} </span>
                         </div>
                     </div>

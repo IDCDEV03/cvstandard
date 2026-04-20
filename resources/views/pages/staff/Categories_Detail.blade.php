@@ -42,7 +42,7 @@
                                         <i class="fas fa-redo-alt"></i> เพิ่มข้อตรวจ
                                     </a>
                                 @else
-                                    <a href="{{ route('agency.item_create', ['id' => request()->cates_id]) }}"
+                                    <a href="{{ route('staff.ItemCreate', ['id' => request()->cates_id]) }}"
                                         class="mx-2 btn btn-secondary btn-default btn-squared btn-shadow-secondary ">
                                         <i class="fas fa-plus"></i> เพิ่มข้อตรวจ
                                     </a>

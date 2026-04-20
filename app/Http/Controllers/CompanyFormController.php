@@ -22,7 +22,6 @@ class CompanyFormController extends Controller
     public function create()
     {
         $companyCode = Auth::user()->company_code;
-        $car_type = DB::table('vehicle_types')->get();
 
         $supply_list = DB::table('supply_datas')
             ->where('company_code', '=', $companyCode)

@@ -140,4 +140,87 @@ class CompanyReportTemplateController extends Controller
 
         return view('pages.company.report_template_show', compact('template', 'fields'));
     }
+
+    public function indexFormGroup()
+    {
+        $formGroups = DB::table('form_groups')
+            ->leftJoin('company_details', 'form_groups.company_id', '=', 'company_details.company_id')
+            ->leftJoin('users', 'form_groups.created_by', '=', 'users.user_id')
+            ->select(
+                'form_groups.*',
+                'company_details.company_name',
+                'users.name as creator_name'
+            )
+            ->whereNull('form_groups.deleted_at')
+            ->orderBy('form_groups.id', 'desc')
+            ->get();
+
+        return view('pages.company.form_group_index', compact('formGroups'));
+    }
+
+    public function createFormGroup()
+    {
+        // ดึงข้อมูลแม่แบบทั้ง 3 ส่วนมาทำ Dropdown
+        $preInspections = DB::table('pre_inspection_templates')->get();        
+        $checkItems = DB::table('forms')->get(); 
+        $reports = DB::table('report_templates')->get();        
+        $companies = DB::table('company_details')->get();
+
+        return view('pages.company.form_group_create', compact('preInspections', 'checkItems', 'reports', 'companies'));
+    }
+
+    public function storeFormGroup(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            // ตรวจสอบอย่างน้อยต้องมีฟอร์มตรวจหลัก
+            'check_item_group_id' => 'required|integer', 
+        ]);
+
+        $isSystemDefault = $request->has('is_system_default') ? 1 : 0;
+        // ถ้าเป็น System Default ให้ company_id เป็น null อัตโนมัติ
+        $companyId = $isSystemDefault ? null : $request->company_id;
+
+        DB::table('form_groups')->insert([
+            'name' => $request->name,
+            'description' => $request->description,
+            'is_system_default' => $isSystemDefault,
+            'company_id' => $companyId,
+            'pre_inspection_template_id' => $request->pre_inspection_template_id,
+            'check_item_group_id' => $request->check_item_group_id,
+            'report_template_id' => $request->report_template_id,
+            'created_by' => auth()->id(),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('company.form-groups.index')->with('success', 'สร้างกลุ่มฟอร์มสำเร็จเรียบร้อย');
+    }
+
+    public function showFormGroup($id)
+    {
+        $formGroup = DB::table('form_groups')
+            ->leftJoin('companies', 'form_groups.company_id', '=', 'companies.id')
+            ->leftJoin('users', 'form_groups.created_by', '=', 'users.id')
+            ->leftJoin('pre_inspection_templates', 'form_groups.pre_inspection_template_id', '=', 'pre_inspection_templates.id')
+            ->leftJoin('check_item_groups', 'form_groups.check_item_group_id', '=', 'check_item_groups.id')
+            ->leftJoin('report_templates', 'form_groups.report_template_id', '=', 'report_templates.id')
+            ->select(
+                'form_groups.*',
+                'companies.name as company_name',
+                'users.name as creator_name',
+                'pre_inspection_templates.name as pre_name',
+                'check_item_groups.name as check_name',
+                'report_templates.name as report_name'
+            )
+            ->where('form_groups.id', $id)
+            ->whereNull('form_groups.deleted_at')
+            ->first();
+
+        if (!$formGroup) {
+            return redirect()->route('company.form-groups.index')->with('error', 'ไม่พบข้อมูลกลุ่มฟอร์ม');
+        }
+
+        return view('pages.company.form_group_show', compact('formGroup'));
+    }
 }

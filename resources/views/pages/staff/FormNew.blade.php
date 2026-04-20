@@ -1,4 +1,4 @@
-@section('title', 'ระบบ E-Checker')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -23,7 +23,7 @@
                                     </div>
                                 </div>
                             @endif
-                            <form action="{{route('staff.form_store')}}" method="POST">
+                            <form action="{{ route('staff.form_store') }}" method="POST">
                                 @csrf
                                 <div class="form-group row mb-25">
                                     <div class="col-sm-3 d-flex aling-items-center">
@@ -44,9 +44,24 @@
                                             id="form_name" name="form_name" required>
                                     </div>
                                 </div>
-                           
 
-                                
+                                <div class="form-group row mb-25">
+                                    <div class="col-sm-3 d-flex aling-items-center">
+                                        <label class="col-form-label color-dark align-center">ประเภทรถ<span
+                                                class="text-danger">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select name="vehicle_type_id" id="vehicle_type_id"
+                                            class="form-select ih-medium ip-gray radius-xs" required>
+                                            <option value="" disabled selected>-- เลือกประเภทรถ --</option>
+                                            @foreach ($car_type as $vtype)
+                                                <option value="{{ $vtype->id }}">{{ $vtype->vehicle_type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+
                                 <div class="form-group row mb-25">
                                     <div class="col-sm-3 d-flex aling-items-center">
                                         <label class="col-form-label  color-dark align-center">ตั้งค่าฟอร์ม<span
@@ -78,7 +93,7 @@
                                     <div class="col-sm-9">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="form_scope"
-                                                id="scope_public" value="public" required>
+                                                id="scope_public" value="public" checked required>
                                             <label class="form-check-label" for="scope_public">ทุกหน่วยงาน</label>
                                         </div>
 
@@ -90,38 +105,38 @@
                                     </div>
                                 </div>
 
-<!--hide-->
-            <div class="mb-3 d-none" id="supply_select_box">
-                <div class="border-top my-3"></div>
-                <div class="table4 table-responsive">
-                    <table class="table mb-0">
-                        <thead>
-                            <tr class="userDatatable-header">
-                                <th>
-                                    <span class="fs-16">เลือก Supply</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($supply_list as $data)
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                name="supply_ids[]" value="{{ $data->sup_id }}"
-                                                id="supply_{{ $data->sup_id }}">
-                                            <label class="form-check-label"
-                                                for="supply_{{ $data->sup_id }}">{{ $data->supply_name }}</label>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                    </div>
-<!--EndHide-->
-                              
+                                <!--hide-->
+                                <div class="mb-3 d-none" id="supply_select_box">
+                                    <div class="border-top my-3"></div>
+                                    <div class="table4 table-responsive">
+                                        <table class="table mb-0">
+                                            <thead>
+                                                <tr class="userDatatable-header">
+                                                    <th>
+                                                        <span class="fs-16">เลือก Supply</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($supply_list as $data)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    name="supply_ids[]" value="{{ $data->sup_id }}"
+                                                                    id="supply_{{ $data->sup_id }}">
+                                                                <label class="form-check-label"
+                                                                    for="supply_{{ $data->sup_id }}">{{ $data->supply_name }}</label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!--EndHide-->
+
 
                                 <div class="col-sm-9">
                                     <div class="layout-button mt-25">

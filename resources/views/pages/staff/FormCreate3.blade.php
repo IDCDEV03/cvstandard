@@ -1,4 +1,4 @@
-@section('title', 'ระบบ E-Checker')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -32,7 +32,7 @@
                         <div class="card-body">
                             <div class="dm-button-list d-flex flex-wrap gap-2">
 
-                                <a class="btn btn-dark btn-default btn-squared btn-transparent-dark">
+                                <a href="{{route('staff.preview_form', ['form_id' => $form_name->form_id])}}" class="btn btn-dark btn-default btn-squared btn-transparent-dark">
                                     <i class="fa fa-search-plus" aria-hidden="true"></i> ตัวอย่างฟอร์ม
                                 </a>
 
@@ -45,7 +45,7 @@
 
                     </div>
 
-                    <div class="card mb-10 mt-2">
+                    <div class="card mb-20 mt-2">
                         <div class="card-body">
 
                             <table class="table table-bordered" id="forms-table">
@@ -53,7 +53,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>ชื่อหมวดหมู่</th>
-                                        <th></th>
+                                        <th>จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
