@@ -1,4 +1,4 @@
-@section('title', 'ระบบ E-Checker')
+@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
@@ -52,7 +52,7 @@
                         </div>
                     </div>
 
-                    <div class="card mb-10">
+                    <div class="card mb-20">
                         <div class="card-body">
                             <div class="table4 p-25 mb-30">
                                 <div class="table-responsive">

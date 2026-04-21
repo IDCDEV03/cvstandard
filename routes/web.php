@@ -27,6 +27,7 @@ use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\CompanyFormController;
 use App\Http\Controllers\CompanyPreInspectionController;
 use App\Http\Controllers\CompanyReportTemplateController;
+use App\Http\Controllers\StaffReportTemplateController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -314,6 +315,14 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
     Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
     Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
+
+      Route::prefix('report-template')->name('staff.report_template.')->group(function () {
+        Route::get('/', [StaffReportTemplateController::class, 'index'])->name('index');
+        Route::get('/create', [StaffReportTemplateController::class, 'create'])->name('create');
+        Route::post('/store', [StaffReportTemplateController::class, 'store'])->name('store');
+        Route::get('/show/{id}', [StaffReportTemplateController::class, 'show'])->name('show');
+    });
+
 });
 
 Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {

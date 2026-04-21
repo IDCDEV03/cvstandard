@@ -12,7 +12,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="mb-3">
-                                    <a href="{{ route('company.form-groups.create') }}"
+                                    <a href="#"
                                         class="btn btn-primary btn-default btn-shadow-primary px-30">
                                         <i class="uil uil-plus-circle me-1"></i> สร้างกลุ่มฟอร์ม (Form Group)
                                     </a>
@@ -25,7 +25,7 @@
 
                                 <div class="btn-group" role="group">
 
-                                    <a href="{{ route('company.report_template.index') }}"
+                                    <a href="{{ route('staff.report_template.index') }}"
                                         class="btn btn-info btn-default btn-squared btn-transparent-info btn-sm px-20">
                                         จัดการ Template รายงาน
                                     </a>
@@ -33,7 +33,7 @@
                                         class="btn btn-secondary btn-default btn-squared btn-transparent-secondary btn-sm px-20">
                                         สร้างฟอร์มใหม่
                                     </a>
-                                    <a href="{{ route('company.pre_inspection.index') }}"
+                                    <a href="#"
                                         class="btn btn-warning btn-default btn-squared btn-transparent-warning btn-sm px-20">
                                         จัดการ Template ก่อนตรวจ
                                     </a>

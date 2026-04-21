@@ -2,14 +2,11 @@
 @section('description', 'ID Drives')
 @extends('layout.app')
 @section('content')
-@php
-     //เช็คลำดับหมวดหมู่   
-        $maxOrder = DB::table('check_categories')
-           ->where('form_id', $id)
-           ->max('cates_no');
-
-       $startOrder = is_null($maxOrder) ? 0 : (int)$maxOrder;
-@endphp
+    @php
+        //เช็คลำดับหมวดหมู่
+        $maxOrder = DB::table('check_categories')->where('form_id', $id)->max('cates_no');
+        $startOrder = is_null($maxOrder) ? 0 : (int) $maxOrder;
+    @endphp
     <div class="container-fluid">
         <div class="social-dash-wrap">
             <div class="row">
@@ -30,19 +27,29 @@
 
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <div class="dm-button-list d-flex flex-wrap gap-2">
+                            <div class="dm-button-list d-flex flex-wrap align-items-center justify-content-between">
 
-                                <a href="{{route('staff.preview_form', ['form_id' => $form_name->form_id])}}" class="btn btn-dark btn-default btn-squared btn-transparent-dark">
-                                    <i class="fa fa-search-plus" aria-hidden="true"></i> ตัวอย่างฟอร์ม
-                                </a>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a href="{{ route('staff.preview_form', ['form_id' => $form_name->form_id]) }}"
+                                        class="btn btn-dark btn-default btn-squared btn-transparent-dark">
+                                        <i class="fa fa-search-plus" aria-hidden="true"></i> ตัวอย่างฟอร์ม
+                                    </a>
 
-                                <a href="{{route('staff.form_new2',['id'=>request()->id,'order'=>$startOrder])}}" class="btn btn-secondary btn-default btn-squared btn-transparent-secondary">
-                                    เพิ่มหมวดหมู่
-                                </a>
+                                    <a href="{{ route('staff.form_new2', ['id' => request()->id, 'order' => $startOrder]) }}"
+                                        class="btn btn-secondary btn-default btn-squared btn-transparent-secondary">
+                                        เพิ่มหมวดหมู่
+                                    </a>
+                                </div>
+
+                                <div>
+                                    <a href="{{ route('staff.form_list') }}"
+                                        class="btn btn-dark btn-default btn-squared btn-transparent-dark">
+                                        <i class="fa fa-arrow-left me-1"></i> ย้อนกลับ
+                                    </a>
+                                </div>
+
                             </div>
-
                         </div>
-
                     </div>
 
                     <div class="card mb-20 mt-2">
@@ -69,26 +76,29 @@
                                             <td>
                                                 <div class="btn-group dm-button-group btn-group-normal my-2" role="group">
 
-                                                     <div class="btn-group dm-button-group btn-group-normal my-2" role="group">
-                                                    <button
-                                                        class="btn btn-primary btn-sm btn-squared btn-transparent-primary"
-                                                        data-bs-toggle="modal" data-bs-target="#editModal"
-                                                        data-id="{{ $item->id }}"
-                                                        data-name="{{ $item->chk_cats_name }}">
-                                                        แก้ไขชื่อหมวดหมู่
-                                                    </button>
-
-                                                
-                                                    <form action="{{route('staff.cates_delete', $item->category_id)}}"
-                                                        method="POST" class="d-inline"
-                                                        onsubmit="return confirm('หากลบหมวดหมู่ข้อตรวจในหมวดหมู่นี้จะถูกลบไปด้วย ต้องการลบใช่หรือไม่?');">
-                                                        @csrf
-                                                        <input type="hidden" name="form_id" value="{{$item->form_id}}">
-                                                        <button type="submit" class="btn btn-danger btn-sm btn-squared btn-transparent-danger">
-                                                            ลบหมวดหมู่
+                                                    <div class="btn-group dm-button-group btn-group-normal my-2"
+                                                        role="group">
+                                                        <button
+                                                            class="btn btn-primary btn-sm btn-squared btn-transparent-primary"
+                                                            data-bs-toggle="modal" data-bs-target="#editModal"
+                                                            data-id="{{ $item->id }}"
+                                                            data-name="{{ $item->chk_cats_name }}">
+                                                            แก้ไขชื่อหมวดหมู่
                                                         </button>
-                                                    </form>
-                                                </div>
+
+
+                                                        <form action="{{ route('staff.cates_delete', $item->category_id) }}"
+                                                            method="POST" class="d-inline"
+                                                            onsubmit="return confirm('หากลบหมวดหมู่ข้อตรวจในหมวดหมู่นี้จะถูกลบไปด้วย ต้องการลบใช่หรือไม่?');">
+                                                            @csrf
+                                                            <input type="hidden" name="form_id"
+                                                                value="{{ $item->form_id }}">
+                                                            <button type="submit"
+                                                                class="btn btn-danger btn-sm btn-squared btn-transparent-danger">
+                                                                ลบหมวดหมู่
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -105,7 +115,7 @@
     </div>
 
 
-      <!-- Modal ฟอร์มแก้ไข -->
+    <!-- Modal ฟอร์มแก้ไข -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -132,8 +142,7 @@
 @endsection
 
 @push('scripts')
-
-  <script>
+    <script>
         var editModal = document.getElementById('editModal');
         editModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
