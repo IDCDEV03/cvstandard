@@ -321,6 +321,7 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
         Route::get('/create', [StaffReportTemplateController::class, 'create'])->name('create');
         Route::post('/store', [StaffReportTemplateController::class, 'store'])->name('store');
         Route::get('/show/{id}', [StaffReportTemplateController::class, 'show'])->name('show');
+         Route::get('/report-preview/{id}', [StaffReportTemplateController::class, 'report_preview'])->name('report_preview');
     });
 
 });

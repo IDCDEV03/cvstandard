@@ -85,7 +85,7 @@ class CompanyVehicleController extends Controller
         $currentVehicles = DB::table('vehicles_detail')->where('supply_id', $supply_id)->count();
 
         if ($currentVehicles >= $supply->vehicle_limit) {
-            return back()->with('error', 'จำนวนรถเต็มแล้ว ไม่สามารถเพิ่มรถได้')->withInput();
+            return back()->with('error', 'รถเต็มจำนวนที่กำหนดแล้ว ไม่สามารถเพิ่มรถได้')->withInput();
         }
 
         $plate = $request->plate;
@@ -119,6 +119,11 @@ class CompanyVehicleController extends Controller
                 'car_insure'        => $request->car_insure,
                 'car_type'          => $request->vehicle_type,
                 'car_image'         => $imagePath,
+                'car_trailer_plate'    => $request->car_trailer_plate,
+                'car_register_date'    => $request->car_register_date,
+                'car_insurance_expire' => $request->car_insurance_expire,
+                'car_total_weight'     => $request->car_total_weight,
+                'car_fuel_type'        => $request->car_fuel_type,
                 'status'            => $request->input('status') == 1 ? '1' : '0',
                 'created_at'        => Carbon::now(),
                 'updated_at'        => Carbon::now(),
@@ -205,6 +210,11 @@ class CompanyVehicleController extends Controller
                 'car_insure'        => $request->car_insure,
                 'car_type'          => $request->vehicle_type,
                 'car_image'         => $imagePath,
+                'car_trailer_plate'    => $request->car_trailer_plate,
+                'car_register_date'    => $request->car_register_date,
+                'car_insurance_expire' => $request->car_insurance_expire,
+                'car_total_weight'     => $request->car_total_weight,
+                'car_fuel_type'        => $request->car_fuel_type,
                 'status'            => $request->status,
                 'updated_at'        => Carbon::now(),
             ];
@@ -267,14 +277,14 @@ class CompanyVehicleController extends Controller
             DB::transaction(function () use ($id, $user, $car) {
 
                 // 2. บันทึก Log ว่าใครเป็นคนลบ และลบข้อมูลอะไรไปบ้าง 
-              DB::table('vehicle_activity_logs')->insert([
-                'vehicle_id'  => $id,
-                'user_id'     => $user->user_id ?? $user->id, 
-                'action'      => 'delete',
-                'before_data' => json_encode($car, JSON_UNESCAPED_UNICODE),
-                'after_data'  => null,
-                'created_at'  => now(),
-            ]);
+                DB::table('vehicle_activity_logs')->insert([
+                    'vehicle_id'  => $id,
+                    'user_id'     => $user->user_id ?? $user->id,
+                    'action'      => 'delete',
+                    'before_data' => json_encode($car, JSON_UNESCAPED_UNICODE),
+                    'after_data'  => null,
+                    'created_at'  => now(),
+                ]);
 
                 // 3. ลบไฟล์รูปภาพของรถคันนี้ออกจาก Server (ถ้ามี)
                 if ($car->car_image && file_exists(public_path($car->car_image))) {
