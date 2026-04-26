@@ -187,8 +187,8 @@
             height: 300,
             menubar: false,
             branding: false,
-            plugins: ['table', 'code'],
-            toolbar: 'bold italic | alignleft aligncenter alignright | table | code | removeformat',
+            plugins: ['table', 'code','image'],
+            toolbar: 'bold italic | alignleft aligncenter alignright | table image | code | removeformat',
             content_style: 'body { font-family: "Sarabun", -apple-system, sans-serif; font-size: 14px; }'
         });
     </script>

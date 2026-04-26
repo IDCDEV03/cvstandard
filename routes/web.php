@@ -16,8 +16,9 @@ use App\Http\Controllers\User\UserProfileController;
 use Database\Seeders\VehicleTypeSeeder;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\User\ManagerController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\StaffFormController;
+use App\Http\Controllers\User\InspectionController;
+use App\Http\Controllers\Staff\StaffController;
+use App\Http\Controllers\Staff\StaffFormController;
 use App\Http\Controllers\SupplyMainController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Agency\AgentCompanyController;
@@ -27,7 +28,9 @@ use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\CompanyFormController;
 use App\Http\Controllers\CompanyPreInspectionController;
 use App\Http\Controllers\CompanyReportTemplateController;
-use App\Http\Controllers\StaffReportTemplateController;
+use App\Http\Controllers\Staff\StaffReportTemplateController;
+use App\Http\Controllers\Staff\StaffPreInspectionController;
+use App\Http\Controllers\Staff\FormGroupController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -154,6 +157,25 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
 
     //บันทึกข้อความ
     Route::get('/veh-doc', [DocumentController::class, 'doc_list'])->name('user.doc_list');
+
+// กลุ่ม Route สำหรับพนักงานตรวจรถ
+Route::prefix('inspection')->name('user.inspection.')->group(function () {
+    Route::get('/', [InspectionController::class, 'index'])->name('index'); 
+    Route::get('/search-vehicle', [InspectionController::class, 'searchVehicle'])->name('searchVehicle'); 
+    Route::post('/start', [InspectionController::class, 'start'])->name('start'); 
+    Route::get('/{record_id}/step2', [InspectionController::class, 'step2'])->name('step2');
+    Route::post('/{record_id}/step2', [InspectionController::class, 'storeStep2'])->name('storeStep2');
+    // Step 3: หน้าจอข้อตรวจหลัก
+    Route::get('/{record_id}/step3', [InspectionController::class, 'step3'])->name('step3');
+    Route::post('/save-result', [InspectionController::class, 'saveResult'])->name('saveResult');
+    // API สำหรับอัปโหลดและลบรูปภาพ (เฉพาะข้อ)
+    Route::post('/upload-item-image', [InspectionController::class, 'uploadItemImage'])->name('uploadItemImage');
+    Route::post('/delete-item-image', [InspectionController::class, 'deleteItemImage'])->name('deleteItemImage');
+
+    Route::get('/{record_id}/step4', [InspectionController::class, 'step4'])->name('step4');
+Route::post('/{record_id}/submit', [InspectionController::class, 'submitInspection'])->name('submitInspection');
+    
+});
 });
 
 Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () {
@@ -295,7 +317,6 @@ Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () 
     Route::get('/check/all', [SupplyMainController::class, 'chk_list'])->name('supply.chk_list');
 });
 
-
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     // Route สำหรับ staff
     Route::get('/index', [PageController::class, 'home'])->name('staff.index');
@@ -323,6 +344,24 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
         Route::get('/show/{id}', [StaffReportTemplateController::class, 'show'])->name('show');
          Route::get('/report-preview/{id}', [StaffReportTemplateController::class, 'report_preview'])->name('report_preview');
     });
+
+     Route::prefix('pre-inspection')->name('staff.pre_inspection.')->group(function () {
+        Route::get('/', [StaffPreInspectionController::class, 'index'])->name('index');
+        Route::get('/create', [StaffPreInspectionController::class, 'create'])->name('create');
+        Route::post('/store', [StaffPreInspectionController::class, 'pre_ins_store'])->name('store');
+
+        Route::get('/{id}', [StaffPreInspectionController::class, 'show'])->name('show');
+    });
+
+         Route::prefix('form-group')->name('staff.form-group.')->group(function () {
+        Route::get('/', [FormGroupController::class, 'index'])->name('index');
+        Route::get('/create', [FormGroupController::class, 'createFormGroup'])->name('create');
+        Route::post('/store', [FormGroupController::class, 'store'])->name('store');
+        Route::get('/{id}/show', [FormGroupController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [FormGroupController::class, 'edit'])->name('edit');
+        Route::put('/{id}/update', [FormGroupController::class, 'update'])->name('update');
+    });
+
 
 });
 

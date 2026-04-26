@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Staff;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -252,11 +253,14 @@ class StaffFormController extends Controller
             ->where('category_id', $id)
             ->max('item_no');
 
+        $item_types = DB::table('item_types')
+            ->get();
+
         $lastOrder = $lastOrder ?? 0;
 
         $category = DB::table('check_categories')->where('id', $id)->first();
 
-        return view('pages.staff.ItemCreate_plus', ['id' => $id], compact('cates_data', 'lastOrder', 'item_data'));
+        return view('pages.staff.ItemCreate_plus', ['id' => $id], compact('cates_data', 'lastOrder', 'item_data', 'item_types'));
     }
 
     // เพิ่มข้อตรวจใหม่ยังบันทึกแบบนับ 1 ใหม่ ยังไม่ได้แก้ไข //
@@ -415,11 +419,11 @@ class StaffFormController extends Controller
     public function PreviewForm($form_id)
     {
         // 1. ดึงข้อมูลฟอร์มหลัก
-       $form = DB::table('forms')
-              ->leftJoin('vehicle_types', 'forms.car_type', '=', 'vehicle_types.id')
-              ->where('forms.form_id', $form_id)
-              ->select('forms.*', 'vehicle_types.vehicle_type') 
-              ->first();
+        $form = DB::table('forms')
+            ->leftJoin('vehicle_types', 'forms.car_type', '=', 'vehicle_types.id')
+            ->where('forms.form_id', $form_id)
+            ->select('forms.*', 'vehicle_types.vehicle_type')
+            ->first();
 
         if (!$form) {
             return redirect()->back()->with('error', 'ไม่พบข้อมูลฟอร์ม');

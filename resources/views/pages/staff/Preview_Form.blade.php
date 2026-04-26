@@ -16,7 +16,7 @@
                 <div class="card mb-4 shadow-sm">
                     <div class="card-header border-bottom" style="background-color: #e3cef7 !important;">
                         <span class="mb-0 text-primary fw-bold fs-18">
-                            ส่วนที่ {{ $category->cates_no }}: {{ $category->chk_cats_name }}
+                            หมวดหมู่ที่ {{ $category->cates_no }} : {{ $category->chk_cats_name }}
                         </span>
                         @if($category->chk_detail)
                             <small class="text-muted">{{ $category->chk_detail }}</small>

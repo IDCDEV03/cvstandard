@@ -29,7 +29,7 @@ return new class extends Migration
             // --- Components (Foreign Keys) ---
             // ส่วนประกอบ 3 ชิ้นที่นำมาประกอบกัน (ตามกฎคือห้ามแก้หลังจากบันทึกแล้ว)
             $table->unsignedBigInteger('pre_inspection_template_id')->nullable();
-            $table->unsignedBigInteger('check_item_group_id')->nullable();
+            $table->string('check_item_form_id',30)->nullable();
             $table->unsignedBigInteger('report_template_id')->nullable();
 
             // --- Status & Audit Trail ---
