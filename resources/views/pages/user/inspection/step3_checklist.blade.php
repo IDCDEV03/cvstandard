@@ -299,13 +299,28 @@
                 });
             });
 
-            // --- ส่วนงานอัปโหลดรูปภาพ (โค้ดมาตรฐานของคุณ) ---
+          // --- ส่วนงานอัปโหลดรูปภาพ (อัปเกรดใหม่ แสดงผลทันที มีระบบกันเหนียว) ---
             document.querySelectorAll('.image-uploader').forEach(input => {
                 input.addEventListener('change', function() {
                     const itemId = this.dataset.item;
                     const recordId = this.closest('.card-body').querySelector('.data-record').value;
                     const file = this.files[0];
                     if (!file) return;
+
+                    const gallery = document.getElementById('gallery_' + itemId);
+
+                    // 1. สร้างพรีวิวให้เห็นทันทีด้วย URL.createObjectURL (ลื่นไหล ไม่ต้องรอโหลดหน้า)
+                    const tempId = Date.now();
+                    const objectUrl = URL.createObjectURL(file);
+                    const tempHtml = `
+                        <div class="col-3 col-md-2 position-relative img-wrapper-temp-${tempId}">
+                            <img src="${objectUrl}" class="img-fluid rounded border" style="height: 70px; width: 100%; object-fit: cover; opacity: 0.5;">
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <i class="uil uil-spinner fa-spin text-primary fs-20"></i>
+                            </div>
+                        </div>
+                    `;
+                    gallery.insertAdjacentHTML('beforeend', tempHtml);
 
                     const formData = new FormData();
                     formData.append('image', file);
@@ -314,22 +329,71 @@
 
                     fetch('{{ route('user.inspection.uploadItemImage') }}', {
                             method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': csrfToken
-                            },
+                            headers: { 'X-CSRF-TOKEN': csrfToken },
                             body: formData
                         })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload(); // รีโหลดเพื่อง่ายต่อการแสดงผลรูปใหม่
+                        .then(res => {
+                            if (!res.ok) throw new Error('Network response was not ok');
+                            return res.text(); // ใช้ .text() รับค่ามาก่อนเพื่อป้องกัน Error กรณีไม่ใช่ JSON
+                        })
+                        .then(text => {
+                            try {
+                                const data = JSON.parse(text); // ลองแปลงเป็น JSON
+                                
+                                // ถ้า Controller ส่ง JSON สำเร็จ กลับมา
+                                if (data.success || data.status === 'success') {
+                                    document.querySelector(`.img-wrapper-temp-${tempId}`).remove();
+                                    
+                                    // ถ้าระบบส่ง ID กลับมาให้ด้วย ให้สร้างรูปลงแกลลอรี่ทันที
+                                    if(data.image_id) {
+                                        const finalHtml = `
+                                            <div class="col-3 col-md-2 position-relative img-wrapper-${data.image_id}">
+                                                <img src="${objectUrl}" class="img-fluid rounded border" style="height: 70px; width: 100%; object-fit: cover;">
+                                                <button type="button" class="btn btn-danger btn-xs position-absolute top-0 end-0 m-1 rounded-circle p-0" style="width: 20px; height: 20px;" onclick="deleteImage(${data.image_id}, '${itemId}')">
+                                                    <i class="uil uil-times fs-12"></i>
+                                                </button>
+                                            </div>
+                                        `;
+                                        gallery.insertAdjacentHTML('beforeend', finalHtml);
+                                        
+                                        // อัปเดตตัวเลขจำนวนรูป
+                                        const countSpan = document.getElementById('count_' + itemId);
+                                        if(countSpan) {
+                                            let currentCount = parseInt(countSpan.innerText.match(/\d+/)[0]) || 0;
+                                            countSpan.innerText = `(${currentCount + 1}/10)`;
+                                        }
+                                    } else {
+                                        location.reload(); // ถ้าไม่ส่ง ID กลับมา บังคับรีโหลด
+                                    }
+                                } else {
+                                    location.reload();
+                                }
+                            } catch (e) {
+                                // 🌟 ตัวแก้บั๊กหลัก: ถ้า Controller ไม่ได้ Return JSON (เช่นเกิดการ Redirect)
+                                // แปลว่าข้อมูลลง DB แล้ว ให้ทำการบังคับรีโหลดหน้าเว็บเพื่อดึงรูปจากฐานข้อมูล
+                                location.reload();
                             }
+                        })
+                        .catch(error => {
+                            console.error('Upload Error:', error);
+                            location.reload(); // เผื่อเหนียว ถ้าเน็ตกระตุกหรือ Error ให้รีโหลดไว้ก่อน
                         });
+                        
+                    // ล้างค่า input ป้องกันบั๊กเลือกไฟล์เดิมซ้ำไม่ได้
+                    this.value = '';
                 });
             });
 
+            // --- ส่วนงานลบรูปภาพ (อัปเกรดใหม่ ลบปุ๊บหายปั๊บ) ---
             function deleteImage(imageId, itemId) {
                 if (!confirm('ยืนยันการลบรูปภาพ?')) return;
+
+                // 1. ทำภาพให้จางลงก่อน เพื่อบอกผู้ใช้ว่ากำลังประมวลผลอยู่
+                const imgWrapper = document.querySelector(`.img-wrapper-${imageId}`);
+                if (imgWrapper) {
+                    imgWrapper.style.opacity = '0.5';
+                }
+
                 fetch('{{ route('user.inspection.deleteItemImage') }}', {
                         method: 'POST',
                         headers: {
@@ -340,12 +404,42 @@
                             image_id: imageId
                         })
                     })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.querySelector(`.img-wrapper-${imageId}`).remove();
+                    .then(res => {
+                        if (!res.ok) throw new Error('Network response error');
+                        return res.text(); // ใช้ .text() ดักไว้ก่อนกัน Error ถ้าไม่ใช่ JSON
+                    })
+                    .then(text => {
+                        try {
+                            const data = JSON.parse(text); // ลองแปลงเป็น JSON
+                            
+                            // ถ้าลบสำเร็จ (รองรับทั้ง key: success และ status: success)
+                            if (data.success || data.status === 'success') {
+                                if (imgWrapper) imgWrapper.remove(); // ลบออกจากหน้าจอทันที
+                                
+                                // อัปเดตตัวเลขจำนวนรูปให้ลดลง
+                                const countSpan = document.getElementById('count_' + itemId);
+                                if (countSpan) {
+                                    let currentCount = parseInt(countSpan.innerText.match(/\d+/)[0]) || 0;
+                                    if (currentCount > 0) {
+                                        countSpan.innerText = `(${currentCount - 1}/10)`;
+                                    }
+                                }
+                            } else {
+                                // ถ้าลบไม่สำเร็จ ให้รีโหลดหน้าจอเพื่อดึงข้อมูลล่าสุด
+                                location.reload();
+                            }
+                        } catch (e) {
+                            // กรณี Controller ไม่ได้ Return เป็น JSON (เช่น Return กลับมาเป็น Redirect)
+                            // ถือว่าทำงานเสร็จแล้ว ให้รีโหลดเพื่ออัปเดตหน้าจอ
+                            location.reload();
                         }
+                    })
+                    .catch(error => {
+                        console.error('Delete Error:', error);
+                        // ถ้าเน็ตหลุดหรือมี Error ให้รีโหลดเพื่อความชัวร์
+                        location.reload();
                     });
+            
             }
         </script>
     @endpush

@@ -269,10 +269,12 @@ class InspectionController extends Controller
         ]);
 
         return response()->json([
+            'success'   => true,
             'status' => 'success', 
             'image_id' => $imageId, 
             'image_url' => asset($dbPath)
         ]);
+        
     }
 
     // ลบรูปภาพย่อย
@@ -281,12 +283,15 @@ class InspectionController extends Controller
         $imageId = $request->image_id;
         $image = DB::table('check_result_images')->where('id', $imageId)->first();
         
-        if ($image) {
-            // ลบไฟล์จริงออกจากเครื่องเซิร์ฟเวอร์ (ถ้าต้องการ)
-            // \Illuminate\Support\Facades\Storage::delete(str_replace('storage/', 'public/', $image->image_path));
+        if ($image) {       
+           \Illuminate\Support\Facades\Storage::delete(str_replace('storage/', 'public/', $image->image_path));
             DB::table('check_result_images')->where('id', $imageId)->delete();
         }
-        return response()->json(['status' => 'success']);
+        return response()->json([
+            'success' => true,
+        'status'  => 'success',
+        'message' => 'ลบรูปภาพเรียบร้อย'
+        ]);
     }
 
     public function step4($record_id)
@@ -315,18 +320,30 @@ class InspectionController extends Controller
     }
 
     // บันทึกการตรวจ
-    public function submitInspection(Request $request, $record_id)
+   public function submitInspection(Request $request, $record_id)
     {
-        $request->validate([
-            'evaluate_status' => 'required',
-            'inspector_sign_data' => 'required', // ข้อมูลลายเซ็นแบบ Base64
-        ]);
-
+        // 1. ดึงข้อมูล record เดิมมาก่อน
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
+        if (!$record) return redirect()->back()->with('error', 'ไม่พบข้อมูลใบตรวจ');
 
-        // 1. แปลงข้อมูลลายเซ็น (Base64) ให้เป็นไฟล์รูปภาพ (PNG)
-        $inspectorSignPath = null;
-        if ($request->inspector_sign_data) {
+        // 2. ตรวจสอบ Validation (แยกเงื่อนไขตามปุ่มที่กด)
+        if ($request->submit_type == 'final') {
+            $request->validate([
+                'evaluate_status' => 'required',
+                'inspector_sign_data' => 'required', // กดยืนยันผล บังคับลายเซ็น
+            ]);
+
+            // ถ้าเลือกสถานะ 3 บังคับให้ต้องมีวันที่นัดตรวจใหม่
+            if ($request->evaluate_status == '3') {
+                $request->validate([
+                    'next_inspect_date' => 'required|date'
+                ]);
+            }
+        }
+
+        // 3. แปลงข้อมูลลายเซ็น (Base64) ให้เป็นไฟล์รูปภาพ (PNG)
+        $inspectorSignPath = $record->inspector_sign; // เก็บค่าเดิมไว้ เผื่อบันทึกแบบร่างแล้วไม่ได้เซ็นซ้ำ
+        if ($request->filled('inspector_sign_data')) {
             $image_parts = explode(";base64,", $request->inspector_sign_data);
             if (count($image_parts) == 2) {
                 $image_base64 = base64_decode($image_parts[1]);
@@ -337,9 +354,8 @@ class InspectionController extends Controller
             }
         }
 
-        // 2. แปลงลายเซ็นคนขับรถ (ถ้ามี)
-        $driverSignPath = null;
-        if ($request->driver_sign_data) {
+        $driverSignPath = $record->driver_sign; // เก็บค่าเดิม
+        if ($request->filled('driver_sign_data')) {
             $image_parts = explode(";base64,", $request->driver_sign_data);
             if (count($image_parts) == 2) {
                 $image_base64 = base64_decode($image_parts[1]);
@@ -350,16 +366,39 @@ class InspectionController extends Controller
             }
         }
 
-        // 3. อัปเดตตาราง chk_records เพื่อจบการทำงาน
-        DB::table('chk_records')->where('record_id', $record_id)->update([
-            'evaluate_status' => $request->evaluate_status,
-            'chk_status'      => '1', // 1 = ตรวจครบ/เสร็จสิ้น
-            'inspector_sign'  => $inspectorSignPath,
-            'driver_sign'     => $driverSignPath,
-            'updated_at'      => now(),
-        ]);
+        // 4. เตรียมชุดข้อมูลสำหรับอัปเดตลงตาราง chk_records
+        $updateData = [
+            'inspector_sign' => $inspectorSignPath,
+            'driver_sign'    => $driverSignPath,
+            'updated_at'     => now(),
+        ];
 
-        // นำไปหน้าแจ้งเตือนความสำเร็จ (Success Page)
-        return redirect()->route('user.inspection.index')->with('success', 'บันทึกผลการตรวจสภาพรถเรียบร้อยแล้ว');
+        // ถ้ามีการเลือกสถานะการใช้งาน ให้เก็บค่าลงไปด้วย
+        if ($request->has('evaluate_status')) {
+            $updateData['evaluate_status'] = $request->evaluate_status;
+            
+            // ถ้าเป็นสถานะ 3 เก็บวันที่ตรวจใหม่ ถ้าไม่ใช่ ให้ล้างค่าทิ้ง (เผื่อช่างเปลี่ยนใจ)
+            if ($request->evaluate_status == '3') {
+                $updateData['next_inspect_date'] = $request->next_inspect_date;
+            } else {
+                $updateData['next_inspect_date'] = null;
+            }
+        }
+
+        // 5. แยกการจบงาน (Draft vs Final)
+        if ($request->submit_type == 'final') {
+            $updateData['chk_status'] = '1'; // 1 = ตรวจเสร็จสิ้น 100%
+            $message = 'บันทึกและยืนยันผลการตรวจสภาพรถเรียบร้อยแล้ว';
+        } else {
+             $updateData['chk_status'] = '2';
+            // กรณีเป็น Draft ปล่อย chk_status ไว้ตามค่าเดิมของระบบ (เช่น '0' กำลังดำเนินการ)
+            $message = 'บันทึกแบบร่างสำเร็จ คุณสามารถกลับมาตรวจต่อได้ในภายหลัง';
+        }
+
+        // 6. อัปเดตตาราง chk_records
+        DB::table('chk_records')->where('record_id', $record_id)->update($updateData);
+
+        // นำไปหน้าแจ้งเตือนความสำเร็จ
+        return redirect()->route('local.home')->with('success', $message);
     }
 }

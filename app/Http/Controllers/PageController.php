@@ -15,7 +15,7 @@ class PageController extends Controller
 {
     public function home()
     {
-        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager,Role::Staff,Role::Company,Role::Supply])) {
+        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager, Role::Staff, Role::Company, Role::Supply])) {
             abort(403);
         }
 
@@ -26,27 +26,27 @@ class PageController extends Controller
             Role::Admin => 'layout.LayoutAdmin',
             Role::Manager => 'layout.app',
             Role::Agency => 'layout.app',
-              Role::Company => 'layout.app',
+            Role::Company => 'layout.app',
             Role::User => 'layout.app',
             Role::Staff => 'layout.app',
-             Role::Supply => 'layout.app',
+            Role::Supply => 'layout.app',
         };
 
         $title = match ($role) {
             Role::Admin => 'ผู้ดูแลระบบ',
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'หน้าหลักหน่วยงาน',
-             Role::Company => 'หน้าหลักหน่วยงาน',
+            Role::Company => 'หน้าหลักหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
-             Role::Supply => 'หน้าหลักเจ้าหน้าที่',
+            Role::Supply => 'หน้าหลักเจ้าหน้าที่',
         };
 
         $description = match ($role) {
             Role::Admin => 'ผู้ดูแลระบบ',
             Role::Manager => 'แดชบอร์ดผู้จัดการ',
             Role::Agency => 'สำหรับหน่วยงาน',
-             Role::Company => 'สำหรับหน่วยงาน',
+            Role::Company => 'สำหรับหน่วยงาน',
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
             Role::Supply => 'หน้าหลักเจ้าหน้าที่',
@@ -54,22 +54,26 @@ class PageController extends Controller
 
         if ($role === Role::User) {
 
-            $user_main_id = Auth::id();
-            $user_gen_id = DB::table('users')
-            ->where('id','=',$user_main_id)
-            ->first();
-
-            $user_gen = $user_gen_id->user_id;
+            $user_main_id = Auth::user()->user_id;
 
             $user_sup = DB::table('inspector_datas')
-            ->where('ins_id',$user_gen)
-            ->first();
+                ->where('ins_id', $user_main_id)               
+                ->first();
 
             $vehicles = DB::table('vehicles_detail')
-            ->select('vehicles_detail.*','vehicle_types.vehicle_type')
-            ->join('vehicle_types','vehicle_types.id','=','vehicles_detail.car_type')
-            ->where('vehicles_detail.supply_id',$user_sup->sup_id)                
-             ->get();
+                ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+                ->leftJoin('chk_records', function ($join) {
+                    $join->on('vehicles_detail.car_id', '=', 'chk_records.veh_id')
+                        ->whereRaw('chk_records.id IN (select MAX(id) from chk_records GROUP BY veh_id)');
+                })
+                ->select(
+                    'vehicles_detail.*',
+                    'vehicle_types.vehicle_type',
+                    'chk_records.chk_status',
+                    'chk_records.record_id as chk_primary_id'
+                )
+                ->where('vehicles_detail.supply_id','=',$user_sup->sup_id)               
+                ->get();;
 
             return view('pages.user.MainPage', compact('vehicles'));
         } elseif ($role === Role::Agency) {
@@ -86,60 +90,54 @@ class PageController extends Controller
                 ->where('role', 'user')
                 ->get();
             return view('pages.agency.index', compact('agency', 'managers', 'users'));
-        }
-        elseif ($role === Role::Manager) {
+        } elseif ($role === Role::Manager) {
             $id = Auth::id();
             $manager = DB::table('users')->where('id', Auth::id())->first();
-           
+
             return view('pages.manager.index', compact('manager'));
-        }
-        elseif ($role === Role::Company) {
-     
-        $user = Auth::user();
-        $companyCode = $user->company_code; 
-        $companyDetails = DB::table('company_details')
-            ->where('company_id', $companyCode)
-            ->first();
+        } elseif ($role === Role::Company) {
 
-        $formCount = DB::table('forms')->where('user_id', $companyCode)->count();
+            $user = Auth::user();
+            $companyCode = $user->company_code;
+            $companyDetails = DB::table('company_details')
+                ->where('company_id', $companyCode)
+                ->first();
 
-        $supplyCount = DB::table('users') 
-            ->where('company_code', $companyCode)
-            ->where('role', 'supply')
-            ->count();               
-       
-        $totalVehicleLimit = DB::table('supply_datas')
-            ->where('company_code', $companyCode)
-            ->sum('vehicle_limit');
-   
-        $registeredVehicleCount = DB::table('vehicles_detail')
-            ->where('company_code', $companyCode)
-            ->count();
-    
-        return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount','totalVehicleLimit','registeredVehicleCount'));
-    }
-        
-          elseif ($role === Role::Staff) {
+            $formCount = DB::table('forms')->where('user_id', $companyCode)->count();
+
+            $supplyCount = DB::table('users')
+                ->where('company_code', $companyCode)
+                ->where('role', 'supply')
+                ->count();
+
+            $totalVehicleLimit = DB::table('supply_datas')
+                ->where('company_code', $companyCode)
+                ->sum('vehicle_limit');
+
+            $registeredVehicleCount = DB::table('vehicles_detail')
+                ->where('company_code', $companyCode)
+                ->count();
+
+            return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount', 'totalVehicleLimit', 'registeredVehicleCount'));
+        } elseif ($role === Role::Staff) {
             $id = Auth::id();
             $staff = DB::table('users')->where('id', Auth::id())->first();
 
-           
+
             return view('pages.staff.index', compact('staff'));
-        }
-        elseif ($role === Role::Supply) {
+        } elseif ($role === Role::Supply) {
             $id = Auth::id();
             $user_id = Auth::user()->user_id;
             $supply = DB::table('users')->where('id', Auth::id())->first();
 
             $chk_list = DB::table('chk_records')
-            ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'vehicles_detail.car_plate','vehicles_detail.car_number_record', 'chk_records.veh_id')
-            ->join('vehicles_detail','chk_records.veh_id','=','vehicles_detail.car_id')
-            ->where('chk_records.agency_id',$user_id)
-            ->groupBy('chk_records.record_id')
-            ->get();
-            return view('pages.supply.home', compact('supply','chk_list','user_id'));
-        }
-        else {
+                ->select('chk_records.created_at as date_check', 'chk_records.form_id', 'chk_records.record_id', 'vehicles_detail.car_plate', 'vehicles_detail.car_number_record', 'chk_records.veh_id')
+                ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+                ->where('chk_records.supply_id', $user_id)
+                ->groupBy('chk_records.record_id')
+                ->get();
+            return view('pages.supply.home', compact('supply', 'chk_list', 'user_id'));
+        } else {
             return view('pages.local.home', compact('layout', 'title', 'description'));
         }
     }

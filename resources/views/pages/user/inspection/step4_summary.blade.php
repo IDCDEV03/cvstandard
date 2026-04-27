@@ -11,7 +11,7 @@
         $totalItems = $passCount + $failCount + $AlmostCount + $uncheckedCount;
         $checkedItems = $passCount + $failCount + $AlmostCount;
         $percent = $totalItems > 0 ? round(($checkedItems / $totalItems) * 100) : 0;
-        $isCompleted = ($uncheckedCount == 0);
+        $isCompleted = $uncheckedCount == 0;
     @endphp
 
     <div class="container-fluid py-3">
@@ -26,36 +26,54 @@
                     <div>
                         <h5 class="mb-1 fw-bold text-dark">สรุปผลการตรวจและลงนาม</h5>
                         <div class="small text-muted mb-1">
-                            <span class="fw-bold text-primary">{{ $formGroup->form_group_name ?? 'แบบฟอร์มการตรวจ' }}</span> 
-                            | ทะเบียน: <span class="fw-bold text-dark">{{ $vehicle->car_plate ?? 'ไม่ระบุ' }}</span>
-                        </div>                    
+                            <span class="fw-bold text-primary">{{ $formGroup->form_group_name ?? 'แบบฟอร์มการตรวจ' }}</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <form id="submitForm" action="{{ route('user.inspection.submitInspection', $record->record_id) }}" method="POST">
+                <div class="card shadow-sm mb-20 ">
+                    <div class="card-header ">
+                           <a href="{{ route('user.inspection.step3', $record->record_id) }}"
+                            class="btn btn btn-primary radius-xs">
+                            <i class="uil uil-arrow-left"></i> ย้อนกลับ
+                        </a>
+                    </div>
+
+                    <div class="card-body" style="background-color: #d7e3f5; border-radius: 0 0 12px 12px;">
+                        <h6 class="card-title">ทะเบียนรถ</h6>
+                        <span class=" fs-20 text-secondary"><strong>
+                          {{ $vehicle->car_plate ?? 'ไม่ระบุ' }}</strong>
+                        </span>
+                      
+                    </div>
+                </div>
+
+                <form id="submitForm" action="{{ route('user.inspection.submitInspection', $record->record_id) }}"
+                    method="POST">
                     @csrf
-                    
+
                     <input type="hidden" name="submit_type" id="submit_type" value="final">
 
                     <div class="card border-0 shadow-sm radius-xs mb-4">
                         <div class="card-body p-3 p-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold mb-0"><i class="uil uil-chart-pie me-1"></i> ภาพรวมการตรวจ</h6>
-                               
+
                             </div>
 
-                               <div class="mb-4">
-                            <label class="fw-bold">ความคืบหน้าการตรวจ: {{ $checkedItems }}/{{ $totalItems }} ข้อ
-                                ({{ $percent }}%)</label>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar {{ $isCompleted ? 'bg-success' : 'bg-primary' }}" role="progressbar"
-                                    style="width: {{ $percent }}%;" aria-valuenow="{{ $percent  }}"
-                                    aria-valuemin="0" aria-valuemax="100">
-                                    {{ $percent }}%
+                            <div class="mb-4">
+                                <label class="fw-bold">ความคืบหน้าการตรวจ: {{ $checkedItems }}/{{ $totalItems }} ข้อ
+                                    ({{ $percent }}%)</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar {{ $isCompleted ? 'bg-success' : 'bg-primary' }}"
+                                        role="progressbar" style="width: {{ $percent }}%;"
+                                        aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ $percent }}%
+                                    </div>
                                 </div>
                             </div>
-                        </div>                            
-                         
+
 
                             <div class="row g-2 text-center">
                                 <div class="col-4">
@@ -76,12 +94,13 @@
                                         <div class="fs-24 fw-bold">{{ $failCount }}</div>
                                         <div class="fs-16 fw-bold text-danger">ชำรุด / ไม่ผ่าน</div>
                                     </div>
-                                </div>                                
-                                
+                                </div>
+
                             </div>
 
                             @if (!$isCompleted)
-                                <div class="alert alert-danger mt-3 mb-0 py-2 px-3 radius-xs border-0 d-flex align-items-center">
+                                <div
+                                    class="alert alert-danger mt-3 mb-0 py-2 px-3 radius-xs border-0 d-flex align-items-center">
                                     <i class="uil uil-info-circle fs-18 me-2"></i>
                                     <div class="fs-18">มีข้อยังไม่ได้ตรวจ <strong>{{ $uncheckedCount }}</strong> ข้อ</div>
                                 </div>
@@ -95,24 +114,54 @@
                                 <span class="text-danger">*</span>
                             </h6>
                             <div class="d-grid gap-3">
-                                <input type="radio" class="btn-check" name="evaluate_status" id="eval_1" value="1">
-                                <label class="btn btn-outline-success border-dark w-100 text-start p-3 radius-xs border d-flex align-items-center" for="eval_1">
-                                    <i class="uil uil-check-circle fs-24 me-3"></i> 
-                                    <span class="fs-18 fw-bold">ปกติ อนุญาตให้ใช้งานได้</span>
+                                <input type="radio" class="btn-check" name="evaluate_status" id="eval_1"
+                                    value="1">
+                                <label
+                                    class="btn btn-outline-success border-dark w-100 text-start p-3 radius-xs border d-flex align-items-center"
+                                    for="eval_1">
+                                    <i class="uil uil-check-circle me-3"
+                                        style="font-size: 24px; line-height: 2; flex-shrink: 0;"></i>
+                                    <span class="fs-18 fw-bold" >ปกติ อนุญาตให้ใช้งานได้</span>
                                 </label>
 
-                                <input type="radio" class="btn-check" name="evaluate_status" id="eval_2" value="2">
-                                <label class="btn btn-outline-warning border-dark btn-block text-start p-3 radius-xs border d-flex align-items-center" for="eval_2">
-                                    <i class="uil uil-exclamation-circle fs-24 me-3"></i> 
-                                    <span class="fs-18 fw-bold">ไม่ปกติ แต่สามารถปฏิบัติงานได้</span>
+                                <input type="radio" class="btn-check eval-radio" name="evaluate_status" id="eval_2"
+                                    value="2">
+                                <label
+                                    class="btn border-dark btn-outline-warning w-100 text-start px-3 py-2 radius-xs border d-flex align-items-center"
+                                    for="eval_2">
+                                    <i class="uil uil-exclamation-circle me-3"
+                                        style="font-size: 24px; line-height: 2; flex-shrink: 0;"></i>
+                                    <div class="d-flex flex-column" style="gap: 2; line-height: 1.5;">
+                                        <span class="fs-15 fw-bold" style="line-height: 1.5;">ไม่ปกติ
+                                            แต่สามารถปฏิบัติงานได้</span>
+                                        <span class="small fw-normal text-dark"
+                                            style=" line-height: 1.5; margin-top: 2px;">(ต้องนำรถไปซ่อมแซม
+                                            และนำรถมาตรวจสภาพใหม่ ภายใน 7 วัน)</span>
+                                    </div>
                                 </label>
 
-                                <input type="radio" class="btn-check" name="evaluate_status" id="eval_3" value="3">
-                                <label class="btn btn-outline-danger border-dark btn-block text-start p-3 radius-xs border d-flex align-items-center" for="eval_3">
-                                    <i class="uil uil-times-circle fs-24 me-3"></i> 
+                                <input type="radio" class="btn-check eval-radio" name="evaluate_status" id="eval_3"
+                                    value="3">
+                                <label
+                                    class="btn border-dark btn-outline-danger w-100 text-start p-3 radius-xs border d-flex align-items-center"
+                                    for="eval_3">
+                                    <i class="uil uil-times-circle me-3"
+                                        style="font-size: 24px; line-height: 2; flex-shrink: 0;"></i>
                                     <span class="fs-18 fw-bold">ไม่ปกติ ไม่อนุญาตให้ใช้งาน</span>
                                 </label>
                             </div>
+
+                            <div id="next_inspect_container" class="mt-3 p-3 rounded border d-none"
+                                style="background-color: #ffffff;">
+                                <label class="small text-dark fw-bold mb-2">
+                                    กำหนดระยะเวลาตรวจสภาพใหม่ วันที่ <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" name="next_inspect_date" id="next_inspect_date"
+                                    class="form-control radius-xs border" min="{{ date('Y-m-d') }}">
+                                <div class="small text-muted mt-1">
+                                    กรุณาระบุวันที่ที่ต้องการให้รถคันนี้กลับมาตรวจสภาพอีกครั้ง</div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -121,35 +170,41 @@
                             <h6 class="fw-bold mb-3"><i class="uil uil-pen me-1"></i> ลงลายเซ็น</h6>
 
                             <div class="mb-4">
-                                <label class="small text-dark fw-bold mb-2">ลายเซ็นผู้ตรวจ <span class="text-danger">*</span></label>
+                                <label class="small text-dark fw-bold mb-2">ลงชื่อผู้ตรวจ <span
+                                        class="text-danger">*</span></label>
                                 <div class="border border-dark rounded bg-white position-relative" style="height: 200px;">
-                                    <canvas id="inspectorCanvas" class="w-100 h-100" style="touch-action: none;"></canvas>
-                                    <button type="button" class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm" onclick="inspectorPad.clear()">ล้าง</button>
+                                    <canvas id="inspectorCanvas" class="w-100 h-100"
+                                        style="touch-action: none;"></canvas>
+                                    <button type="button"
+                                        class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm"
+                                        onclick="inspectorPad.clear()">ล้าง</button>
                                 </div>
                                 <input type="hidden" name="inspector_sign_data" id="inspector_sign_data">
                             </div>
 
                             <div>
-                                <label class="small text-dark fw-bold mb-2">ลายเซ็นผู้ขับขี่ (ถ้ามี)</label>
+                                <label class="small text-dark fw-bold mb-2">ลงชื่อผู้รับการตรวจ (ถ้ามี)</label>
                                 <div class="border border-dark rounded bg-white position-relative" style="height: 200px;">
                                     <canvas id="driverCanvas" class="w-100 h-100" style="touch-action: none;"></canvas>
-                                    <button type="button" class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm" onclick="driverPad.clear()">ล้าง</button>
+                                    <button type="button"
+                                        class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm"
+                                        onclick="driverPad.clear()">ล้าง</button>
                                 </div>
                                 <input type="hidden" name="driver_sign_data" id="driver_sign_data">
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row gap-2 mb-5">
-                        <a href="{{ route('user.inspection.step3', $record->record_id) }}" class="btn btn-dark btn-transparent-dark btn-lg py-3 fw-bold radius-xs flex-fill">
-                            <i class="uil uil-arrow-left"></i> กลับ
-                        </a>
-                        
-                        <button type="button" id="btnDraft" class="btn btn-outline-primary btn-lg py-3 fw-bold radius-xs flex-fill">
+                    <div class="d-flex flex-column flex-md-row gap-2 mb-5">                      
+
+                        <button type="button" id="btnDraft"
+                            class="btn btn-outline-primary btn-lg py-3 fw-bold radius-xs btn-block">
                             <i class="uil uil-save me-1"></i> บันทึกแบบร่าง
                         </button>
 
-                        <button type="button" id="btnSubmit" class="btn btn-success btn-lg py-3 fw-bold radius-xs flex-fill shadow-sm" {{ $isCompleted ? '' : 'disabled' }}>
+                        <button type="button" id="btnSubmit"
+                            class="btn btn-success btn-lg py-3 fw-bold radius-xs btn-block shadow-sm"
+                            {{ $isCompleted ? '' : 'disabled' }}>
                             <i class="uil uil-check-circle me-1"></i> ยืนยันผลการตรวจ
                         </button>
                     </div>
@@ -162,6 +217,37 @@
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+        <script>
+            // ==========================================
+            // ควบคุมการ ซ่อน/โชว์ กล่องวันที่ตรวจสภาพใหม่
+            // ==========================================
+            const evalRadios = document.querySelectorAll('.eval-radio');
+            const nextInspectContainer = document.getElementById('next_inspect_container');
+            const nextInspectInput = document.getElementById('next_inspect_date');
+
+            function toggleNextInspectDate() {
+                // หาปุ่มที่ถูกเลือกอยู่ ณ ปัจจุบัน
+                const selectedRadio = document.querySelector('.eval-radio:checked');
+
+                // ถ้ามีการเลือกปุ่ม และปุ่มนั้นมีค่าเท่ากับ '3'
+                if (selectedRadio && selectedRadio.value === '3') {
+                    nextInspectContainer.classList.remove('d-none'); // โชว์กล่อง
+                    nextInspectInput.setAttribute('required', 'required'); // บังคับให้ต้องกรอก
+                } else {
+                    nextInspectContainer.classList.add('d-none'); // ซ่อนกล่อง
+                    nextInspectInput.removeAttribute('required'); // เลิกบังคับ
+                    nextInspectInput.value = ''; // ล้างข้อมูลวันที่ทิ้ง
+                }
+            }
+
+            // เอาฟังก์ชันไปผูกไว้กับปุ่ม Radio ทั้ง 3 ปุ่ม (เวลากดเปลี่ยน มันจะทำงานทันที)
+            evalRadios.forEach(radio => {
+                radio.addEventListener('change', toggleNextInspectDate);
+            });
+
+            // สั่งให้ทำงาน 1 ครั้งตอนเปิดหน้าเว็บมาครั้งแรก (ป้องกันกรณีเบราว์เซอร์จำค่าเก่าเอาไว้)
+            toggleNextInspectDate();
+        </script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // ตั้งค่า Canvas ให้พอดีกับหน้าจอ
@@ -179,8 +265,12 @@
                 resizeCanvas(driverCanvas);
 
                 // เรียกใช้งาน Signature Pad
-                window.inspectorPad = new SignaturePad(inspectorCanvas, { penColor: "rgb(0, 0, 0)" });
-                window.driverPad = new SignaturePad(driverCanvas, { penColor: "rgb(0, 0, 0)" });
+                window.inspectorPad = new SignaturePad(inspectorCanvas, {
+                    penColor: "rgb(0, 0, 0)"
+                });
+                window.driverPad = new SignaturePad(driverCanvas, {
+                    penColor: "rgb(0, 0, 0)"
+                });
 
                 // แปลงลายเซ็นลง Input
                 function prepareSignatures() {
@@ -207,11 +297,18 @@
                 // ==========================================
                 document.getElementById('btnSubmit').addEventListener('click', function() {
                     document.getElementById('submit_type').value = 'final'; // ตั้งค่าเป็น final
-                    
+
                     // เช็คการประเมินสภาพรถ (บังคับถ้าจะยืนยันผล)
                     const isEvaluated = document.querySelector('input[name="evaluate_status"]:checked');
                     if (!isEvaluated) {
                         alert('กรุณาเลือกประเมินสถานะการใช้งานของรถคันนี้ครับ');
+                        return;
+                    }
+
+                    const selectedEval = document.querySelector('input[name="evaluate_status"]:checked');
+                    if (selectedEval && selectedEval.value === '3' && !nextInspectInput.value) {
+                        alert('กรุณาระบุวันที่กำหนดตรวจสภาพใหม่ด้วยครับ');
+                        nextInspectInput.focus();
                         return;
                     }
 

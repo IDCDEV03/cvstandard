@@ -10,7 +10,7 @@
             <div class="col-md-12">
                 <div class="card mt-4">
                     <div class="card-body">
-                        <a href="{{ route('user.inspection.index') }}" class="btn btn-lg btn-info fs-18">ทดสอบตรวจรถ</a>
+                        <a href="{{ route('user.inspection.index') }}" class="btn btn-lg btn-info fs-18">เริ่มตรวจรถ</a>
                     </div>
                 </div>
             </div>
@@ -34,8 +34,9 @@
                                                 <th class="text-sm fw-bold">ทะเบียนรถ</th>
                                                 <th class="text-sm fw-bold">ยี่ห้อรถ</th>
                                                 <th class="text-sm fw-bold">หมายเลขข้างรถ</th>
-                                                <th>ประเภทรถ</th>
+                                                <th class="text-sm fw-bold">ประเภทรถ</th>
                                                 <th class="text-sm fw-bold">วันที่ลงทะเบียน</th>
+                                                <th class="text-sm fw-bold">สถานะการตรวจ</th>
                                                 <th>จัดการรถ</th>
                                             </tr>
                                         </thead>
@@ -43,18 +44,47 @@
                                             @foreach ($vehicles as $item)
                                                 <tr>
                                                     <td> {{ $loop->iteration }} </td>
-                                                    <td> <a href="{{ route('user.veh_detail', [$item->car_id]) }}">
-                                                            {{ $item->car_plate }} </a></td>
+                                                    <td>
+                                                        <a href="{{ route('user.veh_detail', [$item->car_id]) }}" class="fw-bold">
+                                                            {{ $item->car_plate }}
+                                                        </a>
+                                                        @if($item->chk_status === '2')
+                                                          <span class="dm-tag tag-warning tag-transparented fs-18">      
+                                                          บันทึกแบบร่าง</span>
+                                                        @endif
+
+                                                    </td>
                                                     <td> {{ $item->car_brand }} </td>
                                                     <td> {{ blank($item->car_number_record) ? '-' : $item->car_number_record }}
                                                     </td>
+
                                                     <td> {{ $item->vehicle_type }} </td>
+
                                                     <td> {{ thai_date($item->created_at) }} </td>
-                                                    <td><a href="{{ route('user.veh_edit', [$item->car_id]) }}"
-                                                            class="btn btn-primary btn-xs">แก้ไข</a></td>
+
+                                                    <td class="text-center">
+                                                        @if ($item->chk_status === '1')
+                                                            <span class="dm-tag tag-success tag-transparented fs-18">บันทึกสมบูรณ์
+                                                            </span>
+                                                        @elseif($item->chk_status === '2')
+                                                            <div class="d-flex flex-column gap-1 align-items-center">       
+                                                                <a href="{{ route('user.inspection.step3', [$item->chk_primary_id]) }}"
+                                                                    class="btn btn-dark btn-default btn-squared btn-transparent-dark btn-xs">
+                                                                    ตรวจต่อ <i class="uil uil-arrow-right"
+                                                                        style="font-size:13px;line-height:1;"></i>
+                                                                </a>
+                                                            </div>
+                                                        @else
+                                                            <span class="text-muted small">ยังไม่มีประวัติการตรวจ</span>
+                                                        @endif
+                                                    </td>
+
+                                                    <td>
+                                                        <a href="{{ route('user.veh_edit', [$item->car_id]) }}"
+                                                            class="btn btn-primary btn-xs">แก้ไขข้อมูลรถ</a>
+                                                    </td>
                                                 </tr>
                                             @endforeach
-
                                         </tbody>
                                     </table>
                                 </div>
