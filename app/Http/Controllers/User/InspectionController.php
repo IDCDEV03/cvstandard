@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Role;
 use Illuminate\Support\Facades\File;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InspectionController extends Controller
 {
@@ -124,15 +125,15 @@ class InspectionController extends Controller
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
         if (!$record) return redirect()->route('user.inspection.index')->with('error', 'ไม่พบประวัติการตรวจนี้');
 
-      
+
         $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
 
-       
+
         if (empty($formGroup->pre_inspection_template_id)) {
             return redirect()->route('user.inspection.step3', ['record_id' => $record_id]);
         }
 
-       $preFields = DB::table('pre_inspection_fields')
+        $preFields = DB::table('pre_inspection_fields')
             ->where('template_id', $formGroup->pre_inspection_template_id)
             ->orderBy('sort_order')
             ->get();
@@ -184,14 +185,14 @@ class InspectionController extends Controller
             if (count($dynamicData) > 0) {
                 DB::table('pre_inspection_results')->insert($dynamicData);
             }
-        }       
+        }
         return redirect()->route('user.inspection.step3', ['record_id' => $record_id]);
     }
 
     // โหลดหน้า Step 3
     public function step3(Request $request, $record_id)
     {
-      
+
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
         if (!$record) return redirect()->route('user.inspection.index');
 
@@ -205,10 +206,8 @@ class InspectionController extends Controller
         $existingImages = DB::table('check_result_images')->where('record_id', $record->record_id)->get()->groupBy('item_id');
 
         $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
-        
-        return view('pages.user.inspection.step3_checklist', compact('record', 'formGroup', 'categories', 'currentCategoryId', 'items', 'existingResults', 'existingImages','vehicle'));
 
-      
+        return view('pages.user.inspection.step3_checklist', compact('record', 'formGroup', 'categories', 'currentCategoryId', 'items', 'existingResults', 'existingImages', 'vehicle'));
     }
 
     // Auto-Save ข้อมูลทั่วไปผ่าน AJAX
@@ -216,7 +215,7 @@ class InspectionController extends Controller
     {
         $user = Auth::user()->user_id;
         $data = $request->all();
-        
+
         DB::table('check_records_result')->updateOrInsert(
             [
                 'record_id' => $data['record_id'], // รหัส string (CHK-...)
@@ -270,11 +269,10 @@ class InspectionController extends Controller
 
         return response()->json([
             'success'   => true,
-            'status' => 'success', 
-            'image_id' => $imageId, 
+            'status' => 'success',
+            'image_id' => $imageId,
             'image_url' => asset($dbPath)
         ]);
-        
     }
 
     // ลบรูปภาพย่อย
@@ -282,15 +280,15 @@ class InspectionController extends Controller
     {
         $imageId = $request->image_id;
         $image = DB::table('check_result_images')->where('id', $imageId)->first();
-        
-        if ($image) {       
-           \Illuminate\Support\Facades\Storage::delete(str_replace('storage/', 'public/', $image->image_path));
+
+        if ($image) {
+            \Illuminate\Support\Facades\Storage::delete(str_replace('storage/', 'public/', $image->image_path));
             DB::table('check_result_images')->where('id', $imageId)->delete();
         }
         return response()->json([
             'success' => true,
-        'status'  => 'success',
-        'message' => 'ลบรูปภาพเรียบร้อย'
+            'status'  => 'success',
+            'message' => 'ลบรูปภาพเรียบร้อย'
         ]);
     }
 
@@ -299,28 +297,28 @@ class InspectionController extends Controller
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
         if (!$record) return redirect()->route('user.inspection.index');
 
-      
+
         $totalItems = DB::table('check_items')
             ->join('check_categories', 'check_items.category_id', '=', 'check_categories.category_id')
             ->where('check_categories.form_id', $record->form_id)
             ->count();
 
-     
+
         $results = DB::table('check_records_result')->where('record_id', $record->record_id)->get();
-        
+
         $passCount = $results->where('result_status', '1')->count();
         $failCount = $results->where('result_status', '0')->count();
-         $AlmostCount = $results->where('result_status', '2')->count();
-        $uncheckedCount = $totalItems - ($passCount + $failCount);
+        $AlmostCount = $results->where('result_status', '2')->count();
+        $uncheckedCount = $totalItems - ($passCount + $failCount + $AlmostCount);
 
-         $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
-          $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
+        $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
+        $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
 
-        return view('pages.user.inspection.step4_summary', compact('record', 'totalItems', 'passCount', 'failCount', 'uncheckedCount','formGroup','vehicle','AlmostCount'));
+        return view('pages.user.inspection.step4_summary', compact('record', 'totalItems', 'passCount', 'failCount', 'uncheckedCount', 'formGroup', 'vehicle', 'AlmostCount'));
     }
 
     // บันทึกการตรวจ
-   public function submitInspection(Request $request, $record_id)
+    public function submitInspection(Request $request, $record_id)
     {
         // 1. ดึงข้อมูล record เดิมมาก่อน
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
@@ -376,7 +374,7 @@ class InspectionController extends Controller
         // ถ้ามีการเลือกสถานะการใช้งาน ให้เก็บค่าลงไปด้วย
         if ($request->has('evaluate_status')) {
             $updateData['evaluate_status'] = $request->evaluate_status;
-            
+
             // ถ้าเป็นสถานะ 3 เก็บวันที่ตรวจใหม่ ถ้าไม่ใช่ ให้ล้างค่าทิ้ง (เผื่อช่างเปลี่ยนใจ)
             if ($request->evaluate_status == '3') {
                 $updateData['next_inspect_date'] = $request->next_inspect_date;
@@ -390,7 +388,7 @@ class InspectionController extends Controller
             $updateData['chk_status'] = '1'; // 1 = ตรวจเสร็จสิ้น 100%
             $message = 'บันทึกและยืนยันผลการตรวจสภาพรถเรียบร้อยแล้ว';
         } else {
-             $updateData['chk_status'] = '2';
+            $updateData['chk_status'] = '2';
             // กรณีเป็น Draft ปล่อย chk_status ไว้ตามค่าเดิมของระบบ (เช่น '0' กำลังดำเนินการ)
             $message = 'บันทึกแบบร่างสำเร็จ คุณสามารถกลับมาตรวจต่อได้ในภายหลัง';
         }
@@ -401,4 +399,127 @@ class InspectionController extends Controller
         // นำไปหน้าแจ้งเตือนความสำเร็จ
         return redirect()->route('local.home')->with('success', $message);
     }
+
+    public function viewReport($record_id)
+    {
+        // 1. ดึงข้อมูลบันทึกการตรวจหลัก
+        $record = DB::table('chk_records')->where('record_id', $record_id)->first();
+        if (!$record) return redirect()->back()->with('error', 'ไม่พบข้อมูล');
+
+        // 2. ดึงข้อมูล Form Group เพื่อใช้เป็นสะพานเชื่อม
+        $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
+
+        // 3. ข้อมูลพาหนะ, บริษัท, Supply และ พนักงานตรวจ
+        $vehicle = DB::table('vehicles_detail')
+            ->leftJoin('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+            ->where('vehicles_detail.car_id', $record->veh_id)
+            ->select('vehicles_detail.*', 'vehicle_types.vehicle_type')
+            ->first();
+
+        $company = DB::table('company_details')->where('company_id', $vehicle->company_code)->first();
+        $supply = DB::table('supply_datas')->where('sup_id', $vehicle->supply_id)->first();
+        $form = DB::table('forms')->where('form_id', $record->form_id)->first();
+        $inspector = DB::table('users')->where('user_id', $record->user_id)->first();
+
+        // 4. ดึง Pre-inspection Fields (ข้อมูลที่ช่างกรอกก่อนตรวจ)
+        $preInspectFields = DB::table('pre_inspection_results')
+            ->join('pre_inspection_fields', 'pre_inspection_results.field_id', '=', 'pre_inspection_fields.id')
+            ->where('pre_inspection_results.record_id', $record_id)
+            ->where('pre_inspection_fields.template_id', $formGroup->pre_inspection_template_id)
+            ->get();
+
+        $preImages = DB::table('vehicle_image_records')->where('record_id', $record_id)->first();
+
+        // 5. ดึง Checklist Categories
+        $categories = DB::table('check_categories')
+            ->where('form_id', $formGroup->check_item_form_id)
+            ->orderBy('cates_no', 'asc')
+            ->get();
+
+        $results = DB::table('check_records_result')
+            ->join('check_items', 'check_records_result.item_id', '=', 'check_items.item_id')
+            ->where('check_records_result.record_id', $record_id)
+            ->get()
+            ->groupBy('category_id');
+
+        $itemImages = DB::table('check_result_images')->where('record_id', $record_id)->get()->groupBy('item_id');
+
+        // 6. ดึง Report Template และ Report Template Fields
+        $reportTemplate = DB::table('report_templates')->where('id', $formGroup->report_template_id)->first();
+        $reportFields = DB::table('report_template_fields')->where('template_id', $formGroup->report_template_id)->get();
+
+
+
+        $checked = '<strong style="color: #000; font-size: 18px;">&#9745;</strong>';
+        $unchecked = '<span style="font-size: 18px; color: #666;">&#9744;</span>';
+
+        $replacements = [
+            '[car_plate]'            => $vehicle->car_plate ?? '-',
+            '[car_trailer_plate]'    => $vehicle->car_trailer_plate ?? '-',
+            '[car_insure]'           => $vehicle->car_insure ?? '-',
+            '[car_insurance_expire]' => $vehicle->car_insurance_expire ? thai_date($vehicle->car_insurance_expire) : '-',
+            '[car_tax]'              => $vehicle->car_tax ?? '-',
+            '[car_register_date]'    => $vehicle->car_register_date ? thai_date($vehicle->car_register_date) : '-',
+            '[car_total_weight]'     => $vehicle->car_total_weight ?? '-',
+            '[car_fuel]'             => $vehicle->car_fuel_type ?? '-',
+            '[car_mileage]'          => $vehicle->car_mileage ?? '-',
+
+            '[company_name]'         => $company->company_name ?? '-',
+            '[logo_company]'         => ($company && $company->company_logo) ? '<img src="' . asset($company->company_logo) . '" style="max-height:50px;">' : '',
+            '[supply_name]'          => $supply->supply_name ?? '-',
+
+            '[form_code]'            => $form->form_code ?? '-',
+            '[form_name]'            => $form->form_name ?? '-',
+
+            '[inspect_date]'         => thai_date($record->created_at),
+            '[next_inspect_date]'    => $record->next_inspect_date ? thai_date($record->next_inspect_date) : '-',
+
+            '[inspector_name]'       => $inspector ? ($inspector->prefix . $inspector->name . ' ' . $inspector->lastname) : '-',
+            '[inspector_sign]'       => $record->inspector_sign ? '<img src="' . asset($record->inspector_sign) . '" style="max-height:50px;">' : '',
+
+            '[check_status_1]'       => ($record->evaluate_status == 1) ? $checked : $unchecked,
+            '[check_status_2]'       => ($record->evaluate_status == 2) ? $checked : $unchecked,
+            '[check_status_3]'       => ($record->evaluate_status == 3) ? $checked : $unchecked,
+        ];
+
+        // 6.2 นำ Tag จาก report_template_fields (เช่น [driver_name]) มาจับคู่กับข้อมูลที่กรอกไว้
+        if ($reportFields->isNotEmpty()) {
+            foreach ($reportFields as $rField) {
+                $tag = '[' . $rField->field_key . ']';
+
+                $matchedField = $preInspectFields->firstWhere('field_label', $rField->field_label);
+
+                if ($matchedField) {
+                    $replacements[$tag] = $matchedField->field_value;
+                } elseif (!isset($replacements[$tag])) {
+                    // ถ้าไม่เจอ และยังไม่มีใน Tag พื้นฐาน ให้แสดงเป็นค่าว่าง หรือ '-'
+                    $replacements[$tag] = '-';
+                }
+            }
+        }
+
+
+        // 6.3 ประมวลผลลบ Tag ออกและใส่ข้อมูลจริงลงใน HTML
+        if ($reportTemplate) {
+            $reportTemplate->header_html = str_replace(array_keys($replacements), array_values($replacements), $reportTemplate->header_html);
+            if (!empty($reportTemplate->footer_html)) {
+                $reportTemplate->footer_html = str_replace(array_keys($replacements), array_values($replacements), $reportTemplate->footer_html);
+            }
+        }
+
+        return view('pages.user.inspection.report', compact(
+            'record',
+            'vehicle',
+            'formGroup',
+            'preInspectFields',
+            'preImages',
+            'categories',
+            'results',
+            'itemImages',
+            'reportTemplate'
+        ));
+    }
+
+
+  
 }

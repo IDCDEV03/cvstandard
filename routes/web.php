@@ -146,7 +146,6 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
     Route::post('/check/{record}/confirm', [UserMainController::class, 'confirm'])
         ->name('user.chk_confirm');
 
-
     //แก้ไขภาพ
     Route::get('/images/edit/{record_id}/{id}', [VehiclesController::class, 'edit_images'])->name('user.edit_images');
     Route::post('/images/update', [VehiclesController::class, 'update_image'])->name('update_image');
@@ -158,24 +157,25 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
     //บันทึกข้อความ
     Route::get('/veh-doc', [DocumentController::class, 'doc_list'])->name('user.doc_list');
 
-// กลุ่ม Route สำหรับพนักงานตรวจรถ
-Route::prefix('inspection')->name('user.inspection.')->group(function () {
-    Route::get('/', [InspectionController::class, 'index'])->name('index'); 
-    Route::get('/search-vehicle', [InspectionController::class, 'searchVehicle'])->name('searchVehicle'); 
-    Route::post('/start', [InspectionController::class, 'start'])->name('start'); 
-    Route::get('/{record_id}/step2', [InspectionController::class, 'step2'])->name('step2');
-    Route::post('/{record_id}/step2', [InspectionController::class, 'storeStep2'])->name('storeStep2');
-    // Step 3: หน้าจอข้อตรวจหลัก
-    Route::get('/{record_id}/step3', [InspectionController::class, 'step3'])->name('step3');
-    Route::post('/save-result', [InspectionController::class, 'saveResult'])->name('saveResult');
-    // API สำหรับอัปโหลดและลบรูปภาพ (เฉพาะข้อ)
-    Route::post('/upload-item-image', [InspectionController::class, 'uploadItemImage'])->name('uploadItemImage');
-    Route::post('/delete-item-image', [InspectionController::class, 'deleteItemImage'])->name('deleteItemImage');
+    // กลุ่ม Route สำหรับพนักงานตรวจรถ
+    Route::prefix('inspection')->name('user.inspection.')->group(function () {
+        Route::get('/', [InspectionController::class, 'index'])->name('index');
+        Route::get('/search-vehicle', [InspectionController::class, 'searchVehicle'])->name('searchVehicle');
+        Route::post('/start', [InspectionController::class, 'start'])->name('start');
+        Route::get('/{record_id}/step2', [InspectionController::class, 'step2'])->name('step2');
+        Route::post('/{record_id}/step2', [InspectionController::class, 'storeStep2'])->name('storeStep2');
+        // Step 3: หน้าจอข้อตรวจหลัก
+        Route::get('/{record_id}/step3', [InspectionController::class, 'step3'])->name('step3');
+        Route::post('/save-result', [InspectionController::class, 'saveResult'])->name('saveResult');
+        // API สำหรับอัปโหลดและลบรูปภาพ (เฉพาะข้อ)
+        Route::post('/upload-item-image', [InspectionController::class, 'uploadItemImage'])->name('uploadItemImage');
+        Route::post('/delete-item-image', [InspectionController::class, 'deleteItemImage'])->name('deleteItemImage');
 
-    Route::get('/{record_id}/step4', [InspectionController::class, 'step4'])->name('step4');
-Route::post('/{record_id}/submit', [InspectionController::class, 'submitInspection'])->name('submitInspection');
-    
-});
+        Route::get('/{record_id}/step4', [InspectionController::class, 'step4'])->name('step4');
+        Route::post('/{record_id}/submit', [InspectionController::class, 'submitInspection'])->name('submitInspection');
+        Route::get('/{record_id}/viewreport', [InspectionController::class, 'viewReport'])->name('report');
+      
+    });
 });
 
 Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () {
@@ -292,11 +292,11 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
     });
 
     Route::prefix('company/form-groups')->name('company.form-groups.')->group(function () {
-    Route::get('/', [CompanyReportTemplateController::class, 'indexFormGroup'])->name('index');
-    Route::get('/create', [CompanyReportTemplateController::class, 'createFormGroup'])->name('create');
-    Route::post('/store', [CompanyReportTemplateController::class, 'storeFormGroup'])->name('store');
-    Route::get('/{id}', [CompanyReportTemplateController::class, 'showFormGroup'])->name('show');
-});
+        Route::get('/', [CompanyReportTemplateController::class, 'indexFormGroup'])->name('index');
+        Route::get('/create', [CompanyReportTemplateController::class, 'createFormGroup'])->name('create');
+        Route::post('/store', [CompanyReportTemplateController::class, 'storeFormGroup'])->name('store');
+        Route::get('/{id}', [CompanyReportTemplateController::class, 'showFormGroup'])->name('show');
+    });
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {
@@ -337,15 +337,15 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
     Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
 
-      Route::prefix('report-template')->name('staff.report_template.')->group(function () {
+    Route::prefix('report-template')->name('staff.report_template.')->group(function () {
         Route::get('/', [StaffReportTemplateController::class, 'index'])->name('index');
         Route::get('/create', [StaffReportTemplateController::class, 'create'])->name('create');
         Route::post('/store', [StaffReportTemplateController::class, 'store'])->name('store');
         Route::get('/show/{id}', [StaffReportTemplateController::class, 'show'])->name('show');
-         Route::get('/report-preview/{id}', [StaffReportTemplateController::class, 'report_preview'])->name('report_preview');
+        Route::get('/report-preview/{id}', [StaffReportTemplateController::class, 'report_preview'])->name('report_preview');
     });
 
-     Route::prefix('pre-inspection')->name('staff.pre_inspection.')->group(function () {
+    Route::prefix('pre-inspection')->name('staff.pre_inspection.')->group(function () {
         Route::get('/', [StaffPreInspectionController::class, 'index'])->name('index');
         Route::get('/create', [StaffPreInspectionController::class, 'create'])->name('create');
         Route::post('/store', [StaffPreInspectionController::class, 'pre_ins_store'])->name('store');
@@ -353,7 +353,7 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
         Route::get('/{id}', [StaffPreInspectionController::class, 'show'])->name('show');
     });
 
-         Route::prefix('form-group')->name('staff.form-group.')->group(function () {
+    Route::prefix('form-group')->name('staff.form-group.')->group(function () {
         Route::get('/', [FormGroupController::class, 'index'])->name('index');
         Route::get('/create', [FormGroupController::class, 'createFormGroup'])->name('create');
         Route::post('/store', [FormGroupController::class, 'store'])->name('store');
@@ -361,8 +361,6 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
         Route::get('/{id}/edit', [FormGroupController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [FormGroupController::class, 'update'])->name('update');
     });
-
-
 });
 
 Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {

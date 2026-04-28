@@ -32,10 +32,9 @@
                                             <tr>
                                                 <th class="text-sm fw-bold">#</th>
                                                 <th class="text-sm fw-bold">ทะเบียนรถ</th>
-                                                <th class="text-sm fw-bold">ยี่ห้อรถ</th>
-                                                <th class="text-sm fw-bold">หมายเลขข้างรถ</th>
+                                                <th class="text-sm fw-bold">ยี่ห้อรถ/หมายเลขข้างรถ</th>
                                                 <th class="text-sm fw-bold">ประเภทรถ</th>
-                                                <th class="text-sm fw-bold">วันที่ลงทะเบียน</th>
+                                                <th class="text-sm fw-bold">รายงาน</th>
                                                 <th class="text-sm fw-bold">สถานะการตรวจ</th>
                                                 <th>จัดการรถ</th>
                                             </tr>
@@ -45,29 +44,42 @@
                                                 <tr>
                                                     <td> {{ $loop->iteration }} </td>
                                                     <td>
-                                                        <a href="{{ route('user.veh_detail', [$item->car_id]) }}" class="fw-bold">
+                                                        <a href="{{ route('user.veh_detail', [$item->car_id]) }}"
+                                                            class="fw-bold">
                                                             {{ $item->car_plate }}
                                                         </a>
-                                                        @if($item->chk_status === '2')
-                                                          <span class="dm-tag tag-warning tag-transparented fs-18">      
-                                                          บันทึกแบบร่าง</span>
+                                                        @if ($item->chk_status === '2')
+                                                            <span class="dm-tag tag-warning tag-transparented fs-18">
+                                                                บันทึกแบบร่าง</span>
                                                         @endif
 
                                                     </td>
-                                                    <td> {{ $item->car_brand }} </td>
-                                                    <td> {{ blank($item->car_number_record) ? '-' : $item->car_number_record }}
+                                                    <td> {{ $item->car_brand }}
+                                                        ({{ blank($item->car_number_record) ? '-' : $item->car_number_record }})
                                                     </td>
+
 
                                                     <td> {{ $item->vehicle_type }} </td>
 
-                                                    <td> {{ thai_date($item->created_at) }} </td>
+                                                    <td>
+                                                        @if ($item->chk_status === '1')
+                                                            <a href="{{ route('user.inspection.report', $item->chk_primary_id) }}"
+                                                                class="btn btn-info btn-xs shadow-sm">
+                                                                <i class="uil uil-file-alt"></i> Report
+                                                            </a>
+                                                             @else
+                                                            <span class="text-muted small">ยังไม่มี Report</span>
+                                                            
+                                                        @endif
+                                                    </td>
 
                                                     <td class="text-center">
                                                         @if ($item->chk_status === '1')
-                                                            <span class="dm-tag tag-success tag-transparented fs-18">บันทึกสมบูรณ์
+                                                            <span
+                                                                class="dm-tag tag-success tag-transparented fs-18">บันทึกสมบูรณ์
                                                             </span>
                                                         @elseif($item->chk_status === '2')
-                                                            <div class="d-flex flex-column gap-1 align-items-center">       
+                                                            <div class="d-flex flex-column gap-1 align-items-center">
                                                                 <a href="{{ route('user.inspection.step3', [$item->chk_primary_id]) }}"
                                                                     class="btn btn-dark btn-default btn-squared btn-transparent-dark btn-xs">
                                                                     ตรวจต่อ <i class="uil uil-arrow-right"
