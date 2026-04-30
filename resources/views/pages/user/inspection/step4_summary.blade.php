@@ -92,7 +92,7 @@
                                 <div class="col-4">
                                     <div class="bg-danger-transparent p-2 rounded radius-xs h-100">
                                         <div class="fs-24 fw-bold">{{ $failCount }}</div>
-                                        <div class="fs-16 fw-bold text-danger">ชำรุด / ไม่ผ่าน</div>
+                                        <div class="fs-16 fw-bold text-danger">ไม่ปกติ / ไม่ผ่าน</div>
                                     </div>
                                 </div>
 

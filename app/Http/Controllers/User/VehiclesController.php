@@ -188,7 +188,7 @@ class VehiclesController extends Controller
         'chk_records.form_id',
         'chk_records.record_id',
         'chk_records.user_id as chk_user',
-        'chk_records.agency_id as chk_agent'
+        'chk_records.supply_id as chk_agent'
       )
       ->where('chk_records.record_id', $rec)
       ->first();
@@ -282,7 +282,7 @@ class VehiclesController extends Controller
         'chk_records.form_id',
         'chk_records.record_id',
         'chk_records.user_id as chk_user',
-        'chk_records.agency_id as chk_agent'
+        'chk_records.supply_id as chk_agent'
       )
       ->where('chk_records.record_id', $rec)
       ->first();
@@ -339,7 +339,7 @@ class VehiclesController extends Controller
         'chk_records.form_id',
         'chk_records.record_id',
         'chk_records.user_id as chk_user',
-        'chk_records.agency_id as chk_agent'
+        'chk_records.supply_id as chk_agent'
       )
       ->where('chk_records.record_id', $rec)
       ->first();

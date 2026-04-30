@@ -137,13 +137,13 @@
                 border: none;
                 padding: 0;
             }
-         
+
             .report-header-content img,
             .report-footer-section img {
                 max-height: 60px !important;
                 width: auto !important;
             }
-        
+
             .img-gallery-item {
                 width: calc(25% - 12px) !important;
             }
@@ -182,6 +182,16 @@
             </button>
         </div>
 
+        <div class="card shadow-sm mb-20" > 
+            <div class="card-body">
+                <span class="fs-18 fw-bold">ข้อมูลสำหรับส่งตรวจ</span>
+                  <div class="border-top my-3"></div>
+                <p class="card-text">
+                   /////
+                </p>             
+            </div>
+        </div>
+
         <div id="printable-area">
             <div class="report-container p-2">
 
@@ -200,10 +210,10 @@
                             <table class="table table-bordered ">
                                 <thead>
                                     <tr>
-                                        <th width="40"></th>
-                                        <th align="center">รายการตรวจ</th>
-                                        <th class="text-center" width="180">ผลประเมิน</th>
-                                        <th class="text-center" width="240">สิ่งที่ตรวจพบ</th>
+                                        <th width="5%"></th>
+                                        <th align="center" width="40%">รายการตรวจ</th>
+                                        <th class="text-center" width="20%">ผลประเมิน</th>
+                                        <th class="text-center" width="35%">สิ่งที่ตรวจพบ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -218,17 +228,18 @@
                                                 @if ($res->result_status == '1')
                                                     <span>ปกติ</span>
                                                 @elseif($res->result_status == '2')
-                                                    <span class="text-small">ไม่ปกติ<br> แต่ยังสามารถใช้งานได้</span>
+                                                    <span class="text-small">ไม่ปกติ แต่ยังสามารถใช้งานได้</span>
                                                 @elseif($res->result_status == '0')
                                                     <span style="color: red;">ไม่ปกติ</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($res->result_value)
-                                                    <div class="fw-bold">{{ $res->result_value }}</div>
+                                                    <span class="text-dark text-small">{{ $res->result_value }}</span>
                                                 @endif
                                                 @if ($res->user_comment)
-                                                    <div class="small text-muted"><em>{{ $res->user_comment }}</em></div>
+                                                    <span
+                                                        class="text-dark text-small"><em>{{ $res->user_comment }}</em></span>
                                                 @endif
 
 
@@ -249,10 +260,10 @@
                     <div style="border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 5px;">
                         <h5 class="fw-bold text-dark mb-0">รูปภาพประกอบการตรวจ</h5>
                         <div class="text-dark" style="font-size: 14px;">
-                <strong>ทะเบียนรถ:</strong> {{ $vehicle->car_plate ?? '-' }} | 
-                <strong>วันที่ตรวจ:</strong> {{ thai_date($record->created_at) }}
-            </div>
-           
+                            <strong>ทะเบียนรถ:</strong> {{ $vehicle->car_plate ?? '-' }} |
+                            <strong>วันที่ตรวจ:</strong> {{ thai_date($record->created_at) }}
+                        </div>
+
                     </div>
 
                     @php
