@@ -193,22 +193,49 @@ class InspectionController extends Controller
     public function step3(Request $request, $record_id)
     {
 
-        $record = DB::table('chk_records')->where('record_id', $record_id)->first();
-        if (!$record) return redirect()->route('user.inspection.index');
+       $record = DB::table('chk_records')->where('record_id', $record_id)->first();
+    if (!$record) return redirect()->route('user.inspection.index');
 
-        $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
+    $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
 
-        $categories = DB::table('check_categories')->where('form_id', $record->form_id)->get();
-        $currentCategoryId = $request->get('cat_id', $categories->first()->category_id ?? null);
-        $items = DB::table('check_items')->where('category_id', $currentCategoryId)->get();
+    // 2. ดึงหมวดหมู่ทั้งหมดของฟอร์มนี้
+    $categories = DB::table('check_categories')
+        ->where('form_id', $record->form_id)
+        ->orderBy('cates_no', 'asc')
+        ->get();
 
-        $existingResults = DB::table('check_records_result')->where('record_id', $record->record_id)->get()->keyBy('item_id');
-        $existingImages = DB::table('check_result_images')->where('record_id', $record->record_id)->get()->groupBy('item_id');
+    // 3. ดึงข้อตรวจ "ทั้งหมด" ของทุกหมวดหมู่ในฟอร์มนี้ และจัดกลุ่มตาม category_id
+    // ใช้ groupBy เพื่อให้ใน Blade สามารถเรียก $itemsByCategory[$cat->category_id] ได้เลย
+    $itemsByCategory = DB::table('check_items')
+        ->whereIn('category_id', $categories->pluck('category_id'))
+        ->orderBy('item_no', 'asc')
+        ->get()
+        ->groupBy('category_id');
 
-        $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
+    // 4. ดึงผลการตรวจเดิมและรูปภาพ (ถ้ามี)
+    $existingResults = DB::table('check_records_result')
+        ->where('record_id', $record->record_id)
+        ->get()
+        ->keyBy('item_id');
 
-        return view('pages.user.inspection.step3_checklist', compact('record', 'formGroup', 'categories', 'currentCategoryId', 'items', 'existingResults', 'existingImages', 'vehicle'));
-    }
+    $existingImages = DB::table('check_result_images')
+        ->where('record_id', $record->record_id)
+        ->get()
+        ->groupBy('item_id');
+
+    $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
+
+    return view('pages.user.inspection.step3_checklist', compact(
+        'record', 
+        'formGroup', 
+        'categories', 
+        'itemsByCategory', // ส่งแบบจัดกลุ่มไป
+        'existingResults', 
+        'existingImages', 
+        'vehicle'
+    ));
+}
+    
 
     // Auto-Save ข้อมูลทั่วไปผ่าน AJAX
     public function saveResult(Request $request)

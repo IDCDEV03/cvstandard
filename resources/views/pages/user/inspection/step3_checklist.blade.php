@@ -57,6 +57,78 @@
             border: 1px solid #EAEDF2 !important;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
         }
+
+        /* --- ส่วนแนะนำสำหรับมือถือ --- */
+        .mobile-hint {
+            font-size: 12px;
+            color: #5F63F2;
+            margin-bottom: 5px;
+            animation: sideSwipe 2s infinite;
+        }
+
+        @keyframes sideSwipe {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* --- ปุ่ม Back to Top --- */
+        #backToTop {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 999;
+            display: none;
+            /* ซ่อนไว้ก่อน จะโชว์เมื่อเลื่อนลง */
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #5F63F2;
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(95, 99, 242, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #backToTop:hover {
+            transform: translateY(-3px);
+            background: #4448dc;
+        }
+
+        /* ปรับแต่ง category-wrapper จากครั้งก่อน */
+        .category-wrapper {
+            position: relative;
+        }
+
+        .btn-scroll {
+            position: absolute;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #E4E7EC;
+            color: #5F63F2;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-scroll-left {
+            left: -10px;
+        }
+
+        .btn-scroll-right {
+            right: -10px;
+        }
     </style>
 @endpush
 
@@ -87,15 +159,29 @@
                     </a>
                 </div>
 
-                <div class="category-scroll-container mb-4 pb-2 border-bottom">
-                    <div class="d-flex flex-nowrap overflow-auto hide-scrollbar" style="-webkit-overflow-scrolling: touch;">
-                        @foreach ($categories as $cat)
-                            <a href="{{ route('user.inspection.step3', ['record_id' => $record->record_id, 'cat_id' => $cat->category_id]) }}"
-                                class="btn btn-sm btn-rounded me-2 text-nowrap fw-bold category-tab {{ $currentCategoryId == $cat->category_id ? 'active-tab' : '' }}">
-                                {{ $cat->chk_cats_name }}
-                            </a>
-                        @endforeach
+                <div class="card-body p-0">
+                    <div class="d-block d-md-none text-center mobile-hint">
+                        <i class="uil uil-arrow-side"></i> เลื่อนซ้าย-ขวา เพื่อเปลี่ยนหมวดหมู่
                     </div>
+                    
+                    <div class="category-wrapper px-3 mb-3">
+                        <button type="button" class="btn-scroll btn-scroll-left d-none d-md-flex" id="scrollLeftBtn"><i
+                                class="uil uil-angle-left"></i></button>
+
+                        <div class="hide-scrollbar d-flex flex-nowrap overflow-auto w-100 py-2" id="categoryMenu">
+                            @foreach ($categories as $cat)
+                                <a href="#category-{{ $cat->category_id }}"
+                                    class="btn btn-outline-primary btn-sm text-nowrap me-2 rounded-pill shadow-sm nav-link-cat"
+                                    data-target="category-{{ $cat->category_id }}">
+                                    {{ $cat->chk_cats_name }}
+                                </a>
+                            @endforeach
+                        </div>
+
+                        <button type="button" class="btn-scroll btn-scroll-right d-none d-md-flex" id="scrollRightBtn"><i
+                                class="uil uil-angle-right"></i></button>
+                    </div>
+
                 </div>
 
                 <div class="d-flex flex-column gap-3">
@@ -209,8 +295,9 @@
                                             onclick="document.getElementById('file_{{ $item->item_id }}').click();">
                                             <i class="uil uil-camera-plus"></i> เพิ่มภาพ
                                         </button>
-                                        <input type="file" id="file_{{ $item->item_id }}" class="d-none image-uploader"
-                                            accept="image/*" capture="environment" data-item="{{ $item->item_id }}">
+                                        <input type="file" id="file_{{ $item->item_id }}"
+                                            class="d-none image-uploader" accept="image/*" capture="environment"
+                                            data-item="{{ $item->item_id }}">
                                     </div>
 
                                     <div class="row g-2 image-gallery" id="gallery_{{ $item->item_id }}">
@@ -234,13 +321,56 @@
                     @endforeach
                 </div>
 
+                <button id="backToTop" title="กลับขึ้นบนสุด">
+                    <i class="uil uil-arrow-up" style="font-size: 20px;"></i>
+                </button>
+
             </div>
         </div>
     </div>
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                const backToTopBtn = $('#backToTop');
+
+                // 1. ตรวจสอบการเลื่อนจอ เพื่อแสดง/ซ่อนปุ่ม Back to Top
+                $(window).scroll(function() {
+                    if ($(window).scrollTop() > 300) {
+                        backToTopBtn.fadeIn();
+                    } else {
+                        backToTopBtn.fadeOut();
+                    }
+                });
+
+                // 2. เมื่อกดปุ่ม ให้เลื่อนกลับขึ้นไปบนสุด
+                backToTopBtn.click(function() {
+                    $('html, body').animate({
+                        scrollTop: 0
+                    }, 400);
+                    return false;
+                });
+
+                // 3. รักษา Logic การเลื่อนหมวดหมู่เดิม (Desktop Scroll)
+                const menu = document.getElementById('categoryMenu');
+                $('#scrollLeftBtn').click(() => menu.scrollLeft -= 250);
+                $('#scrollRightBtn').click(() => menu.scrollLeft += 250);
+
+                // ดักจับการหมุนลูกกลิ้งเมาส์บนแถบหมวดหมู่
+                menu.addEventListener('wheel', (e) => {
+                    if (window.innerWidth > 768) { // ทำเฉพาะบนคอม
+                        e.preventDefault();
+                        menu.scrollLeft += e.deltaY;
+                    }
+                }, {
+                    passive: false
+                });
+            });
+        </script>
+        <script>
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+
 
             // ฟังก์ชันบันทึกข้อมูลหลัก
             function saveItemData(card) {
@@ -299,7 +429,7 @@
                 });
             });
 
-          // --- ส่วนงานอัปโหลดรูปภาพ (อัปเกรดใหม่ แสดงผลทันที มีระบบกันเหนียว) ---
+            // --- ส่วนงานอัปโหลดรูปภาพ (อัปเกรดใหม่ แสดงผลทันที มีระบบกันเหนียว) ---
             document.querySelectorAll('.image-uploader').forEach(input => {
                 input.addEventListener('change', function() {
                     const itemId = this.dataset.item;
@@ -329,7 +459,9 @@
 
                     fetch('{{ route('user.inspection.uploadItemImage') }}', {
                             method: 'POST',
-                            headers: { 'X-CSRF-TOKEN': csrfToken },
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken
+                            },
                             body: formData
                         })
                         .then(res => {
@@ -339,13 +471,13 @@
                         .then(text => {
                             try {
                                 const data = JSON.parse(text); // ลองแปลงเป็น JSON
-                                
+
                                 // ถ้า Controller ส่ง JSON สำเร็จ กลับมา
                                 if (data.success || data.status === 'success') {
                                     document.querySelector(`.img-wrapper-temp-${tempId}`).remove();
-                                    
+
                                     // ถ้าระบบส่ง ID กลับมาให้ด้วย ให้สร้างรูปลงแกลลอรี่ทันที
-                                    if(data.image_id) {
+                                    if (data.image_id) {
                                         const finalHtml = `
                                             <div class="col-3 col-md-2 position-relative img-wrapper-${data.image_id}">
                                                 <img src="${objectUrl}" class="img-fluid rounded border" style="height: 70px; width: 100%; object-fit: cover;">
@@ -355,11 +487,12 @@
                                             </div>
                                         `;
                                         gallery.insertAdjacentHTML('beforeend', finalHtml);
-                                        
+
                                         // อัปเดตตัวเลขจำนวนรูป
                                         const countSpan = document.getElementById('count_' + itemId);
-                                        if(countSpan) {
-                                            let currentCount = parseInt(countSpan.innerText.match(/\d+/)[0]) || 0;
+                                        if (countSpan) {
+                                            let currentCount = parseInt(countSpan.innerText.match(/\d+/)[
+                                                0]) || 0;
                                             countSpan.innerText = `(${currentCount + 1}/10)`;
                                         }
                                     } else {
@@ -378,7 +511,7 @@
                             console.error('Upload Error:', error);
                             location.reload(); // เผื่อเหนียว ถ้าเน็ตกระตุกหรือ Error ให้รีโหลดไว้ก่อน
                         });
-                        
+
                     // ล้างค่า input ป้องกันบั๊กเลือกไฟล์เดิมซ้ำไม่ได้
                     this.value = '';
                 });
@@ -411,11 +544,11 @@
                     .then(text => {
                         try {
                             const data = JSON.parse(text); // ลองแปลงเป็น JSON
-                            
+
                             // ถ้าลบสำเร็จ (รองรับทั้ง key: success และ status: success)
                             if (data.success || data.status === 'success') {
                                 if (imgWrapper) imgWrapper.remove(); // ลบออกจากหน้าจอทันที
-                                
+
                                 // อัปเดตตัวเลขจำนวนรูปให้ลดลง
                                 const countSpan = document.getElementById('count_' + itemId);
                                 if (countSpan) {
@@ -439,7 +572,7 @@
                         // ถ้าเน็ตหลุดหรือมี Error ให้รีโหลดเพื่อความชัวร์
                         location.reload();
                     });
-            
+
             }
         </script>
     @endpush
