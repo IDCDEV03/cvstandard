@@ -206,7 +206,7 @@ $(document).ready(function() {
             $(this).removeClass('is-valid is-invalid');
         }
 
-        // คุมปุ่ม Submit (ถ้าช่องไหนในหน้าแดง จะกดเซฟไม่ได้)
+        // submit
         if($('.is-invalid').length > 0) {
             $('button[type="submit"]').attr('disabled', true);
         } else {
