@@ -13,9 +13,9 @@ use App\Enums\Role;
 
 class PageController extends Controller
 {
-    public function home()
+    public function home(Request $request)
     {
-        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager, Role::Staff, Role::Company, Role::Supply])) {
+        if (!in_array(auth()->user()->role, [Role::User, Role::Manager, Role::Agency, Role::Admin, Role::Manager, Role::Staff, Role::Company, Role::Supply, Role::Inspector])) {
             abort(403);
         }
 
@@ -30,6 +30,7 @@ class PageController extends Controller
             Role::User => 'layout.app',
             Role::Staff => 'layout.app',
             Role::Supply => 'layout.app',
+            Role::Inspector => 'layout.app',
         };
 
         $title = match ($role) {
@@ -40,6 +41,7 @@ class PageController extends Controller
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
             Role::Supply => 'หน้าหลักเจ้าหน้าที่',
+            Role::Inspector => 'หน้าหลักผู้ตรวจ',
         };
 
         $description = match ($role) {
@@ -50,6 +52,7 @@ class PageController extends Controller
             Role::User => 'แดชบอร์ดผู้ใช้งานทั่วไป',
             Role::Staff => 'หน้าหลักเจ้าหน้าที่',
             Role::Supply => 'หน้าหลักเจ้าหน้าที่',
+            Role::Inspector => 'ผู้ใช้งานทั่วไป',
         };
 
         if ($role === Role::User) {
@@ -57,7 +60,7 @@ class PageController extends Controller
             $user_main_id = Auth::user()->user_id;
 
             $user_sup = DB::table('inspector_datas')
-                ->where('ins_id', $user_main_id)               
+                ->where('ins_id', $user_main_id)
                 ->first();
 
             $vehicles = DB::table('vehicles_detail')
@@ -72,10 +75,101 @@ class PageController extends Controller
                     'chk_records.chk_status',
                     'chk_records.record_id as chk_primary_id'
                 )
-                ->where('vehicles_detail.supply_id','=',$user_sup->sup_id)               
+                ->where('vehicles_detail.supply_id', '=', $user_sup->sup_id)
                 ->get();;
 
             return view('pages.user.MainPage', compact('vehicles'));
+        } elseif ($role === Role::Inspector) {
+
+            $user_main_id = Auth::user()->user_id;
+            $filter = $request->get('filter', 'all'); // รับค่า filter จาก URL (ค่าเริ่มต้นคือ all)
+
+            // 1. ดึงข้อมูล Profile และสิทธิ์ (เหมือนเดิม)
+            $user_sup = DB::table('inspector_datas')->where('ins_id', $user_main_id)->first();
+            $allowedSupplyIds = [];
+            if ($user_sup->inspector_type == '3') {
+                $allowedSupplyIds = DB::table('inspector_supply_access')->where('ins_id', $user_main_id)->pluck('supply_id')->toArray();
+            }
+
+            // 2. ดึงข้อมูลรถทั้งหมดมาก่อน (เพื่อเอาไปคำนวณ Widget)
+            $allVehicles = DB::table('vehicles_detail')
+                ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+                ->select('vehicles_detail.*', 'vehicle_types.vehicle_type')
+                ->when($user_sup->inspector_type == '1', function ($query) use ($user_sup) {
+                    return $query->where('vehicles_detail.company_code', $user_sup->company_code);
+                })
+                ->when($user_sup->inspector_type == '2', function ($query) use ($user_sup) {
+                    return $query->where('vehicles_detail.supply_id', $user_sup->sup_id);
+                })
+                ->when($user_sup->inspector_type == '3', function ($query) use ($allowedSupplyIds) {
+                    return $query->whereIn('vehicles_detail.supply_id', $allowedSupplyIds);
+                })
+                ->get();
+
+            // ==========================================
+            // 💡 การจัดกลุ่มประวัติ และคำนวณสถิติ
+            // ==========================================
+            $passedInspections = 0;
+            $waitingInspections = 0;
+            $failedInspections = 0;
+            $totalInspections = 0;
+
+            $filteredVehicles = []; // รถที่จะเอาไปแสดงในตาราง
+
+            foreach ($allVehicles as $car) {
+                $history = DB::table('chk_records')
+                    ->where('veh_id', $car->car_id)
+                    ->where('user_id', $user_main_id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+                $car->history = $history;
+                $car->inspect_count = $history->count();
+                $car->latest_record = $history->first();
+
+                // 📌 นับสถิติจาก "สถานะล่าสุด" ของรถแต่ละคัน (ต้องตรวจเสร็จแล้ว chk_status = 1 ถึงจะนับผลประเมิน)
+                if ($car->latest_record && $car->latest_record->chk_status == '1') {
+                    $totalInspections++; // นับรวมทุกคันที่เคยตรวจโดย User คนนี้
+
+                    if ($car->latest_record->evaluate_status == 1) {
+                        $passedInspections++;
+                    } elseif ($car->latest_record->evaluate_status == 2) {
+                        $waitingInspections++;
+                    } elseif ($car->latest_record->evaluate_status == 3) {
+                        $failedInspections++;
+                    }
+                }
+
+                // 📌 กรองรถเข้าตาราง ตามปุ่มที่กด (Filter)
+                $shouldInclude = false;
+                if ($filter == 'all') {
+                    $shouldInclude = true; // โชว์ทั้งหมด
+                } elseif ($car->latest_record && $car->latest_record->chk_status == '1') {
+                    if ($filter == 'passed' && $car->latest_record->evaluate_status == 1) {
+                        $shouldInclude = true;
+                    } elseif ($filter == 'waiting' && $car->latest_record->evaluate_status == 2) {
+                        $shouldInclude = true;
+                    } elseif ($filter == 'failed' && $car->latest_record->evaluate_status == 3) {
+                        $shouldInclude = true;
+                    }
+                }
+
+                // ถ้ารถคันนี้ตรงกับ Filter ค่อยเอาใส่ Array ไปแสดง
+                if ($shouldInclude) {
+                    $filteredVehicles[] = $car;
+                }
+            }
+
+            $vehicles = $filteredVehicles; // เปลี่ยนตัวแปรให้ตรงกับที่ Blade เรียกใช้
+
+            return view('pages.inspector.dashboard', compact(
+                'vehicles',
+                'passedInspections',
+                'waitingInspections',
+                'failedInspections',
+                'totalInspections',
+                'filter' // ส่งค่ากลับไปเพื่อให้รู้ว่าตอนนี้กดปุ่มไหนอยู่
+            ));
         } elseif ($role === Role::Agency) {
             $id = Auth::id();
             $agency = DB::table('users')->where('id', Auth::id())->first();

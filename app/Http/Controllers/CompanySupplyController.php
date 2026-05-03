@@ -111,9 +111,11 @@ class CompanySupplyController extends Controller
     {
         $companyCode = Auth::user()->company_code;
 
-        $supplies = DB::table('supply_datas')
+       $supplies = DB::table('supply_datas')
+            ->select('supply_datas.*') 
+           ->selectRaw('IFNULL((SELECT COUNT(id) FROM vehicles_detail WHERE vehicles_detail.supply_id = supply_datas.sup_id), 0) as total_vehicles')
             ->where('company_code', $companyCode)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('supply_name', 'ASC')
             ->get();
 
         return view('pages.company.supplies_index', compact('supplies'));
@@ -277,15 +279,15 @@ class CompanySupplyController extends Controller
         if (!$supply) abort(404);
 
         // 2. ข้อมูลรถ 
-      $vehicles = DB::table('vehicles_detail')
-        ->leftJoin('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
-        ->where('vehicles_detail.supply_id', $id)
-        ->select(
-            'vehicles_detail.*', 
-            'vehicle_types.vehicle_type as type_name' 
-        )
-        ->orderBy('vehicles_detail.updated_at', 'DESC')
-        ->get();
+        $vehicles = DB::table('vehicles_detail')
+            ->leftJoin('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
+            ->where('vehicles_detail.supply_id', $id)
+            ->select(
+                'vehicles_detail.*',
+                'vehicle_types.vehicle_type as type_name'
+            )
+            ->orderBy('vehicles_detail.updated_at', 'DESC')
+            ->get();
 
         // 3. ข้อมูลพนักงาน 
         $drivers = DB::table('inspector_datas')

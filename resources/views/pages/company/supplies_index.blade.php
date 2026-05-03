@@ -40,8 +40,7 @@
                                     <tr class="userDatatable-header">
                                         <th class="text-center"><span class="userDatatable-title">Logo</span></th>
                                         <th><span class="userDatatable-title">ชื่อบริษัทในเครือ</span></th>
-                                        <th><span class="userDatatable-title">เบอร์โทร / อีเมล</span></th>
-                                        <th><span class="userDatatable-title">จำนวนรถ</span></th>
+                                        <th><span class="userDatatable-title">จำนวนรถที่มี</span></th>
                                         <th><span class="userDatatable-title">วันที่เริ่ม - หมดอายุ</span></th>
                                         <th><span class="userDatatable-title">สถานะ</span></th>
                                         <th class="text-center"><span class="userDatatable-title text-end">จัดการ</span>
@@ -71,19 +70,11 @@
                                                     </a>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div class="userDatatable-content">
-                                                    <span class="d-block">{{ $item->supply_phone ?? '-' }}</span>
-                                                    <small class="text-muted">{{ $item->supply_email ?? '-' }}</small>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="userDatatable-content">
-                                                    <span class="dm-tag tag-info tag-transparented fs-18">
-                                                        {{ $item->vehicle_limit }} คัน
-                                                    </span>
-                                                </div>
-                                            </td>
+                                            <td class="text-center">
+                                              
+                                                  <span class="dm-tag tag-info tag-transparented fs-18">  {{ $item->total_vehicles }} / {{ $item->vehicle_limit }} คัน</span>
+                                             </td>
+                                          
                                             <td>
                                                 <div class="userDatatable-content">
                                                     @if ($item->start_date && $item->expire_date)
@@ -227,7 +218,7 @@
                 responsive: true,
                 columnDefs: [{
                     "orderable": false,
-                    "targets": [0, 6]
+                    "targets": [0, 5]
                 }],
                 pageLength: 25,
                 language: {

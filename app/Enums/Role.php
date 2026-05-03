@@ -11,4 +11,5 @@ enum Role: string
     case Company = 'company';
     case Supply = 'supply';
     case Staff = 'staff';
+    case Inspector = 'inspector';
 }

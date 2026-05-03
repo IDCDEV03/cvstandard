@@ -31,6 +31,9 @@ use App\Http\Controllers\CompanyReportTemplateController;
 use App\Http\Controllers\Staff\StaffReportTemplateController;
 use App\Http\Controllers\Staff\StaffPreInspectionController;
 use App\Http\Controllers\Staff\FormGroupController;
+use App\Http\Controllers\Staff\InspectorController;
+use App\Http\Controllers\DriverController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -103,7 +106,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/announce-delete/{id}/post', [AdminDashboardController::class, 'delete_post'])->name('admin.delete_post');
 });
 
-Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,admin,agency'])->group(function () {
+Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,admin,agency,inspector'])->group(function () {
     Route::get('/page/{id}', [VehiclesController::class, 'veh_detail'])->name('veh.detail');
     Route::get('/result/{rec}', [VehiclesController::class, 'Report_Result'])->name('veh.result');
     Route::get('/repair-notice', [VehiclesController::class, 'repair_notice'])->name('veh.notice');
@@ -111,6 +114,35 @@ Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,a
     Route::get('/form-report/{rec}', [VehiclesController::class, 'Form_report'])->name('form_report');
     Route::get('/form-image/{rec}', [VehiclesController::class, 'Form_Image8'])->name('form_image8');
     Route::get('/form-image-fail/{rec}', [VehiclesController::class, 'FormImage_Fail'])->name('form_imagefail');
+});
+
+Route::middleware(['auth','role:company,supply,staff'])->group(function () {
+    Route::resource('drivers', DriverController::class);
+    Route::post('/drivers/check-duplicate', [DriverController::class, 'checkDuplicate'])->name('drivers.checkDuplicate');
+    Route::get('/get-supplies-by-company', [DriverController::class, 'getSupplies'])->name('drivers.getSupplies');
+});
+
+ Route::prefix('inspection')->middleware(['auth', 'role:user,inspector'])->name('inspection.')->group(function () {
+        Route::get('/', [InspectionController::class, 'index'])->name('index');
+        Route::get('/search-vehicle', [InspectionController::class, 'searchVehicle'])->name('searchVehicle');
+        Route::post('/start', [InspectionController::class, 'start'])->name('start');
+        Route::get('/{record_id}/step2', [InspectionController::class, 'step2'])->name('step2');
+        Route::post('/{record_id}/step2', [InspectionController::class, 'storeStep2'])->name('storeStep2');
+        // Step 3: หน้าจอข้อตรวจหลัก
+        Route::get('/{record_id}/step3', [InspectionController::class, 'step3'])->name('step3');
+        Route::post('/save-result', [InspectionController::class, 'saveResult'])->name('saveResult');
+        // API สำหรับอัปโหลดและลบรูปภาพ (เฉพาะข้อ)
+        Route::post('/upload-item-image', [InspectionController::class, 'uploadItemImage'])->name('uploadItemImage');
+        Route::post('/delete-item-image', [InspectionController::class, 'deleteItemImage'])->name('deleteItemImage');
+
+        Route::get('/{record_id}/step4', [InspectionController::class, 'step4'])->name('step4');
+        Route::post('/{record_id}/submit', [InspectionController::class, 'submitInspection'])->name('submitInspection');
+        Route::get('/{record_id}/viewreport', [InspectionController::class, 'viewReport'])->name('report');
+      
+    });
+
+Route::prefix('inspector')->middleware(['auth', 'role:inspector'])->group(function () {
+ Route::get('/index', [PageController::class, 'home'])->name('ins-dashboard');
 });
 
 Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
@@ -157,25 +189,6 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {
     //บันทึกข้อความ
     Route::get('/veh-doc', [DocumentController::class, 'doc_list'])->name('user.doc_list');
 
-    // กลุ่ม Route สำหรับพนักงานตรวจรถ
-    Route::prefix('inspection')->name('user.inspection.')->group(function () {
-        Route::get('/', [InspectionController::class, 'index'])->name('index');
-        Route::get('/search-vehicle', [InspectionController::class, 'searchVehicle'])->name('searchVehicle');
-        Route::post('/start', [InspectionController::class, 'start'])->name('start');
-        Route::get('/{record_id}/step2', [InspectionController::class, 'step2'])->name('step2');
-        Route::post('/{record_id}/step2', [InspectionController::class, 'storeStep2'])->name('storeStep2');
-        // Step 3: หน้าจอข้อตรวจหลัก
-        Route::get('/{record_id}/step3', [InspectionController::class, 'step3'])->name('step3');
-        Route::post('/save-result', [InspectionController::class, 'saveResult'])->name('saveResult');
-        // API สำหรับอัปโหลดและลบรูปภาพ (เฉพาะข้อ)
-        Route::post('/upload-item-image', [InspectionController::class, 'uploadItemImage'])->name('uploadItemImage');
-        Route::post('/delete-item-image', [InspectionController::class, 'deleteItemImage'])->name('deleteItemImage');
-
-        Route::get('/{record_id}/step4', [InspectionController::class, 'step4'])->name('step4');
-        Route::post('/{record_id}/submit', [InspectionController::class, 'submitInspection'])->name('submitInspection');
-        Route::get('/{record_id}/viewreport', [InspectionController::class, 'viewReport'])->name('report');
-      
-    });
 });
 
 Route::prefix('agency')->middleware(['auth', 'role:agency'])->group(function () {
@@ -337,6 +350,11 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
     Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
 
+    
+    Route::name('staff.')->group(function () {
+        Route::resource('inspectors', InspectorController::class);
+          });
+
     Route::prefix('report-template')->name('staff.report_template.')->group(function () {
         Route::get('/', [StaffReportTemplateController::class, 'index'])->name('index');
         Route::get('/create', [StaffReportTemplateController::class, 'create'])->name('create');
@@ -406,7 +424,6 @@ Route::middleware('auth')->group(function () {
         ->name('notifications.readAll');
 });
 
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.attempt');
@@ -421,6 +438,8 @@ Route::get('/check-username', function () {
     $exists = \App\Models\User::where('username', $username)->exists();
     return response()->json(['exists' => $exists]);
 });
+
+
 
 
 

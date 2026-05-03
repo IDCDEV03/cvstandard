@@ -15,10 +15,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class InspectionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:user']);
-    }
 
     public function index()
     {
@@ -28,57 +24,90 @@ class InspectionController extends Controller
             ->whereNull('deleted_at')
             ->get();
 
-        return view('pages.user.inspection.step1_select', compact('formGroups'));
+        return view('pages.inspection.step1_select', compact('formGroups'));
     }
 
-    // ระบบค้นหารถยนต์ (จำกัดสิทธิ์ตามประเภทช่าง)
+  
+   // ระบบค้นหารถยนต์ (จำกัดสิทธิ์ตามประเภทช่าง และเงื่อนไขการตรวจ)
     public function searchVehicle(Request $request)
     {
         $user = Auth::user()->user_id;
         $search = $request->get('q');
 
         // 1. ดึงข้อมูล Profile ของช่างตรวจที่ล็อกอินอยู่
-        // (สมมติว่าตาราง users มีคอลัมน์ user_id ที่ตรงกับ inspector_datas)
         $inspector = DB::table('inspector_datas')
             ->where('ins_id', '=', $user)
             ->first();
 
-        // ถ้าไม่พบข้อมูลช่าง ให้คืนค่าว่างเปล่า (ป้องกัน Error)
         if (!$inspector) {
             return response()->json([]);
         }
 
-        // 2. เริ่ม Query จากตาราง vehicles_detail ของคุณ
+        // 2. เริ่ม Query จากตาราง vehicles_detail พร้อมกับดึงประวัติการตรวจครั้งล่าสุดมาด้วย
         $query = DB::table('vehicles_detail')
-            ->where('car_plate', 'LIKE', "%{$search}%")
-            ->where('status', '!=', '2'); // สมมติว่า 2 คือสถานะห้ามใช้งาน
+            // Join เอาประวัติล่าสุดมาเพื่อเช็คสถานะ
+            ->leftJoin('chk_records as latest_record', function ($join) {
+                $join->on('vehicles_detail.car_id', '=', 'latest_record.veh_id')
+                     ->whereRaw('latest_record.id IN (select MAX(id) from chk_records GROUP BY veh_id)');
+            })
+            ->where('vehicles_detail.car_plate', 'LIKE', "%{$search}%")
+            ->where('vehicles_detail.status', '!=', '2'); 
 
         // ==========================================
         // 🔒 Data Access Logic (สิทธิ์การมองเห็นรถ)
         // ==========================================
         if ($inspector->inspector_type == 1) {
-            // ช่าง Company: ดูได้ทุก Supply ในบริษัทแม่
-            $query->where('company_code', $inspector->company_code);
+            $query->where('vehicles_detail.company_code', $inspector->company_code);
         } elseif ($inspector->inspector_type == 2) {
-            // ช่าง Supply: ดูได้เฉพาะรถใน Supply ตัวเอง
-            $query->where('company_code', $inspector->company_code)
-                ->where('supply_id', $inspector->sup_id);
+            $query->where('vehicles_detail.company_code', $inspector->company_code)
+                  ->where('vehicles_detail.supply_id', $inspector->sup_id);
         } elseif ($inspector->inspector_type == 3) {
-            // ช่าง Outsource: ดูตามสิทธิ์ที่ Staff ให้ในตาราง Pivot
             $allowedSupplyIds = DB::table('inspector_supply_access')
                 ->where('ins_id', $inspector->ins_id)
                 ->pluck('supply_id');
 
-            $query->where('company_code', $inspector->company_code)
-                ->whereIn('supply_id', $allowedSupplyIds);
+            $query->where('vehicles_detail.company_code', $inspector->company_code)
+                  ->whereIn('vehicles_detail.supply_id', $allowedSupplyIds);
         }
 
-        // 3. ดึงข้อมูลส่งกลับให้ Select2
+        // ==========================================
+        // 🛡️ Eligibility Logic (กรองรถที่ไม่มีสิทธิ์ตรวจออกไป)
+        // ==========================================
+        
+        // กรองที่ 1: ห้ามเคยตรวจครบ 3 ครั้งแล้ว
+        $query->whereRaw('(SELECT COUNT(id) FROM chk_records WHERE veh_id = vehicles_detail.car_id) < 3');
+
+        // กรองที่ 2: เช็คสถานะการตรวจล่าสุด (ถ้ามีประวัติ)
+        $query->where(function($q) {
+            
+            // กรณีที่ 1: รถคันนี้ยังไม่เคยมีประวัติการตรวจเลย (ค้นหาเจอได้ปกติ)
+            $q->whereNull('latest_record.id')
+            
+              // กรณีที่ 2: เคยตรวจแล้ว ต้องผ่านเงื่อนไขย่อยด้านล่างนี้ถึงจะแสดงผล
+              ->orWhere(function($subQ) {
+                  
+                  // ต้องไม่ติดสถานะกำลังตรวจค้างอยู่ (แบบร่าง 2 หรือ ยังไม่ครบ 0)
+                  $subQ->whereNotIn('latest_record.chk_status', ['0', '2']) 
+                  
+                       // ต้องไม่ใช่รถที่ผลการประเมิน "ผ่าน" แล้ว (1)
+                       ->where('latest_record.evaluate_status', '!=', 1)    
+                       
+                       // ถ้าผลประเมินเป็น 3 ต้องรอให้ถึงวันที่ next_inspect_date ก่อน
+                       ->where(function($dateQ) {
+                           $dateQ->where('latest_record.evaluate_status', '!=', 3)
+                                 ->orWhereNull('latest_record.next_inspect_date')
+                                 ->orWhereDate('latest_record.next_inspect_date', '<=', now()); // เทียบว่าวันกำหนดตรวจ น้อยกว่าหรือเท่ากับ วันนี้หรือไม่
+                       });
+              });
+        });
+
+        // 3. ดึงข้อมูลส่งกลับให้ Select2 
+       
         $vehicles = $query->limit(10)->get([
-            'car_id',
-            'car_plate',
-            'car_brand',
-            'car_model'
+            'vehicles_detail.car_id',
+            'vehicles_detail.car_plate',
+            'vehicles_detail.car_brand',
+            'vehicles_detail.car_model'
         ]);
 
         return response()->json($vehicles);
@@ -92,6 +121,52 @@ class InspectionController extends Controller
             'car_id' => 'required',
             'form_group_id' => 'required'
         ]);
+
+        // ==========================================
+        // 🛡️ SECURITY CHECK: ตรวจสอบเงื่อนไขการตรวจรถ
+        // ==========================================
+
+        // ก. นับจำนวนครั้งที่รถคันนี้เคยตรวจไปแล้ว
+        $inspectCount = DB::table('chk_records')
+            ->where('veh_id', $request->car_id)
+            ->count();
+
+        // ข. ดึงประวัติการตรวจครั้งล่าสุดของรถคันนี้
+        $latestRecord = DB::table('chk_records')
+            ->where('veh_id', $request->car_id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // เช็คเงื่อนไขต่างๆ (ถ้าไม่ผ่านจะโดนเด้งกลับพร้อม Error)
+        if ($latestRecord) {
+
+            // 1. เช็คว่ามีรายการค้างตรวจอยู่หรือไม่ (สถานะ 2 หรือ 0 ที่ยังไม่จบ)
+            // คุณตั้ง 'chk_status' ว่า 0=ยังไม่ครบ, 1=ครบ, 2=ดราฟ
+            if (in_array($latestRecord->chk_status, ['0', '2'])) {
+                return back()->with('error', 'รถคันนี้มีการตรวจค้างอยู่ กรุณาดำเนินการตรวจรอบเดิมให้เสร็จสิ้นก่อนเริ่มตรวจใหม่');
+            }
+
+            // 2. เช็คว่าผลประเมินล่าสุด ผ่านแล้วหรือไม่?
+            if ($latestRecord->evaluate_status == 1) {
+                return back()->with('error', 'รถคันนี้ตรวจผ่านแล้ว');
+            }
+
+            // 3. เช็คว่าตรวจครบโควตา 3 ครั้งแล้วหรือยัง?
+            if ($inspectCount >= 3) {
+                return back()->with('error', 'รถคันนี้ได้รับการตรวจครบ 3 ครั้งแล้ว ไม่สามารถตรวจเพิ่มได้อีก');
+            }
+
+            // 4. เช็ควันที่กำหนดตรวจใหม่ (กรณี Evaluate = 3)
+            if ($latestRecord->evaluate_status == 3 && !empty($latestRecord->next_inspect_date)) {
+                $today = \Carbon\Carbon::today();
+                $nextInspect = \Carbon\Carbon::parse($latestRecord->next_inspect_date);
+
+                if ($nextInspect->gt($today)) { // ถ้าวันที่กำหนด มากกว่า วันนี้ (ยังไม่ถึงเวลา)
+                    return back()->with('error', 'รถคันนี้ยังไม่ถึงกำหนดเวลาตรวจซ้ำ (กำหนดคือ ' . $nextInspect->format('d/m/Y') . ')');
+                }
+            }
+        }
+
         // 1. ดึงข้อมูลช่างตรวจ
         $inspector = DB::table('inspector_datas')->where('ins_id', $user)->first();
         // 2. ดึงข้อมูลรถ เพื่อเอา supply_id มาเก็บไว้เป็นสถิติ
@@ -115,22 +190,22 @@ class InspectionController extends Controller
             'updated_at' => now(),
         ]);
 
-        // ส่ง Primary Key (id) ไปยังหน้า Step 2 (ถ่ายรูป)
-        return redirect()->route('user.inspection.step2', ['record_id' => $generateRecordId]);
+        // ส่ง Primary Key (id) ไปยังหน้า Step 2 
+        return redirect()->route('inspection.step2', ['record_id' => $generateRecordId]);
     }
 
     public function step2($record_id)
     {
         // 1. ดึงข้อมูลใบตรวจ
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
-        if (!$record) return redirect()->route('user.inspection.index')->with('error', 'ไม่พบประวัติการตรวจนี้');
+        if (!$record) return redirect()->route('inspection.index')->with('error', 'ไม่พบประวัติการตรวจนี้');
 
 
         $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
 
 
         if (empty($formGroup->pre_inspection_template_id)) {
-            return redirect()->route('user.inspection.step3', ['record_id' => $record_id]);
+            return redirect()->route('inspection.step3', ['record_id' => $record_id]);
         }
 
         $preFields = DB::table('pre_inspection_fields')
@@ -138,7 +213,7 @@ class InspectionController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('pages.user.inspection.step2_pre_inspect', compact('record', 'formGroup', 'preFields'));
+        return view('pages.inspection.step2_pre_inspect', compact('record', 'formGroup', 'preFields'));
     }
 
     public function storeStep2(Request $request, $record_id)
@@ -186,7 +261,7 @@ class InspectionController extends Controller
                 DB::table('pre_inspection_results')->insert($dynamicData);
             }
         }
-        return redirect()->route('user.inspection.step3', ['record_id' => $record_id]);
+        return redirect()->route('inspection.step3', ['record_id' => $record_id]);
     }
 
     // โหลดหน้า Step 3
@@ -194,7 +269,7 @@ class InspectionController extends Controller
     {
 
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
-        if (!$record) return redirect()->route('user.inspection.index');
+        if (!$record) return redirect()->route('inspection.index');
 
         $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
 
@@ -207,9 +282,9 @@ class InspectionController extends Controller
 
         $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
 
-        return view('pages.user.inspection.step3_checklist', compact('record', 'formGroup', 'categories', 'currentCategoryId', 'items', 'existingResults', 'existingImages', 'vehicle'));
-}
-    
+        return view('pages.inspection.step3_checklist', compact('record', 'formGroup', 'categories', 'currentCategoryId', 'items', 'existingResults', 'existingImages', 'vehicle'));
+    }
+
 
     // Auto-Save ข้อมูลทั่วไปผ่าน AJAX
     public function saveResult(Request $request)
@@ -296,7 +371,7 @@ class InspectionController extends Controller
     public function step4($record_id)
     {
         $record = DB::table('chk_records')->where('record_id', $record_id)->first();
-        if (!$record) return redirect()->route('user.inspection.index');
+        if (!$record) return redirect()->route('inspection.index');
 
 
         $totalItems = DB::table('check_items')
@@ -315,7 +390,7 @@ class InspectionController extends Controller
         $formGroup = DB::table('form_groups')->where('form_group_id', $record->form_group_id)->first();
         $vehicle = DB::table('vehicles_detail')->where('car_id', $record->veh_id)->first();
 
-        return view('pages.user.inspection.step4_summary', compact('record', 'totalItems', 'passCount', 'failCount', 'uncheckedCount', 'formGroup', 'vehicle', 'AlmostCount'));
+        return view('pages.inspection.step4_summary', compact('record', 'totalItems', 'passCount', 'failCount', 'uncheckedCount', 'formGroup', 'vehicle', 'AlmostCount'));
     }
 
     // บันทึกการตรวจ
@@ -396,8 +471,8 @@ class InspectionController extends Controller
 
         // 6. อัปเดตตาราง chk_records
         DB::table('chk_records')->where('record_id', $record_id)->update($updateData);
-        
-        return redirect()->route('user.inspection.report',['record_id' => $record_id])->with('success', $message);
+
+        return redirect()->route('inspection.report', ['record_id' => $record_id])->with('success', $message);
     }
 
     public function viewReport($record_id)
@@ -507,7 +582,7 @@ class InspectionController extends Controller
             }
         }
 
-        return view('pages.user.inspection.report', compact(
+        return view('pages.inspection.report', compact(
             'record',
             'vehicle',
             'formGroup',
@@ -519,7 +594,4 @@ class InspectionController extends Controller
             'reportTemplate'
         ));
     }
-
-
-  
 }

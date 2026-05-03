@@ -1,7 +1,6 @@
  @php
      use App\Enums\Role;
      $role = Auth::user()->role;
-
  @endphp
  <div class="sidebar__menu-group">
      <ul class="sidebar_nav">
@@ -23,6 +22,10 @@
                  <span><i class="far fa-building"></i> {{ $agent->supply_name }} </span>
                  <div class="border-top my-3"></div>
                  <span><i class="fas fa-bars"></i> เมนูสำหรับผู้ใช้งาน</span>
+             @elseif ($role === Role::Inspector)                
+                 <span>ระบบตรวจมาตรฐานรถ</span>                
+                 <div class="border-top my-3"></div>
+                 <span><i class="fas fa-bars"></i> เมนูสำหรับผู้ใช้งาน</span>
              @elseif ($role === Role::Manager)
                  @php
                      $agent_id = Auth::user()->company_code;
@@ -39,7 +42,7 @@
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับบุคลากร</span>
-                  @elseif ($role === Role::Company)
+             @elseif ($role === Role::Company)
                  <span>ระบบตรวจมาตรฐานรถ</span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับหน่วยงาน</span>
@@ -175,6 +178,26 @@
                      @csrf
                  </form>
              </li>
+         @elseif ($role === Role::Inspector)
+             <li>
+                 <a href="{{route('ins-dashboard')}}" class="">
+                     <span class="nav-icon uil uil-create-dashboard"></span>
+                     <span class="menu-text">หน้าหลัก</span>
+
+                 </a>
+             </li>
+
+             <li>
+                 <a href="#" class="nav-author__signout"
+                     onclick="event.preventDefault(); document.getElementById('logout').submit();">
+                     <span class="nav-icon uil uil-sign-out-alt"></span>
+                     ออกจากระบบ
+                 </a>
+
+                 <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                     @csrf
+                 </form>
+             </li>
          @elseif ($role === Role::Manager)
              <li>
                  <a href="{{ route('manager.index') }}" class="">
@@ -250,47 +273,47 @@
                      @csrf
                  </form>
              </li>
-               @elseif ($role === Role::Company)
+         @elseif ($role === Role::Company)
              <li>
-                 <a href="{{route('company.index')}}" class="">
+                 <a href="{{ route('company.index') }}" class="">
                      <span class="nav-icon uil uil-home-alt"></span>
                      <span class="menu-text">หน้าหลัก</span>
                  </a>
-             </li>    
-              <li>
+             </li>
+             <li>
                  <a href="#" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">ประกาศ</span>
                  </a>
-             </li> 
-              <li>
-                 <a href="{{route('company.supplies.index')}}" class="">
+             </li>
+             <li>
+                 <a href="{{ route('company.supplies.index') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการบริษัทในเครือ</span>
                  </a>
-             </li>     
-              <li>
-                 <a href="{{route('company.form.index')}}" class="">
+             </li>
+             <li>
+                 <a href="{{ route('company.form.index') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการฟอร์ม</span>
                  </a>
              </li>
 
-            <li>
+             <li>
                  <a href="#" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการรถ</span>
                  </a>
              </li>
 
-                <li>
+             <li>
                  <a href="#" class="">
                      <span class="nav-icon uil uil-check-circle"></span>
                      <span class="menu-text">รายการตรวจรถ</span>
                  </a>
              </li>
 
-                  <li>
+             <li>
                  <a href="#" class="">
                      <span class="nav-icon uil uil-user-md"></span>
                      <span class="menu-text">รายการช่างตรวจ</span>
@@ -314,24 +337,24 @@
                      <span class="nav-icon uil uil-home-alt"></span>
                      <span class="menu-text">หน้าหลัก</span>
                  </a>
-             </li>          
+             </li>
 
-            <li>
+             <li>
                  <a href="{{ route('supply.veh_list') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการรถ</span>
                  </a>
              </li>
 
-                <li>
+             <li>
                  <a href="{{ route('supply.chk_list') }}" class="">
                      <span class="nav-icon uil uil-check-circle"></span>
                      <span class="menu-text">รายการตรวจรถ</span>
                  </a>
              </li>
 
-                  <li>
-                 <a href="{{ route('supply.inspector_list',['id'=>Auth::user()->user_id]) }}" class="">
+             <li>
+                 <a href="{{ route('supply.inspector_list', ['id' => Auth::user()->user_id]) }}" class="">
                      <span class="nav-icon uil uil-user-md"></span>
                      <span class="menu-text">รายการช่างตรวจ</span>
                  </a>

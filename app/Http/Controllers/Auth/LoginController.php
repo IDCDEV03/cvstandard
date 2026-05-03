@@ -71,6 +71,7 @@ class LoginController extends Controller
                 Role::Company => redirect()->route('company.index'),
                 Role::Staff => redirect()->route('staff.index'),
                 Role::Supply => redirect()->route('supply.home'),
+                Role::Inspector => redirect()->route('ins-dashboard'),
                 default => redirect('/home'),
             };
         }
