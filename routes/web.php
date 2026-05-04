@@ -122,7 +122,7 @@ Route::middleware(['auth','role:company,supply,staff'])->group(function () {
     Route::get('/get-supplies-by-company', [DriverController::class, 'getSupplies'])->name('drivers.getSupplies');
 });
 
- Route::prefix('inspection')->middleware(['auth', 'role:user,inspector'])->name('inspection.')->group(function () {
+ Route::prefix('inspection')->middleware(['auth', 'role:user,inspector,company'])->name('inspection.')->group(function () {
         Route::get('/', [InspectionController::class, 'index'])->name('index');
         Route::get('/search-vehicle', [InspectionController::class, 'searchVehicle'])->name('searchVehicle');
         Route::post('/start', [InspectionController::class, 'start'])->name('start');
@@ -268,6 +268,8 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
 
     Route::delete('/company/vehicles/{id}', [CompanyVehicleController::class, 'car_destroy'])->name('company.vehicles.destroy');
 
+     Route::get('/inform', [CompanyDashboardController::class, 'vehicles_information'])->name('company.vehicles.inform');
+
     //CRUD ฟอร์มเช็ค
     Route::get('/form', [CompanyDashboardController::class, 'company_form'])->name('company.form.index');
     Route::get('/form/create', [CompanyFormController::class, 'create'])->name('company.form.create');
@@ -310,6 +312,8 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
         Route::post('/store', [CompanyReportTemplateController::class, 'storeFormGroup'])->name('store');
         Route::get('/{id}', [CompanyReportTemplateController::class, 'showFormGroup'])->name('show');
     });
+
+
 });
 
 Route::prefix('supply')->middleware(['auth', 'role:supply'])->group(function () {

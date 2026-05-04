@@ -132,7 +132,7 @@
 ───────────────────────────────────────── --}}
 <div class="row mb-3">
     <div class="col-12 d-flex justify-content-center gap-10 flex-wrap">
-        <a href="#"
+        <a href="{{route('company.vehicles.inform')}}"
            class="btn btn-primary btn-default btn-squared fs-16">
             <i class="uil uil-clipboard-alt me-2"></i>รายการทั้งหมด
         </a>
@@ -304,6 +304,7 @@
 @endsection
 
 @push('scripts')
+
 <script>
 
 document.addEventListener('DOMContentLoaded', function () {
