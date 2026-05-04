@@ -83,7 +83,7 @@
                                                     @elseif ($record->evaluate_status == 3)
                                                         <span class="text-danger fw-bold fs-14">ไม่ปกติ ไม่อนุญาตให้ใช้งาน</span>
                                                         @if ($record->next_inspect_date)
-                                                            <br><small class="text-danger ms-4"> ซ่อมและตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)->format('d/m/Y')) }}</small>
+                                                            <br><small class="text-danger ms-4"> ซ่อมและตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)) }}</small>
                                                         @endif
                                                     @endif
                                                 </div>
@@ -146,31 +146,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script>
-        const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-            'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-        ];
-
-        function pad(n) {
-            return String(n).padStart(2, '0');
-        }
-
-        function updateClock() {
-            const now = new Date();
-            const d = now.getDate();
-            const m = now.getMonth();
-            const y = now.getFullYear() + 543;
-            const h = pad(now.getHours());
-            const min = pad(now.getMinutes());
-            const s = pad(now.getSeconds());
-
-            document.getElementById('clock-time').textContent = `${h}:${min}:${s}`;
-            document.getElementById('clock-date').textContent = `${d} ${thaiMonths[m]} ${y}`;
-        }
-
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
+ 
 
     <script>
         $(document).ready(function() {
