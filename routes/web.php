@@ -346,9 +346,9 @@ Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/cp_supply/{id}', [StaffController::class, 'Company_SupList'])->name('staff.cp_sup');
 
     //ช่างตรวจ
-    Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
-    Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
-    Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
+    //Route::get('/inspector', [StaffController::class, 'InspectorList'])->name('staff.inspector_list');
+    //Route::get('/inspector-new', [StaffController::class, 'Inspector_Create'])->name('staff.inspector_new');
+    //Route::POST('/ins-store', [StaffController::class, 'Inspector_Store'])->name('staff.ins_store');
 
     
     Route::name('staff.')->group(function () {

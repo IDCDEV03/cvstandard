@@ -204,15 +204,40 @@ class PageController extends Controller
                 ->where('role', 'supply')
                 ->count();
 
+            $driverCount = DB::table('drivers_detail')->where('company_id', $companyCode)->count();
+
+            $InspectorCount = DB::table('inspector_datas')->where('company_code', $companyCode)->count();
+
             $totalVehicleLimit = DB::table('supply_datas')
                 ->where('company_code', $companyCode)
                 ->sum('vehicle_limit');
 
-            $registeredVehicleCount = DB::table('vehicles_detail')
-                ->where('company_code', $companyCode)
-                ->count();
+  $totalVehicles = DB::table('vehicles_detail')
+        ->where('company_code', $companyCode)
+        ->where('status', '1')
+        ->count();
 
-            return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount', 'totalVehicleLimit', 'registeredVehicleCount'));
+ 
+    $inspections = DB::table('chk_records')
+        ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+        ->where('vehicles_detail.company_code', $companyCode)
+        ->where('chk_records.chk_status', '1') // 1=ครบ
+        ->select('chk_records.evaluate_status')
+        ->get();
+
+    $totalInspected = $inspections->count();
+
+    // 3. แยกผ่าน/ไม่ผ่าน (อิงจาก evaluate_status: 1=อนุญาตให้ใช้, 2=มีเงื่อนไข, 3=ไม่อนุญาต)
+    // 1 คือผ่าน และ 2,3 คือไม่ผ่าน 
+    $passCount = $inspections->where('evaluate_status', 1)->count();
+    $failCount = $inspections->whereIn('evaluate_status', [2, 3])->count();
+
+    // 4. คำนวณเปอร์เซ็นต์ (ป้องกันหารด้วย 0)
+    $passPercent = $totalInspected > 0 ? round(($passCount / $totalInspected) * 100) : 0;
+    $failPercent = $totalInspected > 0 ? round(($failCount / $totalInspected) * 100) : 0;
+
+            return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount', 'totalVehicleLimit', 'driverCount','InspectorCount','totalVehicles', 'totalInspected', 'passCount', 'failCount', 'passPercent', 'failPercent'));
+
         } elseif ($role === Role::Staff) {
             $id = Auth::id();
             $staff = DB::table('users')->where('id', Auth::id())->first();
