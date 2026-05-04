@@ -533,7 +533,7 @@ class InspectionController extends Controller
             '[car_trailer_plate]'    => $vehicle->car_trailer_plate ?? '-',
             '[car_insure]'           => $vehicle->car_insure ?? '-',
             '[car_insurance_expire]' => $vehicle->car_insurance_expire ? thai_date($vehicle->car_insurance_expire) : '-',
-            '[car_tax]'              => $vehicle->car_tax ?? '-',
+            '[car_tax]'              => $vehicle->car_tax ? thai_date($vehicle->car_tax): '-',
             '[car_register_date]'    => $vehicle->car_register_date ? thai_date($vehicle->car_register_date) : '-',
             '[car_total_weight]'     => $vehicle->car_total_weight ?? '-',
             '[car_fuel]'             => $vehicle->car_fuel_type ?? '-',
