@@ -223,7 +223,7 @@
                                         @elseif ($record->evaluate_status == 3)
                                             <span class="text-danger fw-bold fs-14">ไม่ปกติ ไม่อนุญาตให้ใช้งาน</span>
                                             @if ($record->next_inspect_date)
-                                                <br><small class="text-danger"> กำหนดตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)->format('d/m/Y')) }}</small>
+                                                <br><small class="text-danger"> กำหนดตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)) }}</small>
                                             @endif
                                         @endif
                                     </div>
