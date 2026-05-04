@@ -32,7 +32,7 @@ class InspectorController extends Controller
         )
         ->orderBy('inspector_datas.created_at', 'desc')
         ->get();
-        return view('pages.staff.inspector.index', compact('inspectors'));
+        return view('pages.staff.Inspector.index', compact('inspectors'));
     }
 
     // 2. หน้าฟอร์มเพิ่มช่างใหม่
