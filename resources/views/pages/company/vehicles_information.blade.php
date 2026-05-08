@@ -81,7 +81,7 @@
                     <tr>
                         <th class="text-sm fw-bold">#</th>
                         <th class="text-sm fw-bold">ทะเบียนรถ / สาขา</th>
-                        <th class="text-sm fw-bold">สถานะล่าสุด</th>
+                        
                         <th class="text-sm fw-bold">ประวัติผลการตรวจ</th>
                         <th class="text-sm fw-bold text-center">รายงาน (Report)</th>
                     </tr>
@@ -97,16 +97,7 @@
                                 <br><small class="text-muted"><i class="uil uil-building"></i> {{ $item->supply_name ?? 'ไม่ระบุสาขา' }}</small>
                             </td>
 
-                            <!-- สถานะการตรวจล่าสุด -->
-                            <td class="text-center">
-                                @if ($item->inspect_count == 0)
-                                    <span class="text-muted small">ยังไม่มีประวัติ</span>
-                                @elseif ($item->latest_record->chk_status === '1')
-                                    <span class="dm-tag tag-success tag-transparented fs-18">บันทึกสมบูรณ์</span>
-                                @elseif ($item->latest_record->chk_status === '2')
-                                    <span class="dm-tag tag-warning tag-transparented fs-18">กำลังตรวจ...</span>
-                                @endif
-                            </td>
+                           
 
                             <!-- สรุปผลการตรวจ -->
                             <td>

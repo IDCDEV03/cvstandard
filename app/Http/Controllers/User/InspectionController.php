@@ -753,8 +753,6 @@ class InspectionController extends Controller
         $reportTemplate = DB::table('report_templates')->where('id', $formGroup->report_template_id)->first();
         $reportFields = DB::table('report_template_fields')->where('template_id', $formGroup->report_template_id)->get();
 
-
-
         $checked = '<strong style="color: #000; font-size: 18px;">&#9745;</strong>';
         $unchecked = '<span style="font-size: 18px; color: #666;">&#9744;</span>';
 
@@ -873,6 +871,14 @@ class InspectionController extends Controller
             '3'     => 'ไม่ผ่าน',
             default => '-',
         };
+
+        $vehicleDocs = DB::table('vehicle_documents')
+    ->where('veh_id', $record->veh_id)
+    ->where('is_active', 1)
+    ->where('file_extension', 'pdf')
+    ->orderBy('created_at', 'asc')
+    ->get();
+
         return view('pages.inspection.report', compact(
             'record',
             'supply',
@@ -886,7 +892,8 @@ class InspectionController extends Controller
             'reportTemplate',
             'roundDates',
             'passedDate',
-            'evaluateText'
+            'evaluateText',
+            'vehicleDocs'
         ));
     }
 

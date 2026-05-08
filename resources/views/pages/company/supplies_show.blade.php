@@ -59,17 +59,7 @@
                                              <span class="dm-tag tag-success tag-transparented fs-18">{{ count($vehicles ?? []) }}/{{ $supply->vehicle_limit }}</span>
                                         </div>
 
-                                        @if (count($vehicles ?? []) < $supply->vehicle_limit)
-                                            <a href="{{ route('company.vehicles.create', $supply->sup_id) }}"
-                                                class="btn btn-primary btn-sm btn-squared">
-                                                <i class="uil uil-plus"></i> ลงทะเบียนรถ
-                                            </a>
-                                        @else
-                                            <div class="d-flex align-items-center text-danger fw-500 fs-13">
-                                                <i class="uil uil-exclamation-circle fs-18 me-1"></i>
-                                                ลงทะเบียนรถเต็มจำนวนแล้ว
-                                            </div>
-                                        @endif
+                                     
                                     </div>
 
 
@@ -108,16 +98,8 @@
                                                                         <i class="uil uil-eye fs-20"></i>
                                                                     </a>
                                                                 </li>
-                                                                <li>
-                                                                    <a href="{{ route('company.vehicles.edit', $car->id) }}"
-                                                                        class="edit text-warning"><i
-                                                                            class="uil uil-edit fs-20"></i></a>
-                                                                </li>
-                                                                <li>
-                                                                    <a href="javascript:void(0)" class="remove btn-delete-car"
-                                                            data-id="{{ $car->id }}"
-                                                            data-url="{{ route('company.vehicles.destroy', $car->id) }}">
-                                                            <i class="uil uil-trash-alt"></i>
+                                                             
+                                                               
                                                         </a>
                                                     </li>
                                                                     

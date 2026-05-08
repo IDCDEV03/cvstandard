@@ -164,49 +164,7 @@
         <div class="pt-4 pb-4">
             <div class="row mb-3">
 
-                <div class="col-md-4 mb-3">
-                    <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
-                        <div class="application-task d-flex align-items-center mb-3">
-                            <div class="application-task-icon wh-60 bg-opacity-success-20 content-center">
-                                <img class="svg" src="{{ asset('assets/img/svg/check-clipboard.svg') }}"
-                                    alt="">
-                            </div>
-                            <div class="application-task-content">
-                                <h2><a href="{{ route('company.form.index') }}">
-                                        {{ $formCount ?? 0 }}/{{ $companyDetails->form_limit ?? 5 }} </a>
-                                </h2>
-                                <span class="text-light fs-14 mt-1 text-capitalize">ฟอร์มตรวจที่สร้างแล้ว</span>
-                            </div>
-                        </div>
-                        <div>
-                            <a href="#" class="btn btn-xs btn-outline-success rounded-pill">
-                                <i class="uil uil-plus"></i> เพิ่มฟอร์มใหม่
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
-                        <div class="application-task d-flex align-items-center mb-3">
-                            <div class="application-task-icon wh-60 bg-opacity-info-20 content-center">
-                                <img class="svg" src="{{ asset('assets/img/svg/building.svg') }}" alt="">
-                            </div>
-                            <div class="application-task-content">
-                                <h2><a href="{{ route('company.supplies.index') }}"> {{ $supplyCount ?? 0 }} </a></h2>
-                                <span class="text-light fs-14 mt-1 text-capitalize">บริษัทในเครือ (Supply)</span>
-                            </div>
-                        </div>
-                        <div>
-                            <a href="{{ route('company.supplies.create') }}"
-                                class="btn btn-xs btn-outline-info rounded-pill">
-                                <i class="uil uil-plus"></i> เพิ่ม Supply ใหม่
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
+                   <div class="col-md-4 mb-3">
                     <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
                         <div class="application-task d-flex align-items-center mb-3">
                             <div class="application-task-icon wh-60 bg-opacity-primary-20 content-center">
@@ -220,32 +178,32 @@
                         <div>
                             <a href="{{ route('company.vehicles.list') }}"
                                 class="btn btn-xs btn-outline-secondary rounded-pill">
-                                <i class="uil uil-plus"></i> รายการรถ
+                                รายการรถ
                             </a>
                         </div>
                     </div>
                 </div>
-
+             
                 <div class="col-md-4 mb-3">
                     <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
                         <div class="application-task d-flex align-items-center mb-3">
-                            <div
-                                class="application-task-icon wh-60 bg-opacity-danger-20
-                            content-center">
-                                <img class="svg" src="{{ asset('assets/img/svg/users-01.svg') }}" alt="">
+                            <div class="application-task-icon wh-60 bg-opacity-info-20 content-center">
+                                <img class="svg" src="{{ asset('assets/img/svg/building.svg') }}" alt="">
                             </div>
                             <div class="application-task-content">
-                                <h2>{{ $InspectorCount ?? 0 }} </h2>
-                                <span class="text-light fs-14 mt-1 text-capitalize">ช่างตรวจ</span>
+                                <h2><a href="{{ route('company.supplies.index') }}"> {{ $supplyCount ?? 0 }} </a></h2>
+                                <span class="text-light fs-14 mt-1 text-capitalize">บริษัทในเครือ (Supply)</span>
                             </div>
                         </div>
                         <div>
-                            <a href="#" class="btn btn-xs btn-outline-dark rounded-pill">
-                                <i class="uil uil-plus"></i> ลงทะเบียนช่างตรวจ
+                            <a href="{{ route('company.supplies.index') }}"
+                                class="btn btn-xs btn-outline-info rounded-pill">
+                               รายการ Supply
                             </a>
                         </div>
                     </div>
-                </div>
+                </div>            
+
 
                 <div class="col-md-4 mb-3">
                     <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">

@@ -7,11 +7,7 @@
             <div class="col-lg-12">
                 <div class="breadcrumb-main">
                     <h4 class="text-capitalize breadcrumb-title">จัดการ Supply ในเครือ</h4>
-                    <div class="breadcrumb-action justify-content-center flex-wrap">
-                        <a href="{{ route('company.supplies.create') }}" class="btn btn-primary btn-sm btn-add">
-                            <i class="uil uil-plus"></i> เพิ่ม Supply ใหม่
-                        </a>
-                    </div>
+                   
                 </div>
             </div>
         </div>
@@ -40,8 +36,7 @@
                                     <tr class="userDatatable-header">
                                         <th class="text-center"><span class="userDatatable-title">Logo</span></th>
                                         <th><span class="userDatatable-title">ชื่อบริษัทในเครือ</span></th>
-                                        <th><span class="userDatatable-title">จำนวนรถที่มี</span></th>
-                                        <th><span class="userDatatable-title">วันที่เริ่ม - หมดอายุ</span></th>
+                                        <th><span class="userDatatable-title">จำนวนรถที่มี</span></th>                                      
                                         <th><span class="userDatatable-title">สถานะ</span></th>
                                         <th class="text-center"><span class="userDatatable-title text-end">จัดการ</span>
                                         </th>
@@ -75,18 +70,7 @@
                                                   <span class="dm-tag tag-info tag-transparented fs-18">  {{ $item->total_vehicles }} / {{ $item->vehicle_limit }} คัน</span>
                                              </td>
                                           
-                                            <td>
-                                                <div class="userDatatable-content">
-                                                    @if ($item->start_date && $item->expire_date)
-                                                        <small class="d-block text-success">เริ่ม:
-                                                            {{ thai_date($item->start_date) }}</small>
-                                                        <small class="d-block text-danger">หมด:
-                                                            {{ thai_date($item->expire_date) }}</small>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </div>
-                                            </td>
+                                          
                                             <td>
                                                 <div class="userDatatable-content d-inline-block">
                                                     @if ($item->supply_status == '1')
@@ -107,19 +91,7 @@
                                                             <i class="uil uil-eye fs-20"></i>
                                                         </a>
                                                     </li>
-                                                    <li>
-                                                        <a href="{{ route('company.supplies.edit', $item->sup_id) }}"
-                                                            class="edit">
-                                                            <i class="uil uil-edit"></i>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)" class="remove btn-delete-supply"
-                                                            data-id="{{ $item->sup_id }}"
-                                                            data-url="{{ route('company.supplies.destroy', $item->sup_id) }}">
-                                                            <i class="uil uil-trash-alt"></i>
-                                                        </a>
-                                                    </li>
+                                                   
                                                 </ul>
                                             </td>
                                         </tr>
@@ -218,7 +190,7 @@
                 responsive: true,
                 columnDefs: [{
                     "orderable": false,
-                    "targets": [0, 5]
+                    "targets": [0, 4]
                 }],
                 pageLength: 25,
                 language: {
