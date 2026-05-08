@@ -236,7 +236,33 @@ class PageController extends Controller
     $passPercent = $totalInspected > 0 ? round(($passCount / $totalInspected) * 100) : 0;
     $failPercent = $totalInspected > 0 ? round(($failCount / $totalInspected) * 100) : 0;
 
-            return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount', 'totalVehicleLimit', 'driverCount','InspectorCount','totalVehicles', 'totalInspected', 'passCount', 'failCount', 'passPercent', 'failPercent'));
+    // นับพนักงานทั้งหมดใน company (status = 1 และยังไม่ถูกลบ)
+$totalDrivers = DB::table('drivers_detail')
+    ->where('company_id', $companyCode)
+    ->where('driver_status', 1)
+    ->whereNull('deleted_at')
+    ->count();
+
+// หา driver_id ที่มี doc_type = cert (is_active = 1)
+$certDriverIds = DB::table('drivers_document')
+    ->join('drivers_detail as d', 'd.driver_id', '=', 'drivers_document.driver_id')
+    ->where('d.company_id', $companyCode)
+    ->where('d.driver_status', 1)
+    ->whereNull('d.deleted_at')
+    ->where('drivers_document.doc_type', 'cert')
+    ->where('drivers_document.is_active', 1)
+    ->distinct()
+    ->count('drivers_document.driver_id');
+
+$noCertDrivers = $totalDrivers - $certDriverIds;
+$certPercent   = $totalDrivers > 0 ? round(($certDriverIds / $totalDrivers) * 100) : 0;
+$noPercent     = $totalDrivers > 0 ? 100 - $certPercent : 0;
+
+            return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount', 'totalVehicleLimit', 'driverCount','InspectorCount','totalVehicles', 'totalInspected', 'passCount', 'failCount', 'passPercent', 'failPercent','totalDrivers',
+    'certDriverIds',
+    'noCertDrivers',
+    'certPercent',
+    'noPercent'));
 
         } elseif ($role === Role::Staff) {
             $id = Auth::id();
