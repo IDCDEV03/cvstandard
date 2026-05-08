@@ -31,7 +31,7 @@
                 <div class="card border-0 box-shadow-none">
                     <div class="card-header">
                         <h6 class="fw-500">
-                            <i class="uil uil-truck me-2 color-primary"></i>สถานะรถบรรทุก
+                            <i class="uil uil-truck me-2 color-primary"></i>สถานะรถบรรทุก 2569
                         </h6>
                         <div class="card-extra">
                             <a href="#" class="btn btn-sm btn-primary btn-outlined radius-xs fs-13 fw-500">
