@@ -93,7 +93,7 @@
                             
                             <!-- ทะเบียนรถ และ สาขา -->
                             <td>
-                                <a href="#" class="fw-bold fs-16 text-primary">{{ $item->car_plate }}</a>
+                                <a href="{{route('staff.vehicles.show',['veh_id'=>$item->car_id])}}" class="fw-bold fs-16 text-primary">{{ $item->car_plate }}</a>
                                 <br><small class="text-muted"><i class="uil uil-building"></i> {{ $item->supply_name ?? 'ไม่ระบุสาขา' }}</small>
                             </td>
 
