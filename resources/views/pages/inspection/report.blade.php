@@ -194,15 +194,67 @@
             </button>
         </div>
 
-        <div class="card shadow-sm mb-20" > 
-            <div class="card-body">
-                <span class="fs-18 fw-bold">ข้อมูลสำหรับส่งตรวจ</span>
-                  <div class="border-top my-3"></div>
-                <p class="card-text">
-                   /////
-                </p>             
-            </div>
+       {{-- ========================================== --}}
+{{-- Email submission data: copyable table --}}
+{{-- (Inspector copies this and pastes into email to head office) --}}
+{{-- ========================================== --}}
+<div class="card shadow-sm mb-20 no-print">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-18 fw-bold">
+                <i class="uil uil-envelope-edit me-1"></i> ข้อมูลสำหรับส่งตรวจ
+            </span>           
         </div>
+
+        <div class="border-top my-3"></div>      
+
+        <div class="table-responsive">
+            <table id="emailSubmitTable" class="table table-bordered table-sm align-middle mb-0"
+                style="font-size: 13px;">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th>บริษัทผู้ขนส่ง</th>
+                        <th>ทะเบียนหัว</th>
+                        <th>ทะเบียนหาง</th>
+                        <th>ชนิดรถ</th>
+                        <th>วันที่จดทะเบียนหัว</th>
+                        <th>น้ำหนักรวมสูงสุด (T)</th>
+                        <th>น้ำหนักรถเปล่าหัว+หาง (T)</th>
+                        <th>วันที่ประกันหมดอายุ</th>
+                        <th>ภาษีหมดอายุ</th>
+                        <th>ประเภทสินค้า</th>
+                        <th>ชนิดเชื้อเพลิง</th>
+                        <th>วันที่ตรวจครั้งที่ 1</th>
+                        <th>วันที่ตรวจครั้งที่ 2</th>
+                        <th>วันที่ตรวจครั้งที่ 3</th>
+                        <th>วันที่ตรวจผ่าน</th>
+                        <th>สรุปผลการตรวจ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="text-center">
+                        <td>{{ $supply->supply_name ?? '-' }}</td>
+                        <td>{{ $vehicle->car_plate ?? '-' }}</td>
+                        <td>{{ $vehicle->car_trailer_plate ?? '-' }}</td>
+                        <td>{{ $vehicle->vehicle_type ?? '-' }}</td>
+                        <td>{{ $vehicle->car_register_date ? thai_date($vehicle->car_register_date) : '-' }}</td>
+                        <td>{{ $vehicle->car_total_weight ?? '-' }}</td>
+                        <td>{{ $vehicle->car_weight ?? '-' }}</td>
+                        <td>{{ $vehicle->car_insurance_expire ? thai_date($vehicle->car_insurance_expire) : '-' }}</td>
+                        <td>{{ $vehicle->car_tax ? thai_date($vehicle->car_tax) : '-' }}</td>
+                        <td>{{ $vehicle->car_product ?? '-' }}</td>
+                        <td>{{ $vehicle->car_fuel_type ?? '-' }}</td>
+                        <td>{{ $roundDates['round1'] ? thai_date($roundDates['round1']) : '-' }}</td>
+                        <td>{{ $roundDates['round2'] ? thai_date($roundDates['round2']) : '-' }}</td>
+                        <td>{{ $roundDates['round3'] ? thai_date($roundDates['round3']) : '-' }}</td>
+                        <td>{{ $passedDate ? thai_date($passedDate) : '-' }}</td>
+                        <td>{{ $evaluateText }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         <div id="printable-area">
             <div class="report-container p-2">

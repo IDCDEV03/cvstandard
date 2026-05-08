@@ -19,6 +19,20 @@ class CompanyVehicleController extends Controller
         $this->middleware(['auth', 'role:company']);
     }
 
+      public function VehiclesList()
+    {
+        $veh_list = DB::table('vehicles_detail')
+            ->select('vehicles_detail.car_id', 'vehicles_detail.car_plate', 'vehicles_detail.car_brand', 'vehicles_detail.car_model', 'users.company_code', 'users.name', 'vehicle_types.vehicle_type', 'vehicles_detail.status', 'vehicles_detail.created_at','supply_datas.supply_name')
+            ->leftjoin('users', 'users.company_code', '=', 'vehicles_detail.company_code')
+            ->leftjoin('supply_datas', 'vehicles_detail.supply_id', 'supply_datas.sup_id')
+            ->leftjoin('vehicle_types', 'vehicles_detail.car_type', 'vehicle_types.id')
+            ->orderBy('vehicles_detail.created_at', 'DESC')
+            ->groupBy('vehicles_detail.car_id')
+            ->get();
+
+        return view('pages.company.vehicles_list', compact('veh_list'));
+    }
+
     public function create($supply_id)
     {
         $companyCode = Auth::user()->company_code;

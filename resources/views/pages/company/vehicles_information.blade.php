@@ -1,12 +1,12 @@
 @section('title', 'รายการตรวจสอบสภาพรถ')
+@section('description', 'ID Drives')
 @extends('layout.app')
-
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
             <div class="d-flex align-items-center user-member__title mb-30 mt-30">
-                <h4 class="text-capitalize">สถานะการตรวจสภาพรถ</h4>
+                <h4 class="text-capitalize">รายการรถและการตรวจรถ</h4>
             </div>
 
 
@@ -31,12 +31,53 @@
     </div>
 </div>
 
+<div class="card mb-25 border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h6 class="fw-500 mb-0"><i class="uil uil-search me-2"></i>ค้นหาข้อมูลการตรวจรถ</h6>
+    </div>
+    <div class="card-body">
+        <form action="{{route('company.vehicles.inform')}}" method="GET">
+            <input type="hidden" name="filter" value="{{ $filter }}">
+            
+            <div class="row align-items-end g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-500">จากวันที่</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-500">ถึงวันที่</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-500">ผลประเมินล่าสุด</label>
+                    <select name="evaluate_status" class="form-select">
+                        <option value="">-- แสดงทั้งหมด --</option>
+                        <option value="1" {{ request('evaluate_status') == '1' ? 'selected' : '' }}>ผ่าน</option>
+                        <option value="2" {{ request('evaluate_status') == '2' ? 'selected' : '' }}>ไม่ผ่าน แต่สามารถปฏิบัติงานได้</option>
+                        <option value="3" {{ request('evaluate_status') == '3' ? 'selected' : '' }}>ไม่ผ่าน (ไม่อนุญาตใช้งาน)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-default btn-squared flex-grow-1">
+                            ค้นหา
+                        </button>
+                        <a href="{{route('company.vehicles.inform')}}" class="btn btn-light btn-default btn-squared border">
+                            ล้างค่า
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- ตารางแสดงข้อมูล -->
 <div class="card mb-50">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-default table-bordered mb-0" id="table-one">
-                <thead class="table-info">
+                <thead class="table-primary">
                     <tr>
                         <th class="text-sm fw-bold">#</th>
                         <th class="text-sm fw-bold">ทะเบียนรถ / สาขา</th>
@@ -83,14 +124,14 @@
                                                     @elseif ($record->evaluate_status == 3)
                                                         <span class="text-danger fw-bold fs-14">ไม่ปกติ ไม่อนุญาตให้ใช้งาน</span>
                                                         @if ($record->next_inspect_date)
-                                                            <br><small class="text-danger ms-4"> ซ่อมและตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)) }}</small>
+                                                            <br><small class="text-danger ms-4"> ตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)) }}</small>
                                                         @endif
                                                     @endif
                                                 </div>
                                             @elseif($record->chk_status == '2')
                                                 <div class="border-bottom pb-1 mb-1">
                                                     <small class="text-muted fw-bold">ครั้งที่ {{ $item->inspect_count - $index }}: </small>
-                                                    <span class="text-warning fs-14">แบบร่าง / ยังไม่เสร็จสิ้น</span>
+                                                    <span class="text-danger fs-14">แบบร่าง / ยังไม่เสร็จสิ้น</span>
                                                 </div>
                                             @endif
                                         @endforeach
@@ -107,11 +148,11 @@
                                         @foreach($item->history as $index => $record)
                                             <div class="border-bottom pb-1 mb-1 w-100 text-center">
                                                 @if ($record->chk_status === '1')
-                                                    <a href="{{ route('inspection.report', $record->record_id) }}" class="btn btn-info btn-xs shadow-sm">
+                                                    <a href="{{ route('inspection.report', $record->record_id) }}" class="btn btn-info btn-xs shadow-sm ">
                                                         <i class="uil uil-file-alt"></i> Report ครั้งที่ {{ $item->inspect_count - $index }}
                                                     </a>
                                                 @elseif ($record->chk_status === '2')
-                                                    <span class="badge bg-light text-dark rounded-pill fs-11">รอ Inspector ส่งเรื่อง</span>
+                                                    <span class="text-danger">รอช่างตรวจยืนยันผล</span>
                                                 @endif
                                             </div>
                                         @endforeach
@@ -122,11 +163,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">
-                                <i class="uil uil-box fs-24 d-block mb-2"></i>ไม่มีข้อมูลรถในสถานะนี้
-                            </td>
-                        </tr>
+                        
                     @endforelse
                 </tbody>
             </table>

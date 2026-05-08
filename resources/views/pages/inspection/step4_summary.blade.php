@@ -12,6 +12,8 @@
         $checkedItems = $passCount + $failCount + $AlmostCount;
         $percent = $totalItems > 0 ? round(($checkedItems / $totalItems) * 100) : 0;
         $isCompleted = $uncheckedCount == 0;
+        // Inspector signature from user profile (if exists)
+        $hasProfileSign = !empty($inspectorProfileSign);
     @endphp
 
     <div class="container-fluid py-3">
@@ -27,17 +29,16 @@
                         <h5 class="mb-1 fw-bold text-dark">สรุปผลการตรวจและลงนาม</h5>
                         <div class="small text-muted mb-1">
                             <span class="fw-bold text-primary">{{ $formGroup->form_group_name ?? 'แบบฟอร์มการตรวจ' }}</span>
-                            </span>
                         </div>
                     </div>
                 </div>
 
                 <div class="card shadow-sm mb-20 ">
-                    <div class="card-header ">                       
-                            <a href="{{ route('inspection.step3', $record->record_id) }}"
-                                class="btn btn btn-primary radius-xs">
-                                <i class="uil uil-arrow-left"></i> ย้อนกลับ
-                            </a>
+                    <div class="card-header ">
+                        <a href="{{ route('inspection.step3', $record->record_id) }}"
+                            class="btn btn btn-primary radius-xs">
+                            <i class="uil uil-arrow-left"></i> ย้อนกลับ
+                        </a>
                     </div>
 
                     <div class="card-body" style="background-color: #d7e3f5; border-radius: 0 0 12px 12px;">
@@ -45,7 +46,6 @@
                         <span class=" fs-20 text-secondary"><strong>
                                 {{ $vehicle->car_plate ?? 'ไม่ระบุ' }}</strong>
                         </span>
-
                     </div>
                 </div>
 
@@ -54,12 +54,14 @@
                     @csrf
 
                     <input type="hidden" name="submit_type" id="submit_type" value="final">
+                    {{-- Flag: 1 = use profile signature, 0 = use canvas (live signed) --}}
+                    <input type="hidden" name="use_profile_sign" id="use_profile_sign"
+                        value="{{ $hasProfileSign ? '1' : '0' }}">
 
                     <div class="card border-0 shadow-sm radius-xs mb-4">
                         <div class="card-body p-3 p-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold mb-0"><i class="uil uil-chart-pie me-1"></i> ภาพรวมการตรวจ</h6>
-
                             </div>
 
                             <div class="mb-4">
@@ -74,7 +76,6 @@
                                 </div>
                             </div>
 
-
                             <div class="row g-2 text-center">
                                 <div class="col-4">
                                     <div class="bg-success-transparent  p-2 rounded radius-xs h-100">
@@ -88,14 +89,12 @@
                                         <div class="fs-16 fw-bold text-warning">ไม่ปกติ แต่ใช้งานได้</div>
                                     </div>
                                 </div>
-
                                 <div class="col-4">
                                     <div class="bg-danger-transparent p-2 rounded radius-xs h-100">
                                         <div class="fs-24 fw-bold">{{ $failCount }}</div>
                                         <div class="fs-16 fw-bold text-danger">ไม่ปกติ / ไม่ผ่าน</div>
                                     </div>
                                 </div>
-
                             </div>
 
                             @if (!$isCompleted)
@@ -169,19 +168,65 @@
                         <div class="card-body p-3 p-md-4">
                             <h6 class="fw-bold mb-3"><i class="uil uil-pen me-1"></i> ลงลายเซ็น</h6>
 
+                            {{-- ========================================== --}}
+                            {{-- Inspector signature block --}}
+                            {{-- ========================================== --}}
                             <div class="mb-4">
                                 <label class="small text-dark fw-bold mb-2">ลงชื่อผู้ตรวจ <span
                                         class="text-danger">*</span></label>
-                                <div class="border border-dark rounded bg-white position-relative" style="height: 200px;">
-                                    <canvas id="inspectorCanvas" class="w-100 h-100"
-                                        style="touch-action: none;"></canvas>
-                                    <button type="button"
-                                        class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm"
-                                        onclick="inspectorPad.clear()">ล้าง</button>
-                                </div>
+
+                                @if ($hasProfileSign)
+                                    {{-- Profile signature exists: show image by default + toggle to canvas --}}
+                                    <div id="inspectorProfileBox"
+                                        class="border border-dark rounded bg-white position-relative d-flex justify-content-center align-items-center"
+                                        style="height: 200px;">
+                                        <img src="{{ asset($inspectorProfileSign) }}" alt="ลายเซ็นผู้ตรวจ"
+                                            style="max-height: 180px; max-width: 100%; object-fit: contain;">
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <button type="button" id="btnSwitchToCanvas"
+                                            class="btn btn-link btn-sm fw-bold p-0">
+                                            <i class="uil uil-edit me-1"></i> คลิกที่นี่หากต้องการเซ็นใหม่
+                                        </button>
+                                    </div>
+
+                                    {{-- Canvas (hidden by default) --}}
+                                    <div id="inspectorCanvasBox" class="d-none">
+                                        <div class="border border-dark rounded bg-white position-relative"
+                                            style="height: 200px;">
+                                            <canvas id="inspectorCanvas" class="w-100 h-100"
+                                                style="touch-action: none;"></canvas>
+                                            <button type="button"
+                                                class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm"
+                                                onclick="inspectorPad.clear()">ล้าง</button>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <button type="button" id="btnSwitchToProfile"
+                                                class="btn btn-link btn-sm  fw-bold p-0">
+                                                <i class="uil uil-arrow-left me-1"></i> ใช้ลายเซ็นจากภาพ
+                                            </button>
+                                        </div>
+                                    </div>
+                                @else
+                                    {{-- No profile signature: live canvas only --}}
+                                    <div id="inspectorCanvasBox">
+                                        <div class="border border-dark rounded bg-white position-relative"
+                                            style="height: 200px;">
+                                            <canvas id="inspectorCanvas" class="w-100 h-100"
+                                                style="touch-action: none;"></canvas>
+                                            <button type="button"
+                                                class="btn btn-dark btn-transparent-dark btn-xs position-absolute bottom-0 end-0 m-2 shadow-sm"
+                                                onclick="inspectorPad.clear()">ล้าง</button>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <input type="hidden" name="inspector_sign_data" id="inspector_sign_data">
                             </div>
 
+                            {{-- ========================================== --}}
+                            {{-- Driver signature block (live canvas always) --}}
+                            {{-- ========================================== --}}
                             <div>
                                 <label class="small text-dark fw-bold mb-2">ลงชื่อผู้รับการตรวจ (ถ้ามี)</label>
                                 <div class="border border-dark rounded bg-white position-relative" style="height: 200px;">
@@ -196,7 +241,6 @@
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2 mb-5">
-
                         <button type="button" id="btnDraft"
                             class="btn btn-outline-primary btn-lg py-3 fw-bold radius-xs btn-block">
                             <i class="uil uil-save me-1"></i> บันทึกแบบร่าง
@@ -219,40 +263,41 @@
         <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
         <script>
             // ==========================================
-            // ควบคุมการ ซ่อน/โชว์ กล่องวันที่ตรวจสภาพใหม่
+            // Toggle next-inspect-date box based on evaluate_status
             // ==========================================
             const evalRadios = document.querySelectorAll('.eval-radio');
             const nextInspectContainer = document.getElementById('next_inspect_container');
             const nextInspectInput = document.getElementById('next_inspect_date');
 
             function toggleNextInspectDate() {
-                // หาปุ่มที่ถูกเลือกอยู่ ณ ปัจจุบัน
                 const selectedRadio = document.querySelector('.eval-radio:checked');
-
-                // ถ้ามีการเลือกปุ่ม และปุ่มนั้นมีค่าเท่ากับ '3'
                 if (selectedRadio && selectedRadio.value === '3') {
-                    nextInspectContainer.classList.remove('d-none'); // โชว์กล่อง
-                    nextInspectInput.setAttribute('required', 'required'); // บังคับให้ต้องกรอก
+                    nextInspectContainer.classList.remove('d-none');
+                    nextInspectInput.setAttribute('required', 'required');
                 } else {
-                    nextInspectContainer.classList.add('d-none'); // ซ่อนกล่อง
-                    nextInspectInput.removeAttribute('required'); // เลิกบังคับ
-                    nextInspectInput.value = ''; // ล้างข้อมูลวันที่ทิ้ง
+                    nextInspectContainer.classList.add('d-none');
+                    nextInspectInput.removeAttribute('required');
+                    nextInspectInput.value = '';
                 }
             }
-
-            // เอาฟังก์ชันไปผูกไว้กับปุ่ม Radio ทั้ง 3 ปุ่ม (เวลากดเปลี่ยน มันจะทำงานทันที)
-            evalRadios.forEach(radio => {
-                radio.addEventListener('change', toggleNextInspectDate);
-            });
-
-            // สั่งให้ทำงาน 1 ครั้งตอนเปิดหน้าเว็บมาครั้งแรก (ป้องกันกรณีเบราว์เซอร์จำค่าเก่าเอาไว้)
+            evalRadios.forEach(radio => radio.addEventListener('change', toggleNextInspectDate));
             toggleNextInspectDate();
         </script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // ตั้งค่า Canvas ให้พอดีกับหน้าจอ
+                // ==========================================
+                // Profile signature flag (from server)
+                // ==========================================
+                const hasProfileSign = {{ $hasProfileSign ? 'true' : 'false' }};
+                const useProfileSignInput = document.getElementById('use_profile_sign');
+
+                // ==========================================
+                // Canvas resize helper
+                // ==========================================
                 function resizeCanvas(canvas) {
-                    var ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    if (!canvas) return;
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
                     canvas.width = canvas.offsetWidth * ratio;
                     canvas.height = canvas.offsetHeight * ratio;
                     canvas.getContext("2d").scale(ratio, ratio);
@@ -261,61 +306,118 @@
                 const inspectorCanvas = document.getElementById('inspectorCanvas');
                 const driverCanvas = document.getElementById('driverCanvas');
 
-                resizeCanvas(inspectorCanvas);
+                // ==========================================
+                // Init driver pad (always live canvas)
+                // ==========================================
                 resizeCanvas(driverCanvas);
-
-                // เรียกใช้งาน Signature Pad
-                window.inspectorPad = new SignaturePad(inspectorCanvas, {
-                    penColor: "rgb(0, 0, 0)"
-                });
                 window.driverPad = new SignaturePad(driverCanvas, {
                     penColor: "rgb(0, 0, 0)"
                 });
 
-                // แปลงลายเซ็นลง Input
+                // ==========================================
+                // Init inspector pad
+                // - If profile sign exists: pad initialized but hidden until user clicks "เซ็นใหม่"
+                //   (resize is deferred until canvas becomes visible)
+                // - If no profile sign: pad active from start
+                // ==========================================
+                let inspectorPadInitialized = false;
+
+                function initInspectorPad() {
+                    if (inspectorPadInitialized) return;
+                    resizeCanvas(inspectorCanvas);
+                    window.inspectorPad = new SignaturePad(inspectorCanvas, {
+                        penColor: "rgb(0, 0, 0)"
+                    });
+                    inspectorPadInitialized = true;
+                }
+
+                if (!hasProfileSign) {
+                    // No profile sign: init pad immediately
+                    initInspectorPad();
+                }
+
+                // ==========================================
+                // Toggle: switch from profile image to canvas
+                // ==========================================
+                const btnSwitchToCanvas = document.getElementById('btnSwitchToCanvas');
+                const btnSwitchToProfile = document.getElementById('btnSwitchToProfile');
+                const profileBox = document.getElementById('inspectorProfileBox');
+                const canvasBox = document.getElementById('inspectorCanvasBox');
+
+                if (btnSwitchToCanvas) {
+                    btnSwitchToCanvas.addEventListener('click', function() {
+                        profileBox.classList.add('d-none');
+                        document.querySelector('.text-center.mt-2').classList.add('d-none'); // hide its own row
+                        canvasBox.classList.remove('d-none');
+                        useProfileSignInput.value = '0';
+                        initInspectorPad();
+                        // Resize after becoming visible (offsetWidth was 0 while hidden)
+                        setTimeout(() => resizeCanvas(inspectorCanvas), 50);
+                    });
+                }
+
+                if (btnSwitchToProfile) {
+                    btnSwitchToProfile.addEventListener('click', function() {
+                        canvasBox.classList.add('d-none');
+                        profileBox.classList.remove('d-none');
+                        // Show the "เซ็นใหม่" button row again
+                        const switchRow = btnSwitchToCanvas.closest('.text-center.mt-2');
+                        if (switchRow) switchRow.classList.remove('d-none');
+                        useProfileSignInput.value = '1';
+                        if (window.inspectorPad) inspectorPad.clear();
+                    });
+                }
+
+                // ==========================================
+                // Convert canvas to base64 before submit
+                // ==========================================
                 function prepareSignatures() {
-                    if (!inspectorPad.isEmpty()) {
+                    // Inspector: only send canvas data if user opted to sign live
+                    if (useProfileSignInput.value === '0' && window.inspectorPad && !inspectorPad.isEmpty()) {
                         document.getElementById('inspector_sign_data').value = inspectorPad.toDataURL();
                     }
+                    // Driver: always check live canvas
                     if (!driverPad.isEmpty()) {
                         document.getElementById('driver_sign_data').value = driverPad.toDataURL();
                     }
                 }
 
                 // ==========================================
-                // 1. จัดการปุ่ม "บันทึกแบบร่าง" (Save Draft)
+                // Save Draft
                 // ==========================================
                 document.getElementById('btnDraft').addEventListener('click', function() {
-                    document.getElementById('submit_type').value = 'draft'; // ตั้งค่าเป็น draft
+                    document.getElementById('submit_type').value = 'draft';
                     prepareSignatures();
-                    // Submit ได้เลยโดยไม่ต้องสนว่าครบ 100% หรือประเมินสภาพรถหรือยัง
                     document.getElementById('submitForm').submit();
                 });
 
                 // ==========================================
-                // 2. จัดการปุ่ม "ยืนยันผลการตรวจ" (Final Submit)
+                // Final Submit
                 // ==========================================
                 document.getElementById('btnSubmit').addEventListener('click', function() {
-                    document.getElementById('submit_type').value = 'final'; // ตั้งค่าเป็น final
+                    document.getElementById('submit_type').value = 'final';
 
-                    // เช็คการประเมินสภาพรถ (บังคับถ้าจะยืนยันผล)
+                    // Check evaluate_status
                     const isEvaluated = document.querySelector('input[name="evaluate_status"]:checked');
                     if (!isEvaluated) {
                         alert('กรุณาเลือกประเมินสถานะการใช้งานของรถคันนี้ครับ');
                         return;
                     }
 
-                    const selectedEval = document.querySelector('input[name="evaluate_status"]:checked');
-                    if (selectedEval && selectedEval.value === '3' && !nextInspectInput.value) {
+                    if (isEvaluated.value === '3' && !nextInspectInput.value) {
                         alert('กรุณาระบุวันที่กำหนดตรวจสภาพใหม่ด้วยครับ');
                         nextInspectInput.focus();
                         return;
                     }
 
-                    // เช็คลายเซ็นผู้ตรวจ (บังคับถ้าจะยืนยันผล)
-                    if (inspectorPad.isEmpty()) {
-                        alert('กรุณาลงลายมือชื่อผู้ตรวจครับ');
-                        return;
+                    // Check inspector signature:
+                    // - If using profile sign → OK (server will copy from users.signature_image)
+                    // - If using live canvas → must not be empty
+                    if (useProfileSignInput.value === '0') {
+                        if (!window.inspectorPad || inspectorPad.isEmpty()) {
+                            alert('กรุณาลงลายมือชื่อผู้ตรวจครับ');
+                            return;
+                        }
                     }
 
                     prepareSignatures();

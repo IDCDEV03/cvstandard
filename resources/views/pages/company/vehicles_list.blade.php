@@ -13,9 +13,7 @@
                             <div class="fw-bold fs-20 ">
                                 รายการรถ
                             </div>
-                            <a href="{{ route('staff.vehicles.create') }}" class="btn btn-sm btn-secondary">
-                                <i class="fas fa-truck me-1"></i> + ลงทะเบียนรถ
-                            </a>
+                         
                         </div>
                     </div>
                 </div>

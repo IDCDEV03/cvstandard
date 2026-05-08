@@ -30,7 +30,7 @@ class CompanySupplyController extends Controller
 
         $user = Auth::user();
         $companyCode = $user->company_code;
-        $agencyId = $user->agency_user_id ?? $user->agency_id;
+        $agencyId = 'TZ-7412';
 
         $request->validate([
             'supply_name' => 'required|string|max:200',
@@ -91,7 +91,6 @@ class CompanySupplyController extends Controller
                 'role' => 'supply',
                 'company_code' => $companyCode,
                 'agency_user_id' => $agencyId,
-                'agency_id' => $agencyId,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
@@ -290,8 +289,8 @@ class CompanySupplyController extends Controller
             ->get();
 
         // 3. ข้อมูลพนักงาน 
-        $drivers = DB::table('inspector_datas')
-            ->where('sup_id', $id)
+        $drivers = DB::table('drivers_detail')
+            ->where('supply_id', $id)
             ->get();
 
         return view('pages.company.supplies_show', compact('supply', 'vehicles', 'drivers'));

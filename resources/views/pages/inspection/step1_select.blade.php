@@ -3,6 +3,35 @@
 @extends('layout.app')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/custom-mobile.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <style>
+            .form-check-custom .btn-check:checked+label {
+                border-color: #5F63F2 !important;
+                background-color: #f4f5ff !important;
+            }
+
+            .form-check-custom .btn-check:checked+label .icon-check {
+                display: block !important;
+            }
+
+            .select2-container .select2-selection--single {
+                height: 50px;
+                border-radius: 8px;
+                border-color: #e3e6ef;
+                display: flex;
+                align-items: center;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: 48px;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: normal;
+                font-size: 15px;
+                padding-left: 15px;
+            }
+        </style>
 @endpush
 @section('content')
     <div class="container-fluid py-3">
@@ -21,15 +50,16 @@
                 </div>
 
                 <div class="card border-0 shadow-sm radius-xs mb-4">
-                     <div class="card-header d-flex justify-content-end align-items-center">
-                            <small class="text-muted" id="live-clock">
-                        </div>
+                    <div class="card-header d-flex justify-content-end align-items-center">
+                        <small class="text-muted" id="live-clock">
+                    </div>
                     <div class="card-body p-3 p-md-4">
-                        <form action="{{ route('inspection.start') }}" method="POST">
+                        <form action="{{ route('inspection.start') }}" method="POST" id="inspectionStartForm">
                             @csrf
 
                             <div class="mb-4 pb-2 border-bottom">
-                                <label class="form-label fw-bold text-dark mb-2">1. ค้นหาทะเบียนรถ <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold text-dark mb-2">1. ค้นหาทะเบียนรถ <span
+                                        class="text-danger">*</span></label>
                                 <select name="car_id" id="vehicleSearch" class="form-control form-control-lg" required>
                                 </select>
                                 <small class="text-muted mt-2 d-block"><i class="uil uil-info-circle"></i>
@@ -72,101 +102,105 @@
         </div>
     </div>
 
-    @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <style>
-            .form-check-custom .btn-check:checked+label {
-                border-color: #5F63F2 !important;
-                background-color: #f4f5ff !important;
-            }
-
-            .form-check-custom .btn-check:checked+label .icon-check {
-                display: block !important;
-            }
-
-            .select2-container .select2-selection--single {
-                height: 50px;
-                border-radius: 8px;
-                border-color: #e3e6ef;
-                display: flex;
-                align-items: center;
-            }
-
-            .select2-container--default .select2-selection--single .select2-selection__arrow {
-                height: 48px;
-            }
-
-            .select2-container--default .select2-selection--single .select2-selection__rendered {
-                line-height: normal;
-                font-size: 15px;
-                padding-left: 15px;
-            }
-        </style>
-    @endpush
-
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script>
-               function updateClock() {
+   @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        // ==========================================
+        // Live clock display (Buddhist Era format)
+        // ==========================================
+        function updateClock() {
             const now = new Date();
-
             const day = String(now.getDate()).padStart(2, '0');
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear() + 543;
-
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-
             const fullDateTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-
             document.getElementById('live-clock').textContent = fullDateTime;
         }
-
         updateClock();
         setInterval(updateClock, 1000);
 
-            $(document).ready(function() {
-                $('#vehicleSearch').select2({
-                    theme: 'bootstrap-5',
-                    ajax: {
-                        url: "{{ route('inspection.searchVehicle') }}",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                q: params.term
-                            };
-                        },
-                        processResults: function(data) {
-                            return {
-                                results: $.map(data, function(item) {
-                                    return {
-                                        text: item.car_plate + (item.car_brand ? ' (' + item
-                                            .car_brand + ')' : ''),
-                                        id: item.car_id
-                                    }
-                                })
-                            };
-                        },
-                        cache: true
+        // ==========================================
+        // Vehicle search with lock indication
+        // ==========================================
+        $(document).ready(function() {
+            $('#vehicleSearch').select2({
+                theme: 'bootstrap-5',
+                ajax: {
+                    url: "{{ route('inspection.searchVehicle') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { q: params.term };
                     },
-                    minimumInputLength: 2,
-                    placeholder: 'พิมพ์ทะเบียนรถ...',
-                    language: {
-                        inputTooShort: function() {
-                            return "กรุณาพิมพ์อย่างน้อย 2 ตัวอักษร";
-                        },
-                        noResults: function() {
-                            return "ไม่พบข้อมูลรถยนต์";
-                        },
-                        searching: function() {
-                            return "กำลังค้นหา...";
-                        }
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.car_id,
+                                    text: item.car_plate + (item.car_brand ? ' (' + item.car_brand + ')' : ''),
+                                    // Custom fields for rendering and selection control
+                                    car_plate: item.car_plate,
+                                    car_brand: item.car_brand,
+                                    is_locked: item.is_locked,
+                                    lock_message: item.lock_message,
+                                    disabled: item.is_locked
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 2,
+                placeholder: 'พิมพ์ทะเบียนรถ...',
+
+                // ⭐ Custom render: shows lock icon + message for locked vehicles
+                templateResult: function(item) {
+                    if (!item.id) return item.text;
+
+                    if (item.is_locked) {
+                        return $('<div class="d-flex flex-column" style="opacity: 0.6;">' +
+                            '<div><i class="uil uil-lock text-danger"></i> <strong>' +
+                                $('<div>').text(item.car_plate).html() +
+                            '</strong>' + (item.car_brand ? ' (' + $('<div>').text(item.car_brand).html() + ')' : '') + '</div>' +
+                            '<small class="text-danger" style="font-size: 11px;">' +
+                                '<i class="uil uil-info-circle"></i> ' + $('<div>').text(item.lock_message).html() +
+                            '</small>' +
+                        '</div>');
                     }
-                });
+
+                    return $('<div> <strong>' +
+                        $('<div>').text(item.car_plate).html() +
+                    '</strong>' + (item.car_brand ? ' (' + $('<div>').text(item.car_brand).html() + ')' : '') + '</div>');
+                },
+                templateSelection: function(item) {
+                    return item.text || item.car_plate || 'พิมพ์ทะเบียนรถ...';
+                },
+                escapeMarkup: function(markup) {
+                    return markup;
+                },
+
+                language: {
+                    inputTooShort: function() { return "กรุณาพิมพ์อย่างน้อย 2 ตัวอักษร"; },
+                    noResults: function() { return "ไม่พบข้อมูลรถยนต์"; },
+                    searching: function() { return "กำลังค้นหา..."; }
+                }
             });
-        </script>
-        
-    @endpush
+
+            // ==========================================
+            // Form submit guard - block locked vehicles
+            // ==========================================
+            $('#inspectionStartForm').on('submit', function(e) {
+                const selectedData = $('#vehicleSearch').select2('data')[0];
+                if (selectedData && selectedData.is_locked) {
+                    e.preventDefault();
+                    alert('ไม่สามารถเลือกรถคันนี้ได้: ' + selectedData.lock_message);
+                    return false;
+                }
+            });
+        });
+    </script>
+@endpush
 @endsection

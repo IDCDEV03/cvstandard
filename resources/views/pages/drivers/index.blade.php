@@ -53,6 +53,8 @@
                                             <td>{{ $item->assigned_car_id ?? '-' }}</td>
                                             <td class="text-center text-nowrap">
                                                 <div class="btn-group" role="group">
+                                                    <a href="{{ route('drivers.show', $item->driver_id) }}" class="btn btn-secondary btn-xs shadow-sm border-0">
+                                                        <i class="uil uil-eye"></i> รายละเอียด</a>
                                                     <a href="{{ route('drivers.edit', $item->driver_id) }}"
                                                         class="btn btn-warning btn-xs shadow-sm border-0" title="แก้ไข">
                                                         <i class="uil uil-edit"></i> แก้ไข

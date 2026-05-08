@@ -28,9 +28,9 @@
                  </a>
              @else
                  <a class="navbar-brand" href="#">
-                     <img class="dark" src="{{ asset('assets/img/logo-1.png') }}"
+                     <img class="dark" src="{{ asset('assets/img/insee.jpg') }}"
                          style="height: 40px; object-fit: contain;" alt="img">
-                     <img class="light" src="{{ asset('assets/img/logo-1.png') }}"
+                     <img class="light" src="{{ asset('assets/img/insee.jpg') }}"
                          style="height: 40px; object-fit: contain;" alt="img">
                  </a>
              @endif

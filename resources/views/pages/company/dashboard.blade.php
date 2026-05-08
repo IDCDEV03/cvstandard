@@ -207,8 +207,8 @@
                             </div>
                         </div>
                         <div>
-                            <a href="#" class="btn btn-xs btn-outline-secondary rounded-pill">
-                                <i class="uil uil-plus"></i> ลงทะเบียนรถ
+                            <a href="{{route('company.vehicles.list')}}" class="btn btn-xs btn-outline-secondary rounded-pill">
+                                <i class="uil uil-plus"></i> รายการรถ
                             </a>
                         </div>
                     </div>
@@ -244,13 +244,13 @@
                                 <img class="svg" src="{{ asset('assets/img/svg/users-01.svg') }}" alt="">
                             </div>
                             <div class="application-task-content">
-                                <h2> {{$driverCount ?? 0}} </h2>
+                                <h2><a href="{{route('drivers.index')}}" >{{$driverCount ?? 0}} </a></h2>
                                 <span class="text-light fs-14 mt-1 text-capitalize">พนักงานขับรถ</span>
                             </div>
                         </div>
                         <div>
-                            <a href="#" class="btn btn-xs btn-outline-dark rounded-pill">
-                                <i class="uil uil-plus"></i> ลงทะเบียนพนักงานขับรถ
+                            <a href="{{route('drivers.index')}}" class="btn btn-xs btn-outline-dark rounded-pill">
+                                รายการพนักงานขับรถ
                             </a>
                         </div>
                     </div>
@@ -261,44 +261,33 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card mb-25 border-0 radius-xl">
+                        
                         <div class="card-header border-bottom">
-                            <h6 class="mb-0">ข้อมูลบริษัทเบื้องต้น</h6>
+                            <h6 class="mb-0">Developed by</h6>
                         </div>
                         <div class="card-body p-25">
                             <div class="d-flex align-items-center mb-3">
-                                @if (!empty($companyDetails->company_logo))
-                                    <img src="{{ asset($companyDetails->company_logo) }}" alt="Logo"
+                               
+                                    <img src="{{ asset('iddrives.png') }}" alt="Logo"
                                         class="img-thumbnail me-3 border-0"
-                                        style="max-height: 80px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                                @else
-                                    <div class="bg-light d-flex align-items-center justify-content-center me-3"
-                                        style="width: 80px; height: 80px; border-radius: 8px;">
-                                        <i class="uil uil-image text-muted fs-24"></i>
-                                    </div>
-                                @endif
-                                <div>
-                                    <h5 class="mb-1">{{ $companyDetails->company_name ?? '-' }}</h5>
-                                    <p class="text-muted mb-0">
-                                        <i class="uil uil-map-marker"></i>
-                                        {{ $companyDetails->company_province ?? 'ไม่ระบุจังหวัด' }}
-                                    </p>
-                                </div>
-                            </div>
-                            <hr class="border-light">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <p class="mb-1 text-muted fs-14">วันเริ่มใช้งาน</p>
-                                    <h6 class="mb-0">{{ thai_date($companyDetails->start_date) }}</h6>
-                                </div>
-                                <div class="col-sm-6 mt-3 mt-sm-0">
-                                    <p class="mb-1 text-muted fs-14">วันสิ้นสุดการใช้งาน</p>
-                                    <h6 class="mb-0">{{ thai_date($companyDetails->expire_date) }}</h6>
-                                </div>
-                            </div>
+                                        style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+
+                                          <img src="{{ asset('tz.png') }}" alt="Logo"
+                                        class="img-thumbnail me-3 border-0"
+                                        style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+
+                                        <img src="{{ asset('id_inspection.png') }}" alt="Logo"
+                                        class="img-thumbnail me-3 border-0"
+                                        style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+                              
+                            </div>                       
+                            
                         </div>
                     </div>
                 </div>
             </div>
+
+            
         </div>
     </div>
 @endsection

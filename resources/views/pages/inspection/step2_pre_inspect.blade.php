@@ -33,13 +33,103 @@
                         <span class="small text-muted">ขั้นตอนที่ 2 : กรอกข้อมูลก่อนตรวจรถ</span>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
 
+                <form action="{{ route('inspection.storeStep2', $record->record_id) }}" method="POST"
+                    enctype="multipart/form-data" id="step2Form">
+                    @csrf
 
-                        <form action="{{ route('inspection.storeStep2', $record->record_id) }}" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
+                    {{-- ============================================== --}}
+                    {{-- Card 1: Update vehicle info (tax / register / insurance) --}}                   
+                    {{-- ============================================== --}}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">                            
+                                <div>
+                                    <span class="fs-22 fw-bold">
+                                        ทะเบียนรถ: <strong class="text-primary">{{ $vehicle->car_plate ?? '-' }}</strong>
+                                    </span>
+                                </div>
+                            </div>
+                          
+
+                            <div class="row g-3">
+                                {{-- Field 1: Car tax expire date --}}
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-dark mb-1">
+                                       วันหมดอายุภาษี
+                                    </label>
+                                    <input type="text"
+                                        class="form-control date-th-input radius-xs"
+                                        data-hidden-id="real_car_tax"
+                                        placeholder="วว/ดด/ปปปป (พ.ศ.) เช่น 11/02/2570"
+                                        inputmode="numeric"
+                                        maxlength="10">
+                                    <input type="hidden" name="vehicle_info[car_tax]" id="real_car_tax">
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <small class="text-muted">
+                                            ข้อมูลล่าสุด:
+                                            <strong class="text-dark">
+                                                {{ $vehicle->car_tax ? thai_date($vehicle->car_tax) : 'ไม่มีข้อมูล' }}
+                                            </strong>
+                                        </small>
+                                        <div class="fs-12 date-feedback"></div>
+                                    </div>
+                                </div>
+<div class="border-top"></div>
+                                {{-- Field 2: Vehicle register date --}}
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-dark mb-1">
+                                       วันที่จดทะเบียน
+                                    </label>
+                                    <input type="text"
+                                        class="form-control date-th-input radius-xs"
+                                        data-hidden-id="real_car_register_date"
+                                        placeholder="วว/ดด/ปปปป (พ.ศ.) เช่น 15/06/2560"
+                                        inputmode="numeric"
+                                        maxlength="10">
+                                    <input type="hidden" name="vehicle_info[car_register_date]" id="real_car_register_date">
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <small class="text-muted">
+                                            ข้อมูลล่าสุด:
+                                            <strong class="text-dark">
+                                                {{ $vehicle->car_register_date ? thai_date($vehicle->car_register_date) : 'ไม่มีข้อมูล' }}
+                                            </strong>
+                                        </small>
+                                        <div class="fs-12 date-feedback"></div>
+                                    </div>
+                                </div>
+<div class="border-top"></div>
+                                {{-- Field 3: Insurance expire date --}}
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-dark mb-1">
+                                       วันที่ประกันหมดอายุ
+                                    </label>
+                                    <input type="text"
+                                        class="form-control date-th-input radius-xs"
+                                        data-hidden-id="real_car_insurance_expire"
+                                        placeholder="วว/ดด/ปปปป (พ.ศ.) เช่น 20/12/2569"
+                                        inputmode="numeric"
+                                        maxlength="10">
+                                    <input type="hidden" name="vehicle_info[car_insurance_expire]" id="real_car_insurance_expire">
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <small class="text-muted">
+                                            ข้อมูลล่าสุด:
+                                            <strong class="text-dark">
+                                                {{ $vehicle->car_insurance_expire ? thai_date($vehicle->car_insurance_expire) : 'ไม่มีข้อมูล' }}
+                                            </strong>
+                                        </small>
+                                        <div class="fs-12 date-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ============================================== --}}
+                    {{-- Card 2: Pre-inspection fields (existing - unchanged) --}}
+                    {{-- ============================================== --}}
+                    <div class="card">
+                        <div class="card-body">
                             <div class="row g-3 mb-4">
 
                                 @php $imgIndex = 1; @endphp
@@ -102,29 +192,33 @@
                                                 class="form-control radius-xs bg-light border-0" readonly
                                                 placeholder="พิกัดจะปรากฏที่นี่อัตโนมัติ..."
                                                 {{ $field->is_required ? 'required' : '' }}>
-                                           
                                         </div>
                                     @endif
                                 @endforeach
                             </div>
- <div class="border-top my-3"></div>
+
+                            <div class="border-top my-3"></div>
                             <div class="d-flex gap-2">
-                                <button type="submit"
+                                <button type="submit" id="btnNextStep"
                                     class="btn btn-info text-white btn-lg w-100 py-3 fw-bold radius-xs shadow-sm">
                                     ถัดไป <i class="uil uil-arrow-right ms-1"></i>
                                 </button>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+
+                </form>
+
             </div>
         </div>
     </div>
-
-    @push('scripts')
+@endsection
+   @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // จัดการพรีวิวรูปภาพ
+                // ==========================================
+                // Image preview handler (existing - unchanged)
+                // ==========================================
                 document.querySelectorAll('.file-input').forEach(input => {
                     input.addEventListener('change', function(e) {
                         const id = this.getAttribute('data-id');
@@ -142,7 +236,9 @@
                     });
                 });
 
-                // จัดการดึงพิกัด GPS
+                // ==========================================
+                // GPS coordinate fetcher (existing - unchanged)
+                // ==========================================
                 document.querySelectorAll('.get-gps-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const id = this.getAttribute('data-id');
@@ -152,14 +248,11 @@
 
                         if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(function(position) {
-                                input.value = position.coords.latitude + ',' + position.coords
-                                    .longitude;
-                                btn.innerHTML =
-                                    '<i class="uil uil-check"></i> สำเร็จ';
+                                input.value = position.coords.latitude + ',' + position.coords.longitude;
+                                btn.innerHTML = '<i class="uil uil-check"></i> สำเร็จ';
                                 btn.classList.replace('btn-outline-primary', 'btn-success');
                             }, function(error) {
-                                alert(
-                                    'ไม่สามารถดึงตำแหน่งได้ กรุณาเปิด Location Service ของมือถือครับ');
+                                alert('ไม่สามารถดึงตำแหน่งได้ กรุณาเปิด Location Service ของมือถือครับ');
                                 btn.innerHTML = '<i class="uil uil-map-marker"></i> ลองใหม่';
                             });
                         } else {
@@ -169,5 +262,110 @@
                 });
             });
         </script>
+
+        <script>
+            // ==========================================
+            // Thai Buddhist Date Input Handler
+            // Format: dd/mm/yyyy (Buddhist Era) -> auto-converted to Y-m-d (CE) for DB
+            // ==========================================
+            $(document).ready(function() {
+
+                // Helper: validate if date is real (handles Feb, leap year, 30/31 days)
+                function isValidDate(day, month, yearCE) {
+                    const d = new Date(yearCE, month - 1, day);
+                    return d.getFullYear() === yearCE
+                        && (d.getMonth() + 1) === month
+                        && d.getDate() === day;
+                }
+
+                $('.date-th-input').on('input', function(e) {
+                    let input = $(this).val().replace(/[^0-9]/g, '');
+                    let formattedDate = '';
+
+                    // Auto-insert slashes
+                    if (input.length > 2) {
+                        formattedDate += input.substring(0, 2) + '/';
+                        if (input.length > 4) {
+                            formattedDate += input.substring(2, 4) + '/';
+                            formattedDate += input.substring(4, 8);
+                        } else {
+                            formattedDate += input.substring(2);
+                        }
+                    } else {
+                        formattedDate = input;
+                    }
+
+                    $(this).val(formattedDate);
+
+                    // Find paired feedback element + hidden input
+                    let feedback = $(this).closest('.col-12').find('.date-feedback');
+                    let hiddenInputId = $(this).data('hidden-id');
+                    let hiddenInput = $('#' + hiddenInputId);
+
+                    // Empty input = clear (this field is optional)
+                    if (formattedDate.length === 0) {
+                        hiddenInput.val('');
+                        feedback.html('');
+                        $(this).removeClass('is-valid is-invalid');
+                        toggleSubmitButton();
+                        return;
+                    }
+
+                    // Full date entered (10 chars: dd/mm/yyyy)
+                    if (formattedDate.length === 10) {
+                        let parts = formattedDate.split('/');
+                        let day = parseInt(parts[0]);
+                        let month = parseInt(parts[1]);
+                        let yearBE = parseInt(parts[2]);
+
+                        // Validate: year must be Buddhist era (> 2400 to be safe)
+                        if (yearBE < 2400 || yearBE > 2700) {
+                            hiddenInput.val('');
+                            feedback.html('<span class="text-danger"><i class="uil uil-times-circle"></i> ใส่ปี พ.ศ. ให้ถูกต้อง (เช่น 2570)</span>');
+                            $(this).addClass('is-invalid').removeClass('is-valid');
+                            toggleSubmitButton();
+                            return;
+                        }
+
+                        // Convert BE -> CE
+                        let yearCE = yearBE - 543;
+
+                        // Validate real date (catches 31/02, 30/02, 32/13, etc.)
+                        if (!isValidDate(day, month, yearCE)) {
+                            hiddenInput.val('');
+                            feedback.html('<span class="text-danger"><i class="uil uil-times-circle"></i> วันที่ไม่ถูกต้อง</span>');
+                            $(this).addClass('is-invalid').removeClass('is-valid');
+                            toggleSubmitButton();
+                            return;
+                        }
+
+                        // All checks passed - format for DB (Y-m-d)
+                        let dayStr   = String(day).padStart(2, '0');
+                        let monthStr = String(month).padStart(2, '0');
+                        let finalDateForDB = yearCE + '-' + monthStr + '-' + dayStr;
+
+                        hiddenInput.val(finalDateForDB);
+                        feedback.html('<span class="text-success"><i class="uil uil-check-circle"></i> รูปแบบวันที่ถูกต้อง</span>');
+                        $(this).addClass('is-valid').removeClass('is-invalid');
+                    } else {
+                        // Incomplete input (less than 10 chars but not empty)
+                        hiddenInput.val('');
+                        feedback.html('');
+                        $(this).removeClass('is-valid is-invalid');
+                    }
+
+                    toggleSubmitButton();
+                });
+
+                // Disable submit button if any date input is invalid
+                function toggleSubmitButton() {
+                    if ($('.date-th-input.is-invalid').length > 0) {
+                        $('#btnNextStep').attr('disabled', true);
+                    } else {
+                        $('#btnNextStep').attr('disabled', false);
+                    }
+                }
+            });
+        </script>
     @endpush
-@endsection
+

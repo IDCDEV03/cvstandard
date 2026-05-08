@@ -132,7 +132,7 @@
 
                                 <div class="tab-pane fade" id="drivers" role="tabpanel" aria-labelledby="drivers-tab">
                                     <div class="d-flex justify-content-end mb-3">
-                                        <a href="#" class="btn btn-info btn-sm text-white">
+                                        <a href="{{ route('drivers.create') }}" class="btn btn-info btn-sm text-white">
                                             <i class="uil uil-plus"></i> เพิ่มพนักงานขับรถ
                                         </a>
                                     </div>
@@ -152,14 +152,14 @@
                                                 @foreach ($drivers as $driver)
                                                     <tr>
                                                         <td class="text-start">
-                                                            {{ $driver->ins_prefix }}{{ $driver->ins_name }}
-                                                            {{ $driver->ins_lastname }}
+                                                            {{ $driver->prefix }}{{ $driver->name }}
+                                                            {{ $driver->lastname }}
                                                         </td>
-                                                        <td>{{ $driver->ins_phone ?? '-' }}</td>
-                                                        <td>{{ $driver->dl_number ?? '-' }}</td>
+                                                        <td>{{ $driver->phone ?? '-' }}</td>
+                                                        <td>{{ $driver->driver_license_no ?? '-' }}</td>
                                                       
                                                         <td>
-                                                            @if ($driver->ins_status == '1' || $driver->ins_status == 'active')
+                                                            @if ($driver->driver_status == '1' || $driver->driver_status == 'active')
                                                                 <span class="badge bg-success rounded-pill">Active</span>
                                                             @else
                                                                 <span class="badge bg-danger rounded-pill">Inactive</span>
@@ -168,6 +168,12 @@
                                                         <td>
                                                             <ul
                                                                 class="orderDatatable_actions mb-0 d-flex flex-wrap justify-content-center gap-2">
+                                                                <li>
+                                                                    <a href="{{ route('drivers.show', $driver->driver_id) }}"
+                                                            class="view text-info" title="จัดการรถและพนักงาน">
+                                                            <i class="uil uil-eye fs-20"></i>
+                                                        </a>
+                                                                </li>
                                                                 <li><a href="#" class="edit text-warning"><i
                                                                             class="uil uil-edit fs-20"></i></a></li>
                                                                 <li><a href="#" class="remove text-danger"><i

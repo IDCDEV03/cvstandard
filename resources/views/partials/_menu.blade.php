@@ -43,7 +43,11 @@
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับบุคลากร</span>
              @elseif ($role === Role::Company)
+             @php
+                 $company_name = Auth::user()->name;
+             @endphp
                  <span>ระบบตรวจมาตรฐานรถ</span>
+                 <span><i class="far fa-building"></i> {{ $company_name }} </span>
                  <div class="border-top my-3"></div>
                  <span>เมนูสำหรับหน่วยงาน</span>
              @elseif ($role === Role::Supply)
@@ -280,12 +284,7 @@
                      <span class="menu-text">หน้าหลัก</span>
                  </a>
              </li>
-             <li>
-                 <a href="#" class="">
-                     <span class="nav-icon uil uil-truck"></span>
-                     <span class="menu-text">ประกาศ</span>
-                 </a>
-             </li>
+             
              <li>
                  <a href="{{ route('company.supplies.index') }}" class="">
                      <span class="nav-icon uil uil-truck"></span>
@@ -300,23 +299,23 @@
              </li>
 
              <li>
-                 <a href="#" class="">
+                 <a href="{{route('company.vehicles.list')}}" class="">
                      <span class="nav-icon uil uil-truck"></span>
                      <span class="menu-text">รายการรถ</span>
                  </a>
              </li>
 
              <li>
-                 <a href="#" class="">
+                 <a href="{{route('company.vehicles.inform')}}" class="">
                      <span class="nav-icon uil uil-check-circle"></span>
                      <span class="menu-text">รายการตรวจรถ</span>
                  </a>
              </li>
 
              <li>
-                 <a href="#" class="">
+                 <a href="{{route('drivers.index')}}" class="">
                      <span class="nav-icon uil uil-user-md"></span>
-                     <span class="menu-text">รายการช่างตรวจ</span>
+                     <span class="menu-text">รายการพนักงานขับรถ</span>
                  </a>
              </li>
 

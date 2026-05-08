@@ -60,10 +60,16 @@ class CompanyDashboardController extends Controller
 
     public function vehicles_information(Request $request)
     {
-        $companyCode = Auth::user()->user_id;
-        $filter = $request->get('filter', 'all'); // รับค่า filter จาก URL (ค่าเริ่มต้นคือ all)
+        // เปลี่ยนมาใช้ company_code ตามโครงสร้างตาราง vehicles_detail
+        $companyCode = Auth::user()->company_code;
+        $filter = $request->get('filter', 'all');
 
-        // 1. ดึงข้อมูลรถทั้งหมดของบริษัทนี้ พร้อมชื่อ Supply และประเภทรถ
+        // รับค่าจากฟอร์มค้นหา
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $searchStatus = $request->get('evaluate_status');
+
+        // 1. ดึงข้อมูลรถทั้งหมดของบริษัทนี้
         $allVehicles = DB::table('vehicles_detail')
             ->join('vehicle_types', 'vehicles_detail.car_type', '=', 'vehicle_types.id')
             ->leftJoin('supply_datas', 'vehicles_detail.supply_id', '=', 'supply_datas.sup_id')
@@ -71,59 +77,86 @@ class CompanyDashboardController extends Controller
             ->select('vehicles_detail.*', 'vehicle_types.vehicle_type', 'supply_datas.supply_name')
             ->get();
 
-        // ==========================================
-        // 💡 การจัดกลุ่มประวัติ และคำนวณสถิติ
-        // ==========================================
         $passedInspections = 0;
         $waitingInspections = 0;
         $failedInspections = 0;
         $totalInspections = 0;
-
         $filteredVehicles = [];
 
         foreach ($allVehicles as $car) {
-            // ดึงประวัติการตรวจของรถคันนี้ **(ดึงทุกรายการ ไม่สนว่าใครตรวจ)**
-            $history = DB::table('chk_records')
+            // สร้าง Query สำหรับดึงประวัติการตรวจ
+            $historyQuery = DB::table('chk_records')
                 ->where('veh_id', $car->car_id)
-                ->orderBy('created_at', 'desc')
-                ->get();
+                ->orderBy('created_at', 'desc');
 
+            // กรองตามช่วงวันที่ (ถ้ามีการระบุ)
+            if ($startDate && $endDate) {
+                $historyQuery->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            }
+
+            // กรองตามสถานะผลประเมินจากการค้นหา (ถ้ามีการระบุ)
+            if ($searchStatus) {
+                $historyQuery->where('evaluate_status', $searchStatus);
+            }
+
+            $history = $historyQuery->get();
             $car->history = $history;
             $car->inspect_count = $history->count();
             $car->latest_record = $history->first();
 
-            // 📌 นับสถิติจาก "สถานะล่าสุด" ของรถแต่ละคัน (ต้องตรวจเสร็จแล้ว)
+            //  นับสถิติจาก "สถานะล่าสุด" ของข้อมูลที่ถูกกรองแล้ว
             if ($car->latest_record && $car->latest_record->chk_status == '1') {
                 $totalInspections++;
-
-                if ($car->latest_record->evaluate_status == 1) {
-                    $passedInspections++;
-                } elseif ($car->latest_record->evaluate_status == 2) {
-                    $waitingInspections++;
-                } elseif ($car->latest_record->evaluate_status == 3) {
-                    $failedInspections++;
-                }
+                if ($car->latest_record->evaluate_status == 1) $passedInspections++;
+                elseif ($car->latest_record->evaluate_status == 2) $waitingInspections++;
+                elseif ($car->latest_record->evaluate_status == 3) $failedInspections++;
             }
 
-            // 📌 กรองรถเข้าตาราง ตามปุ่มที่กด
+            //  กรองรถเข้าตาราง
             $shouldInclude = false;
-            if ($filter == 'all') {
-                $shouldInclude = true;
-            } elseif ($car->latest_record && $car->latest_record->chk_status == '1') {
-                if ($filter == 'passed' && $car->latest_record->evaluate_status == 1) {
+
+            // กรณีไม่มีการค้นหา (โชว์ตามปุ่ม filter ปกติ)
+            if (!$startDate && !$endDate && !$searchStatus) {
+                if ($filter == 'all') {
                     $shouldInclude = true;
-                } elseif ($filter == 'waiting' && $car->latest_record->evaluate_status == 2) {
-                    $shouldInclude = true;
-                } elseif ($filter == 'failed' && $car->latest_record->evaluate_status == 3) {
+                } elseif ($car->latest_record && $car->latest_record->chk_status == '1') {
+                    if ($filter == 'passed' && $car->latest_record->evaluate_status == 1) $shouldInclude = true;
+                    elseif ($filter == 'waiting' && $car->latest_record->evaluate_status == 2) $shouldInclude = true;
+                    elseif ($filter == 'failed' && $car->latest_record->evaluate_status == 3) $shouldInclude = true;
+                }
+            } else {
+                // กรณีมีการค้นหา: ถ้ามีประวัติการตรวจที่ตรงกับเงื่อนไขการค้นหา ให้แสดงรถคันนั้น
+                if ($car->inspect_count > 0) {
                     $shouldInclude = true;
                 }
             }
 
-            // ถ้ารถคันนี้ตรงกับ Filter ค่อยเอาใส่ Array ไปแสดง
             if ($shouldInclude) {
                 $filteredVehicles[] = $car;
             }
         }
+
+        // ==========================================
+        // 💡 เพิ่มส่วนการเรียงลำดับ (Sorting)
+        // ==========================================
+        usort($filteredVehicles, function ($a, $b) {
+            // ดึงวันที่ตรวจล่าสุดออกมา ถ้าไม่มีให้เป็น null
+            $dateA = $a->latest_record ? $a->latest_record->created_at : null;
+            $dateB = $b->latest_record ? $b->latest_record->created_at : null;
+
+            // กรณีที่ไม่มีข้อมูลการตรวจทั้งคู่ ให้คงลำดับเดิม
+            if ($dateA == $dateB) return 0;
+
+            // ถ้ารถคัน A ไม่มีข้อมูลการตรวจ (null) ให้เอาคัน A ไปไว้ข้างหลัง (return 1)
+            if (is_null($dateA)) return 1;
+
+            // ถ้ารถคัน B ไม่มีข้อมูลการตรวจ (null) ให้เอาคัน A ไว้ข้างหน้า (return -1)
+            if (is_null($dateB)) return -1;
+
+            // เปรียบเทียบวันที่ (เรียงจากใหม่ไปเก่า - Descending Order)
+            return $dateA < $dateB ? 1 : -1;
+        });
+
 
         $vehicles = $filteredVehicles;
 

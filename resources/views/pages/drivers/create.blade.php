@@ -21,7 +21,7 @@
 
                  <div class="card mb-50">
                      <div class="card-body">
-                         <form action="{{ route('drivers.store') }}" method="POST">
+                         <form action="{{ route('drivers.store') }}" method="POST" enctype="multipart/form-data">
                              @csrf
                              <div class="row">
                                  <!-- ข้อมูลส่วนตัว -->
@@ -134,6 +134,263 @@
                                          <div class="fs-12 mt-1 date-feedback"></div>
                                      </div>
 
+                                     {{-- ===== Driver Documents Section ===== --}}
+                                     <div class="col-md-12 mb-3">
+                                         <label class="form-label fw-500">เอกสารประจำตัวพนักงาน</label>
+                                         <p class="text-muted fs-13 mb-3">
+                                             เลือกอัปโหลดเอกสารที่มี —
+                                             รองรับ <strong>PDF</strong> และ <strong>DOCX</strong> ขนาดสูงสุด 10 MB ต่อไฟล์
+                                         </p>
+
+                                         {{-- 4 preset slots --}}
+                                         <div class="row g-3 mb-3">
+
+                                             {{-- 1. ใบรับรองแพทย์ --}}
+                                             <div class="col-md-6">
+                                                 <div class="border rounded p-3 h-100" id="slot-medical">
+                                                     <div class="d-flex align-items-start gap-3">
+                                                         <div class="slot-icon bg-success-transparent rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                             style="width:38px;height:38px">
+                                                             <i class="fa fa-stethoscope text-success"
+                                                                 aria-hidden="true"></i>
+
+                                                         </div>
+                                                         <div class="flex-grow-1 min-w-0">
+                                                             <div class="d-flex align-items-center gap-2 mb-1">
+                                                                 <span class="fw-500 fs-14">ใบรับรองแพทย์</span>
+                                                                 <span
+                                                                     class="dm-tag tag-success tag-transparented">ถ้ามี</span>
+                                                             </div>
+                                                             <p class="text-muted fs-12 mb-2">PDF / DOCX · สูงสุด 10 MB</p>
+
+                                                             {{-- ปุ่มเลือกไฟล์ (แสดงตอนยังไม่มีไฟล์) --}}
+                                                             <button type="button"
+                                                                 class="btn btn-outline-secondary btn-sm btn-slot-pick"
+                                                                 data-slot="medical">
+                                                                 <i class="fa fa-upload" aria-hidden="true"></i> เลือกไฟล์
+                                                             </button>
+                                                             <input type="file" name="doc_medical" accept=".pdf,.docx"
+                                                                 class="d-none slot-file-input" data-slot="medical">
+
+                                                             {{-- preview (ซ่อนไว้ก่อน) --}}
+                                                             <div class="slot-preview d-none mt-2" data-slot="medical">
+                                                                 <div
+                                                                     class="d-flex align-items-center gap-2 p-2 rounded alert alert-info">
+                                                                     <i class="slot-file-icon fs-16 flex-shrink-0"></i>
+                                                                     <span
+                                                                         class="slot-file-name fs-13 text-truncate flex-grow-1"></span>
+                                                                     <span
+                                                                         class="slot-file-size fs-12 text-muted flex-shrink-0"></span>
+                                                                     <button type="button"
+                                                                         class="btn-slot-clear btn btn-sm p-0 text-muted ms-1"
+                                                                         data-slot="medical" style="line-height:1">
+                                                                         <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                     </button>
+                                                                 </div>
+                                                                 <p class="text-success fs-12 mt-1 mb-0">
+                                                                     <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                                                     พร้อมอัปโหลด
+                                                                 </p>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                             {{-- 2. สำเนาใบขับขี่ --}}
+                                             <div class="col-md-6">
+                                                 <div class="border rounded p-3 h-100" id="slot-license">
+                                                     <div class="d-flex align-items-start gap-3">
+                                                         <div class="slot-icon bg-primary-transparent rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                             style="width:38px;height:38px">
+                                                             <i class="fa fa-id-badge text-primary"></i>
+                                                         </div>
+                                                         <div class="flex-grow-1 min-w-0">
+                                                             <div class="d-flex align-items-center gap-2 mb-1">
+                                                                 <span class="fw-500 fs-14">สำเนาใบขับขี่</span>
+                                                                 <span
+                                                                     class="dm-tag tag-success tag-transparented">ถ้ามี</span>
+                                                             </div>
+                                                             <p class="text-muted fs-12 mb-2">PDF / DOCX · สูงสุด 10 MB</p>
+
+                                                             <button type="button"
+                                                                 class="btn btn-outline-secondary btn-sm btn-slot-pick"
+                                                                 data-slot="license">
+                                                                 <i class="fa fa-upload me-1" aria-hidden="true"></i>
+                                                                 เลือกไฟล์
+                                                             </button>
+                                                             <input type="file" name="doc_license" accept=".pdf,.docx"
+                                                                 class="d-none slot-file-input" data-slot="license">
+
+                                                             <div class="slot-preview d-none mt-2" data-slot="license">
+                                                                 <div
+                                                                     class="d-flex align-items-center gap-2 p-2 rounded alert alert-info">
+                                                                     <i class="slot-file-icon fs-16 flex-shrink-0"></i>
+                                                                     <span
+                                                                         class="slot-file-name fs-13 text-truncate flex-grow-1"></span>
+                                                                     <span
+                                                                         class="slot-file-size fs-12 text-muted flex-shrink-0"></span>
+                                                                     <button type="button"
+                                                                         class="btn-slot-clear btn btn-sm p-0 text-muted ms-1"
+                                                                         data-slot="license" style="line-height:1">
+                                                                         <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                     </button>
+                                                                 </div>
+                                                                 <p class="text-success fs-12 mt-1 mb-0">
+                                                                     <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                                                     พร้อมอัปโหลด
+                                                                 </p>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                             {{-- 3. สำเนาบัตรประชาชน --}}
+                                             <div class="col-md-6">
+                                                 <div class="border rounded p-3 h-100" id="slot-idcard">
+                                                     <div class="d-flex align-items-start gap-3">
+                                                         <div class="slot-icon bg-info-transparent rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                             style="width:38px;height:38px">
+                                                             <i class="fa fa-id-card text-info"></i>
+                                                         </div>
+                                                         <div class="flex-grow-1 min-w-0">
+                                                             <div class="d-flex align-items-center gap-2 mb-1">
+                                                                 <span class="fw-500 fs-14">สำเนาบัตรประชาชน</span>
+                                                                 <span
+                                                                     class="dm-tag tag-success tag-transparented">ถ้ามี</span>
+                                                             </div>
+                                                             <p class="text-muted fs-12 mb-2">PDF / DOCX · สูงสุด 10 MB</p>
+
+                                                             <button type="button"
+                                                                 class="btn btn-outline-secondary btn-sm btn-slot-pick"
+                                                                 data-slot="idcard">
+                                                                 <i class="fa fa-upload me-1" aria-hidden="true"></i>
+                                                                 เลือกไฟล์
+                                                             </button>
+                                                             <input type="file" name="doc_idcard" accept=".pdf,.docx"
+                                                                 class="d-none slot-file-input" data-slot="idcard">
+
+                                                             <div class="slot-preview d-none mt-2" data-slot="idcard">
+                                                                 <div
+                                                                     class="d-flex align-items-center gap-2 p-2 rounded alert alert-info">
+                                                                     <i class="slot-file-icon fs-16 flex-shrink-0"></i>
+                                                                     <span
+                                                                         class="slot-file-name fs-13 text-truncate flex-grow-1"></span>
+                                                                     <span
+                                                                         class="slot-file-size fs-12 text-muted flex-shrink-0"></span>
+                                                                     <button type="button"
+                                                                         class="btn-slot-clear btn btn-sm p-0 text-muted ms-1"
+                                                                         data-slot="idcard" style="line-height:1">
+                                                                         <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                     </button>
+                                                                 </div>
+                                                                 <p class="text-success fs-12 mt-1 mb-0">
+                                                                     <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                                                     พร้อมอัปโหลด
+                                                                 </p>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                             {{-- 4. Certificate การอบรม --}}
+                                             <div class="col-md-6">
+                                                 <div class="border rounded p-3 h-100" id="slot-cert">
+                                                     <div class="d-flex align-items-start gap-3">
+                                                         <div class="slot-icon bg-warning-transparent rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                             style="width:38px;height:38px">
+                                                             <i class="fa fa-certificate text-warning"></i>
+                                                         </div>
+                                                         <div class="flex-grow-1 min-w-0">
+                                                             <div class="d-flex align-items-center gap-2 mb-1">
+                                                                 <span class="fw-500 fs-14">Certificate การอบรม</span>
+                                                                 <span
+                                                                     class="dm-tag tag-success tag-transparented">ถ้ามี</span>
+                                                             </div>
+                                                             <p class="text-muted fs-12 mb-2">PDF / DOCX · สูงสุด 10 MB</p>
+
+                                                             <button type="button"
+                                                                 class="btn btn-outline-secondary btn-sm btn-slot-pick"
+                                                                 data-slot="cert">
+                                                                 <i class="fa fa-upload me-1" aria-hidden="true"></i>
+                                                                 เลือกไฟล์
+                                                             </button>
+                                                             <input type="file" name="doc_cert" accept=".pdf,.docx"
+                                                                 class="d-none slot-file-input" data-slot="cert">
+
+                                                             <div class="slot-preview d-none mt-2" data-slot="cert">
+                                                                 <div
+                                                                     class="d-flex align-items-center gap-2 p-2 rounded alert alert-info">
+                                                                     <i class="slot-file-icon fs-16 flex-shrink-0"></i>
+                                                                     <span
+                                                                         class="slot-file-name fs-13 text-truncate flex-grow-1"></span>
+                                                                     <span
+                                                                         class="slot-file-size fs-12 text-muted flex-shrink-0"></span>
+                                                                     <button type="button"
+                                                                         class="btn-slot-clear btn btn-sm p-0 text-muted ms-1"
+                                                                         data-slot="cert" style="line-height:1">
+                                                                         <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                     </button>
+                                                                 </div>
+                                                                 <p class="text-success fs-12 mt-1 mb-0">
+                                                                     <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                                                     พร้อมอัปโหลด
+                                                                 </p>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                         </div>{{-- end .row --}}
+
+                                         {{-- เอกสารอื่นๆ --}}
+                                         <div class="border rounded p-3">
+                                             <div class="d-flex align-items-center gap-2 mb-2">
+                                                 <i class="fa fa-paperclip text-muted"></i>
+                                                 <span class="fw-500 fs-14">เอกสารอื่นๆ</span>
+                                                 <span class="dm-tag tag-success tag-transparented">ถ้ามี</span>
+                                             </div>
+                                             <div class="d-flex gap-2 align-items-start">
+                                                 <input type="text" id="extra-doc-name" name="doc_other_name"
+                                                     class="form-control form-control-sm"
+                                                     placeholder="ระบุชื่อเอกสาร เช่น สัญญาจ้าง" maxlength="200"
+                                                     style="max-width:280px">
+                                                 <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                     id="btn-extra-pick">
+                                                     <i class="fa fa-upload me-1" aria-hidden="true"></i> เลือกไฟล์
+                                                 </button>
+                                                 <input type="file" name="doc_other" accept=".pdf,.docx"
+                                                     class="d-none" id="extra-file-input">
+                                             </div>
+                                             <p class="text-muted fs-12 mt-1 mb-2">
+                                                 <i class="ti ti-info-circle me-1"></i>กรอกชื่อเอกสารก่อน แล้วจึงเลือกไฟล์
+                                             </p>
+
+                                             {{-- preview เอกสารอื่นๆ --}}
+                                             <div id="extra-preview" class="d-none">
+                                                 <div class="d-flex align-items-center gap-2 p-2 rounded alert alert-info">
+                                                     <i id="extra-file-icon" class="fs-16 flex-shrink-0"></i>
+                                                     <span id="extra-file-name"
+                                                         class="fs-13 text-truncate flex-grow-1"></span>
+                                                     <span id="extra-file-size"
+                                                         class="fs-12 text-muted flex-shrink-0"></span>
+                                                     <button type="button" id="btn-extra-clear"
+                                                         class="btn btn-sm p-0 text-muted ms-1" style="line-height:1">
+                                                         <i class="fa fa-trash" aria-hidden="true"></i>
+                                                     </button>
+                                                 </div>
+                                                 <p class="text-success fs-12 mt-1 mb-0">
+                                                     <i class="fa fa-check-circle" aria-hidden="true"></i> พร้อมอัปโหลด
+                                                 </p>
+                                             </div>
+                                         </div>
+
+                                     </div>
+                                     {{-- ===== End Driver Documents Section ===== --}}
+
                                      <div class="col-md-12 mb-3">
                                          <label class="form-label">หมายเหตุเพิ่มเติม</label>
                                          <textarea name="remark" class="form-control" rows="3"></textarea>
@@ -155,66 +412,70 @@
  @push('scripts')
      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-$(document).ready(function() {
-    // ใช้ Class .date-th-input เพื่อรองรับหลายๆ ช่องในหน้าเดียว
-    $('.date-th-input').on('input', function(e) {
-        let input = $(this).val().replace(/[^0-9]/g, ''); 
-        let formattedDate = '';
-        
-        // เติม Slash (/) อัตโนมัติ
-        if (input.length > 2) {
-            formattedDate += input.substring(0, 2) + '/';
-            if (input.length > 4) {
-                formattedDate += input.substring(2, 4) + '/';
-                formattedDate += input.substring(4, 8);
-            } else {
-                formattedDate += input.substring(2);
-            }
-        } else {
-            formattedDate = input;
-        }
-        
-        $(this).val(formattedDate);
-        
-        // ค้นหาช่องแจ้งเตือนและช่องซ่อนที่ "อยู่คู่กับช่องที่กำลังพิมพ์"
-        let feedback = $(this).siblings('.date-feedback');
-        let hiddenInputId = $(this).data('hidden-id');
-        let hiddenInput = $('#' + hiddenInputId);
+     <script>
+         $(document).ready(function() {
+             // ใช้ Class .date-th-input เพื่อรองรับหลายๆ ช่องในหน้าเดียว
+             $('.date-th-input').on('input', function(e) {
+                 let input = $(this).val().replace(/[^0-9]/g, '');
+                 let formattedDate = '';
 
-        if (formattedDate.length === 10) {
-            let parts = formattedDate.split('/');
-            let day = parts[0];
-            let month = parts[1];
-            let yearBE = parseInt(parts[2]);
+                 // เติม Slash (/) อัตโนมัติ
+                 if (input.length > 2) {
+                     formattedDate += input.substring(0, 2) + '/';
+                     if (input.length > 4) {
+                         formattedDate += input.substring(2, 4) + '/';
+                         formattedDate += input.substring(4, 8);
+                     } else {
+                         formattedDate += input.substring(2);
+                     }
+                 } else {
+                     formattedDate = input;
+                 }
 
-            if(yearBE > 2500) {
-                let yearCE = yearBE - 543;
-                let finalDateForDB = yearCE + '-' + month + '-' + day;
-                
-                hiddenInput.val(finalDateForDB);
-                feedback.html('<span class="text-success"><i class="uil uil-check-circle"></i> รูปแบบวันที่ถูกต้อง </span>');
-                $(this).addClass('is-valid').removeClass('is-invalid');
-            } else {
-                hiddenInput.val('');
-                feedback.html('<span class="text-danger"><i class="uil uil-times-circle"></i> ใส่ปี พ.ศ. ให้ถูกต้อง</span>');
-                $(this).addClass('is-invalid').removeClass('is-valid');
-            }
-        } else {
-            hiddenInput.val('');
-            feedback.html('');
-            $(this).removeClass('is-valid is-invalid');
-        }
+                 $(this).val(formattedDate);
 
-        // submit
-        if($('.is-invalid').length > 0) {
-            $('button[type="submit"]').attr('disabled', true);
-        } else {
-            $('button[type="submit"]').attr('disabled', false);
-        }
-    });
-});
-</script>
+                 // ค้นหาช่องแจ้งเตือนและช่องซ่อนที่ "อยู่คู่กับช่องที่กำลังพิมพ์"
+                 let feedback = $(this).siblings('.date-feedback');
+                 let hiddenInputId = $(this).data('hidden-id');
+                 let hiddenInput = $('#' + hiddenInputId);
+
+                 if (formattedDate.length === 10) {
+                     let parts = formattedDate.split('/');
+                     let day = parts[0];
+                     let month = parts[1];
+                     let yearBE = parseInt(parts[2]);
+
+                     if (yearBE > 2500) {
+                         let yearCE = yearBE - 543;
+                         let finalDateForDB = yearCE + '-' + month + '-' + day;
+
+                         hiddenInput.val(finalDateForDB);
+                         feedback.html(
+                             '<span class="text-success"><i class="uil uil-check-circle"></i> รูปแบบวันที่ถูกต้อง </span>'
+                         );
+                         $(this).addClass('is-valid').removeClass('is-invalid');
+                     } else {
+                         hiddenInput.val('');
+                         feedback.html(
+                             '<span class="text-danger"><i class="uil uil-times-circle"></i> ใส่ปี พ.ศ. ให้ถูกต้อง</span>'
+                         );
+                         $(this).addClass('is-invalid').removeClass('is-valid');
+                     }
+                 } else {
+                     hiddenInput.val('');
+                     feedback.html('');
+                     $(this).removeClass('is-valid is-invalid');
+                 }
+
+                 // submit
+                 if ($('.is-invalid').length > 0) {
+                     $('button[type="submit"]').attr('disabled', true);
+                 } else {
+                     $('button[type="submit"]').attr('disabled', false);
+                 }
+             });
+         });
+     </script>
      <script>
          $(document).ready(function() {
              // 1. เรียกใช้งาน Select2
@@ -319,5 +580,116 @@ $(document).ready(function() {
                  checkDuplicate($(this), $('#license-feedback'), 'driver_license_no');
              });
          });
+     </script>
+     <script>
+         (function() {
+             const MAX_BYTES = 10 * 1024 * 1024;
+             const EXT_RE = /\.(pdf|docx)$/i;
+
+             // --- helper: format bytes ---
+             function fmtSize(bytes) {
+                 if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                 return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+             }
+
+             // --- helper: icon class by extension ---
+             function iconClass(filename) {
+                 return /\.pdf$/i.test(filename) ?
+                     'ti ti-file-type-pdf text-danger' :
+                     'ti ti-file-type-doc text-primary';
+             }
+
+             // --- validate file ---
+             function validate(file) {
+                 if (!EXT_RE.test(file.name)) {
+                     Swal.fire('ประเภทไฟล์ไม่ถูกต้อง', 'รองรับเฉพาะ PDF และ DOCX เท่านั้น', 'warning');
+                     return false;
+                 }
+                 if (file.size > MAX_BYTES) {
+                     Swal.fire('ไฟล์ใหญ่เกินไป', 'ขนาดไฟล์ต้องไม่เกิน 10 MB', 'warning');
+                     return false;
+                 }
+                 return true;
+             }
+
+             // ==========================================
+             // Preset slots (medical / license / idcard / cert)
+             // ==========================================
+             document.querySelectorAll('.btn-slot-pick').forEach(function(btn) {
+                 btn.addEventListener('click', function() {
+                     var slot = this.dataset.slot;
+                     document.querySelector('.slot-file-input[data-slot="' + slot + '"]').click();
+                 });
+             });
+
+             document.querySelectorAll('.slot-file-input').forEach(function(input) {
+                 input.addEventListener('change', function() {
+                     var slot = this.dataset.slot;
+                     var file = this.files[0];
+                     if (!file) return;
+                     if (!validate(file)) {
+                         this.value = '';
+                         return;
+                     }
+
+                     var preview = document.querySelector('.slot-preview[data-slot="' + slot + '"]');
+                     preview.querySelector('.slot-file-icon').className = iconClass(file.name) +
+                         ' slot-file-icon fs-16 flex-shrink-0';
+                     preview.querySelector('.slot-file-name').textContent = file.name;
+                     preview.querySelector('.slot-file-size').textContent = fmtSize(file.size);
+
+                     // ซ่อนปุ่ม แสดง preview
+                     document.querySelector('.btn-slot-pick[data-slot="' + slot + '"]').classList.add(
+                         'd-none');
+                     preview.classList.remove('d-none');
+                 });
+             });
+
+             document.querySelectorAll('.btn-slot-clear').forEach(function(btn) {
+                 btn.addEventListener('click', function() {
+                     var slot = this.dataset.slot;
+                     var input = document.querySelector('.slot-file-input[data-slot="' + slot + '"]');
+                     input.value = '';
+
+                     document.querySelector('.slot-preview[data-slot="' + slot + '"]').classList.add(
+                         'd-none');
+                     document.querySelector('.btn-slot-pick[data-slot="' + slot + '"]').classList.remove(
+                         'd-none');
+                 });
+             });
+
+             // ==========================================
+             // Extra slot (เอกสารอื่นๆ)
+             // ==========================================
+             document.getElementById('btn-extra-pick').addEventListener('click', function() {
+                 var docName = document.getElementById('extra-doc-name').value.trim();
+                 if (!docName) {
+                     Swal.fire('แจ้งเตือน', 'กรุณากรอกชื่อเอกสารก่อนเลือกไฟล์', 'info');
+                     return;
+                 }
+                 document.getElementById('extra-file-input').click();
+             });
+
+             document.getElementById('extra-file-input').addEventListener('change', function() {
+                 var file = this.files[0];
+                 if (!file) return;
+                 if (!validate(file)) {
+                     this.value = '';
+                     return;
+                 }
+
+                 document.getElementById('extra-file-icon').className = iconClass(file.name) +
+                     ' fs-16 flex-shrink-0';
+                 document.getElementById('extra-file-name').textContent = file.name;
+                 document.getElementById('extra-file-size').textContent = fmtSize(file.size);
+                 document.getElementById('extra-preview').classList.remove('d-none');
+             });
+
+             document.getElementById('btn-extra-clear').addEventListener('click', function() {
+                 document.getElementById('extra-file-input').value = '';
+                 document.getElementById('extra-preview').classList.add('d-none');
+             });
+
+         })();
      </script>
  @endpush
