@@ -33,11 +33,7 @@
                         <h6 class="fw-500">
                             <i class="uil uil-truck me-2 color-primary"></i>สถานะรถบรรทุก 2569
                         </h6>
-                        <div class="card-extra">
-                            <a href="#" class="btn btn-sm btn-primary btn-outlined radius-xs fs-13 fw-500">
-                                <i class="uil uil-list-ul me-1"></i>รายละเอียด
-                            </a>
-                        </div>
+                        
                     </div>
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -86,11 +82,7 @@
                         <h6 class="fw-500">
                             <i class="uil uil-user-circle me-2 color-success"></i>พนักงานขับรถ
                         </h6>
-                        <div class="card-extra">
-                            <a href="#" class="btn btn-sm btn-success btn-outlined radius-xs fs-13 fw-500">
-                                <i class="uil uil-list-ul me-1"></i>รายละเอียด
-                            </a>
-                        </div>
+                       
                     </div>
                     <div class="card-body">
                         <div class="row align-items-center">
