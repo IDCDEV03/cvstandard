@@ -21,135 +21,145 @@
             </div>
         </div>
 
-{{-- ─────────────────────────────────────────
+        {{-- ─────────────────────────────────────────
     Donut Charts Row
 ───────────────────────────────────────── --}}
-<div class="row mb-25">
+        <div class="row mb-25">
 
-    {{-- Vehicle Chart Card --}}
-    <div class="col-xxl-6 col-lg-6 col-12 mb-25">
-        <div class="card border-0 box-shadow-none">
-            <div class="card-header">
-                <h6 class="fw-500">
-                    <i class="uil uil-truck me-2 color-primary"></i>สถานะรถบรรทุก
-                </h6>
-                <div class="card-extra">
-                    <a href="#"
-                       class="btn btn-sm btn-primary btn-outlined radius-xs fs-13 fw-500">
-                        <i class="uil uil-list-ul me-1"></i>รายละเอียด
-                    </a>
+            {{-- Vehicle Chart Card --}}
+            <div class="col-xxl-6 col-lg-6 col-12 mb-25">
+                <div class="card border-0 box-shadow-none">
+                    <div class="card-header">
+                        <h6 class="fw-500">
+                            <i class="uil uil-truck me-2 color-primary"></i>สถานะรถบรรทุก
+                        </h6>
+                        <div class="card-extra">
+                            <a href="#" class="btn btn-sm btn-primary btn-outlined radius-xs fs-13 fw-500">
+                                <i class="uil uil-list-ul me-1"></i>รายละเอียด
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-sm-5 text-center">
+                                <div id="vehicle-chart"></div>
+                                <p class="fs-13 color-gray mt-10 mb-0">จำนวนรถทั้งหมด <strong
+                                        class="color-dark">{{ $totalVehicles }} คัน</strong></p>
+                            </div>
+                            <div class="col-sm-7">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bullet bullet-sm bg-primary me-10 rounded-circle"></span>
+                                            <span class="fs-13 color-gray">จำนวนรถที่ตรวจ</span>
+                                        </div>
+                                        <span class="fs-14 fw-600 color-primary">{{ $totalInspected }} <small
+                                                class="fw-400 color-gray">คัน</small></span>
+                                    </li>
+                                    <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bullet bullet-sm bg-success me-10 rounded-circle"></span>
+                                            <a href="#" class="fs-13 color-gray text-decoration-none">ตรวจผ่าน</a>
+                                        </div>
+                                        <span class="fs-14 fw-600 color-success">{{ $passCount }} <small
+                                                class="fw-400 color-gray">{{ $passPercent }}%</small></span>
+                                    </li>
+                                    <li class="d-flex align-items-center justify-content-between py-10">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bullet bullet-sm bg-danger me-10 rounded-circle"></span>
+                                            <a href="#" class="fs-13 color-gray text-decoration-none">ตรวจไม่ผ่าน</a>
+                                        </div>
+                                        <span class="fs-14 fw-600 color-danger">{{ $failCount }} <small
+                                                class="fw-400 color-gray">{{ $failPercent }}%</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-sm-5 text-center">
-                        <div id="vehicle-chart"></div>
-                        <p class="fs-13 color-gray mt-10 mb-0">จำนวนรถทั้งหมด <strong class="color-dark">{{ $totalVehicles }} คัน</strong></p>
+
+            {{-- Driver Chart Card --}}
+            <div class="col-xxl-6 col-lg-6 col-12 mb-25">
+                <div class="card border-0 box-shadow-none">
+                    <div class="card-header">
+                        <h6 class="fw-500">
+                            <i class="uil uil-user-circle me-2 color-success"></i>พนักงานขับรถ
+                        </h6>
+                        <div class="card-extra">
+                            <a href="#" class="btn btn-sm btn-success btn-outlined radius-xs fs-13 fw-500">
+                                <i class="uil uil-list-ul me-1"></i>รายละเอียด
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-sm-7">
-                        <ul class="list-unstyled mb-0">
-                            <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
-                                <div class="d-flex align-items-center">
-                                    <span class="bullet bullet-sm bg-primary me-10 rounded-circle"></span>
-                                    <span class="fs-13 color-gray">จำนวนรถที่ตรวจ</span>
-                                </div>
-                                <span class="fs-14 fw-600 color-primary">{{ $totalInspected }} <small class="fw-400 color-gray">คัน</small></span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
-                                <div class="d-flex align-items-center">
-                                    <span class="bullet bullet-sm bg-success me-10 rounded-circle"></span>
-                                    <a href="#" class="fs-13 color-gray text-decoration-none">ตรวจผ่าน</a>
-                                </div>
-                                <span class="fs-14 fw-600 color-success">{{ $passCount }} <small class="fw-400 color-gray">{{ $passPercent }}%</small></span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between py-10">
-                                <div class="d-flex align-items-center">
-                                    <span class="bullet bullet-sm bg-danger me-10 rounded-circle"></span>
-                                    <a href="#" class="fs-13 color-gray text-decoration-none">ตรวจไม่ผ่าน</a>
-                                </div>
-                                <span class="fs-14 fw-600 color-danger">{{ $failCount }} <small class="fw-400 color-gray">{{ $failPercent }}%</small>
-                            </li>
-                        </ul>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-sm-5 text-center">
+                                <div id="driver-chart"></div>
+                                <p class="fs-13 color-gray mt-10 mb-0">
+                                    จำนวนพนักงานทั้งหมด
+                                    <strong class="color-dark">{{ $totalDrivers }} คน</strong>
+                                </p>
+                            </div>
+                            <div class="col-sm-7">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bullet bullet-sm bg-info me-10 rounded-circle"></span>
+                                            <span class="fs-13 color-gray">พนักงานขับรถ</span>
+                                        </div>
+                                        <span class="fs-14 fw-600 color-info">
+                                            {{ $totalDrivers }}
+                                            <small class="fw-400 color-gray">คน</small>
+                                        </span>
+                                    </li>
+                                    <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bullet bullet-sm bg-success me-10 rounded-circle"></span>
+                                            <span class="fs-13 color-gray">ผ่านการอบรม</span>
+                                        </div>
+                                        <span class="fs-14 fw-600 color-success">
+                                            {{ $certDriverIds }}
+                                            <small class="fw-400 color-gray">{{ $certPercent }}%</small>
+                                        </span>
+                                    </li>
+                                    <li class="d-flex align-items-center justify-content-between py-10">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bullet bullet-sm bg-danger me-10 rounded-circle"></span>
+                                            <span class="fs-13 color-gray">ไม่มีข้อมูล</span>
+                                        </div>
+                                        <span class="fs-14 fw-600 color-danger">
+                                            {{ $noCertDrivers }}
+                                            <small class="fw-400 color-gray">{{ $noPercent }}%</small>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {{-- Driver Chart Card --}}
-    <div class="col-xxl-6 col-lg-6 col-12 mb-25">
-        <div class="card border-0 box-shadow-none">
-            <div class="card-header">
-                <h6 class="fw-500">
-                    <i class="uil uil-user-circle me-2 color-success"></i>สถานะพนักงานขับรถ
-                </h6>
-                <div class="card-extra">
-                    <a href="#"
-                       class="btn btn-sm btn-success btn-outlined radius-xs fs-13 fw-500">
-                        <i class="uil uil-list-ul me-1"></i>รายละเอียด
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-sm-5 text-center">
-                        <div id="driver-chart"></div>
-                        <p class="fs-13 color-gray mt-10 mb-0">จำนวนพนักงานทั้งหมด <strong class="color-dark">44 คน</strong></p>
-                    </div>
-                    <div class="col-sm-7">
-                        <ul class="list-unstyled mb-0">
-                            <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
-                                <div class="d-flex align-items-center">
-                                    <span class="bullet bullet-sm bg-info me-10 rounded-circle"></span>
-                                    <span class="fs-13 color-gray">พนักงานขับรถ</span>
-                                </div>
-                                <span class="fs-14 fw-600 color-info">44 <small class="fw-400 color-gray">คน</small></span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between py-10 border-bottom">
-                                <div class="d-flex align-items-center">
-                                    <span class="bullet bullet-sm bg-success me-10 rounded-circle"></span>
-                                    <a href="#" class="fs-13 color-gray text-decoration-none">ผ่านการอบรม</a>
-                                </div>
-                                <span class="fs-14 fw-600 color-success">37 <small class="fw-400 color-gray">84%</small></span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between py-10">
-                                <div class="d-flex align-items-center">
-                                    <span class="bullet bullet-sm bg-danger me-10 rounded-circle"></span>
-                                    <a href="#" class="fs-13 color-gray text-decoration-none">ไม่ผ่านการอบรม</a>
-                                </div>
-                                <span class="fs-14 fw-600 color-danger">7 <small class="fw-400 color-gray">16%</small></span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- ─────────────────────────────────────────
+        {{-- ─────────────────────────────────────────
     Action Buttons
 ───────────────────────────────────────── --}}
-<div class="row mb-3">
-    <div class="col-12 d-flex justify-content-center gap-10 flex-wrap">
-        <a href="{{route('company.vehicles.inform')}}"
-           class="btn btn-primary btn-default btn-squared fs-16">
-            <i class="uil uil-clipboard-alt me-2"></i>รายการทั้งหมด
-        </a>
-        <a href="#"
-           class="btn btn-success btn-default btn-squared fs-16">
-            <i class="uil uil-check me-2"></i>รถตรวจผ่าน
-        </a>
-        <a href="#"
-           class="btn btn-warning btn-default btn-squared fs-16">
-            <i class="uil uil-clock me-2"></i>รอตรวจอีกครั้ง
-        </a>
-        <a href="#"
-           class="btn btn-danger btn-default btn-squared fs-16">
-            <i class="uil uil-times me-2"></i>รถที่ตรวจไม่ผ่าน
-        </a>
-    </div>
-</div>
+        <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-center gap-10 flex-wrap">
+                <a href="{{ route('company.vehicles.inform') }}" class="btn btn-primary btn-default btn-squared fs-16">
+                    <i class="uil uil-clipboard-alt me-2"></i>รายการทั้งหมด
+                </a>
+                <a href="#" class="btn btn-success btn-default btn-squared fs-16">
+                    <i class="uil uil-check me-2"></i>รถตรวจผ่าน
+                </a>
+                <a href="#" class="btn btn-warning btn-default btn-squared fs-16">
+                    <i class="uil uil-clock me-2"></i>รอตรวจอีกครั้ง
+                </a>
+                <a href="#" class="btn btn-danger btn-default btn-squared fs-16">
+                    <i class="uil uil-times me-2"></i>รถที่ตรวจไม่ผ่าน
+                </a>
+            </div>
+        </div>
 
         <div class="pt-4 pb-4">
             <div class="row mb-3">
@@ -158,7 +168,8 @@
                     <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
                         <div class="application-task d-flex align-items-center mb-3">
                             <div class="application-task-icon wh-60 bg-opacity-success-20 content-center">
-                                <img class="svg" src="{{ asset('assets/img/svg/check-clipboard.svg') }}" alt="">
+                                <img class="svg" src="{{ asset('assets/img/svg/check-clipboard.svg') }}"
+                                    alt="">
                             </div>
                             <div class="application-task-content">
                                 <h2><a href="{{ route('company.form.index') }}">
@@ -207,7 +218,8 @@
                             </div>
                         </div>
                         <div>
-                            <a href="{{route('company.vehicles.list')}}" class="btn btn-xs btn-outline-secondary rounded-pill">
+                            <a href="{{ route('company.vehicles.list') }}"
+                                class="btn btn-xs btn-outline-secondary rounded-pill">
                                 <i class="uil uil-plus"></i> รายการรถ
                             </a>
                         </div>
@@ -223,7 +235,7 @@
                                 <img class="svg" src="{{ asset('assets/img/svg/users-01.svg') }}" alt="">
                             </div>
                             <div class="application-task-content">
-                                <h2>{{$InspectorCount ?? 0}} </h2>
+                                <h2>{{ $InspectorCount ?? 0 }} </h2>
                                 <span class="text-light fs-14 mt-1 text-capitalize">ช่างตรวจ</span>
                             </div>
                         </div>
@@ -244,12 +256,12 @@
                                 <img class="svg" src="{{ asset('assets/img/svg/users-01.svg') }}" alt="">
                             </div>
                             <div class="application-task-content">
-                                <h2><a href="{{route('drivers.index')}}" >{{$driverCount ?? 0}} </a></h2>
+                                <h2><a href="{{ route('drivers.index') }}">{{ $driverCount ?? 0 }} </a></h2>
                                 <span class="text-light fs-14 mt-1 text-capitalize">พนักงานขับรถ</span>
                             </div>
                         </div>
                         <div>
-                            <a href="{{route('drivers.index')}}" class="btn btn-xs btn-outline-dark rounded-pill">
+                            <a href="{{ route('drivers.index') }}" class="btn btn-xs btn-outline-dark rounded-pill">
                                 รายการพนักงานขับรถ
                             </a>
                         </div>
@@ -261,110 +273,127 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card mb-25 border-0 radius-xl">
-                        
+
                         <div class="card-header border-bottom">
                             <h6 class="mb-0">Developed by</h6>
                         </div>
                         <div class="card-body p-25">
                             <div class="d-flex align-items-center mb-3">
-                               
-                                    <img src="{{ asset('iddrives.png') }}" alt="Logo"
-                                        class="img-thumbnail me-3 border-0"
-                                        style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
 
-                                          <img src="{{ asset('tz.png') }}" alt="Logo"
-                                        class="img-thumbnail me-3 border-0"
-                                        style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+                                <img src="{{ asset('iddrives.png') }}" alt="Logo"
+                                    class="img-thumbnail me-3 border-0"
+                                    style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
 
-                                        <img src="{{ asset('id_inspection.png') }}" alt="Logo"
-                                        class="img-thumbnail me-3 border-0"
-                                        style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
-                              
-                            </div>                       
-                            
+                                <img src="{{ asset('tz.png') }}" alt="Logo" class="img-thumbnail me-3 border-0"
+                                    style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+
+                                <img src="{{ asset('id_inspection.png') }}" alt="Logo"
+                                    class="img-thumbnail me-3 border-0"
+                                    style="max-height: 80px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            
+
         </div>
     </div>
 @endsection
 
 @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passData = {{ $passCount }};
+            const failData = {{ $failCount }};
+            const totalInspected = "{{ $totalInspected }}";
 
-<script>
+            const chartSeries = (passData === 0 && failData === 0) ? [0, 0] : [passData, failData];
 
-document.addEventListener('DOMContentLoaded', function () {
-    const passData = {{ $passCount }};
-    const failData = {{ $failCount }};
-    const totalInspected = "{{ $totalInspected }}"; 
-  
-    const chartSeries = (passData === 0 && failData === 0) ? [0, 0] : [passData, failData];
-
-    const vehicleChart = new ApexCharts(document.getElementById('vehicle-chart'), {
-        chart: { type: 'donut', width: 180, height: 180 },
-        series: chartSeries, 
-        labels: ['ผ่าน', 'ไม่ผ่าน'],
-        colors: ['#36AE7C', '#EB5353'],
-        legend: { show: false },
-        dataLabels: { enabled: false },
-        plotOptions: {
-            pie: {
-                donut: {
-                    size: '65%',
-                    labels: {
-                        show: true,
-                        total: {
-                            show: true,
-                            label: 'ที่ตรวจแล้ว',
-                            fontSize: '11px',
-                            color: '#9299B8',
-                            formatter: () => totalInspected // แสดงยอดรวมตรงกลาง
+            const vehicleChart = new ApexCharts(document.getElementById('vehicle-chart'), {
+                chart: {
+                    type: 'donut',
+                    width: 180,
+                    height: 180
+                },
+                series: chartSeries,
+                labels: ['ผ่าน', 'ไม่ผ่าน'],
+                colors: ['#36AE7C', '#EB5353'],
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'ที่ตรวจแล้ว',
+                                    fontSize: '11px',
+                                    color: '#9299B8',
+                                    formatter: () => totalInspected // แสดงยอดรวมตรงกลาง
+                                }
+                            }
                         }
                     }
-                }
-            }
-        },
-        tooltip: {
-            y: { formatter: val => val + ' คัน' }
-        }
-    });
-    
-    vehicleChart.render();
-
-    
-    const driverChart = new ApexCharts(document.getElementById('driver-chart'), {
-        chart: { type: 'donut', width: 180, height: 180 },
-        series: [37, 7],
-        labels: ['ผ่าน', 'ไม่ผ่าน'],
-        colors: ['#36AE7C', '#EB5353'],
-        legend: { show: false },
-        dataLabels: { enabled: false },
-        plotOptions: {
-            pie: {
-                donut: {
-                    size: '65%',
-                    labels: {
-                        show: true,
-                        total: {
-                            show: true,
-                            label: 'ทั้งหมด',
-                            fontSize: '11px',
-                            color: '#9299B8',
-                            formatter: () => '44'
-                        }
+                },
+                tooltip: {
+                    y: {
+                        formatter: val => val + ' คัน'
                     }
                 }
-            }
-        },
-        tooltip: {
-            y: { formatter: val => val + ' คน' }
-        }
-    });
-    driverChart.render();
+            });
 
-});
-</script>
+            vehicleChart.render();
+
+
+            const driverChart = new ApexCharts(document.getElementById('driver-chart'), {
+                chart: {
+                    type: 'donut',
+                    width: 180,
+                    height: 180
+                },
+                series: [{{ $certDriverIds }}, {{ $noCertDrivers }}],
+                labels: ['ผ่าน', 'ไม่พบข้อมูล'],
+                colors: ['#36AE7C', '#EB5353'],
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'ทั้งหมด',
+                                    fontSize: '11px',
+                                    color: '#9299B8',
+                                    formatter: () => '{{ $totalDrivers }}'
+                                }
+                            }
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: val => val + ' คน'
+                    }
+                }
+            });
+            driverChart.render();
+
+        });
+    </script>
 @endpush
