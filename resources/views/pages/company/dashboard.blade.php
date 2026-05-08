@@ -33,7 +33,7 @@
                         <h6 class="fw-500">
                             <i class="uil uil-truck me-2 color-primary"></i>สถานะรถบรรทุก 2569
                         </h6>
-                        
+
                     </div>
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -82,7 +82,7 @@
                         <h6 class="fw-500">
                             <i class="uil uil-user-circle me-2 color-success"></i>พนักงานขับรถ
                         </h6>
-                       
+
                     </div>
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -141,13 +141,18 @@
                 <a href="{{ route('company.vehicles.inform') }}" class="btn btn-primary btn-default btn-squared fs-16">
                     <i class="uil uil-clipboard-alt me-2"></i>รายการทั้งหมด
                 </a>
-                <a href="#" class="btn btn-success btn-default btn-squared fs-16">
+                <a href="{{ route('company.vehicles.inform') . '?' . http_build_query(['filter' => 'passed']) }}"
+                    class="btn btn-success btn-squared fs-16 {{ request('filter') == 'passed' ? 'active' : 'btn-default' }}">
                     <i class="uil uil-check me-2"></i>รถตรวจผ่าน
                 </a>
-                <a href="#" class="btn btn-warning btn-default btn-squared fs-16">
+
+                <a href="{{ route('company.vehicles.inform') . '?' . http_build_query(['filter' => 'waiting']) }}"
+                    class="btn btn-warning btn-squared fs-16 {{ request('filter') == 'waiting' ? 'active' : 'btn-default' }}">
                     <i class="uil uil-clock me-2"></i>รอตรวจอีกครั้ง
                 </a>
-                <a href="#" class="btn btn-danger btn-default btn-squared fs-16">
+
+                <a href="{{ route('company.vehicles.inform') . '?' . http_build_query(['filter' => 'failed']) }}"
+                    class="btn btn-danger btn-squared fs-16 {{ request('filter') == 'failed' ? 'active' : 'btn-default' }}">
                     <i class="uil uil-times me-2"></i>รถที่ตรวจไม่ผ่าน
                 </a>
             </div>
@@ -156,7 +161,7 @@
         <div class="pt-4 pb-4">
             <div class="row mb-3">
 
-                   <div class="col-md-4 mb-3">
+                <div class="col-md-4 mb-3">
                     <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
                         <div class="application-task d-flex align-items-center mb-3">
                             <div class="application-task-icon wh-60 bg-opacity-primary-20 content-center">
@@ -175,7 +180,7 @@
                         </div>
                     </div>
                 </div>
-             
+
                 <div class="col-md-4 mb-3">
                     <div class="feature-cards5 d-flex flex-column align-items-start radius-xl p-25">
                         <div class="application-task d-flex align-items-center mb-3">
@@ -190,11 +195,11 @@
                         <div>
                             <a href="{{ route('company.supplies.index') }}"
                                 class="btn btn-xs btn-outline-info rounded-pill">
-                               รายการ Supply
+                                รายการ Supply
                             </a>
                         </div>
                     </div>
-                </div>            
+                </div>
 
 
                 <div class="col-md-4 mb-3">
