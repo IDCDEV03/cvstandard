@@ -15,12 +15,7 @@ use App\Enums\Role;
 class VehicleController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:staff,company']);
-    }
-   
-
+ 
 // ============================================================
 // INDEX — render page + KPI counts
 // ============================================================
