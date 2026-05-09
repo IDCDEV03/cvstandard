@@ -100,6 +100,40 @@
                                          <input type="text" name="phone" class="form-control">
                                      </div>
 
+                                     {{-- รูปภาพประจำตัว --}}
+                                     <div class="col-md-12 mb-3 mt-2">
+                                         <label class="form-label fw-500">รูปภาพประจำตัว</label>
+                                         <div class="d-flex align-items-start gap-4 mt-1">
+                                             <div class="flex-shrink-0">
+                                                 <div id="profile-placeholder"
+                                                      class="d-flex align-items-center rounded justify-content-center bg-light border"
+                                                      style="width:110px;height:110px;cursor:pointer;"
+                                                      onclick="document.getElementById('profile-file-input').click()">
+                                                     <i class="fa fa-user fs-36 text-muted"></i>
+                                                 </div>
+                                                 <img id="profile-preview-img" src="" alt="รูปประจำตัว"
+                                                      class="d-none rounded border"
+                                                      style="width:110px;height:110px;object-fit:cover;">
+                                             </div>
+                                             <div>
+                                                 <p class="text-muted fs-12 mb-2">รองรับ JPG, PNG · ขนาดสูงสุด 5 MB</p>
+                                                 <div class="d-flex gap-2">
+                                                     <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                             onclick="document.getElementById('profile-file-input').click()">
+                                                         <i class="fa fa-upload me-1"></i> เลือกรูปภาพ
+                                                     </button>
+                                                     <button type="button" id="btn-profile-clear"
+                                                             class="btn btn-outline-danger btn-sm d-none">
+                                                         <i class="fa fa-trash me-1"></i> ลบ
+                                                     </button>
+                                                 </div>
+                                                 <input type="file" id="profile-file-input" name="driver_profile"
+                                                        accept="image/jpeg,image/png,image/webp" class="d-none">
+                                                 <div id="profile-feedback" class="fs-12 mt-2"></div>
+                                             </div>
+                                         </div>
+                                     </div>
+<div class="border-top"></div>
                                      <!-- ข้อมูลการทำงาน -->
                                      <div class="col-md-12 mt-4">
                                          <h6 class="fw-bold text-primary">ข้อมูลการทำงานและ ใบขับขี่</h6>
@@ -690,6 +724,52 @@
                  document.getElementById('extra-preview').classList.add('d-none');
              });
 
+         })();
+     </script>
+     <script>
+         // Profile photo preview and validation
+         (function() {
+             var fileInput   = document.getElementById('profile-file-input');
+             var previewImg  = document.getElementById('profile-preview-img');
+             var placeholder = document.getElementById('profile-placeholder');
+             var clearBtn    = document.getElementById('btn-profile-clear');
+             var feedback    = document.getElementById('profile-feedback');
+             var MAX_IMG     = 5 * 1024 * 1024;
+
+             fileInput.addEventListener('change', function() {
+                 var file = this.files[0];
+                 if (!file) return;
+
+                 if (!file.type.startsWith('image/')) {
+                     Swal.fire('ประเภทไฟล์ไม่ถูกต้อง', 'รองรับเฉพาะไฟล์รูปภาพเท่านั้น', 'warning');
+                     this.value = '';
+                     return;
+                 }
+                 if (file.size > MAX_IMG) {
+                     Swal.fire('ไฟล์ใหญ่เกินไป', 'ขนาดรูปต้องไม่เกิน 5 MB', 'warning');
+                     this.value = '';
+                     return;
+                 }
+
+                 var reader = new FileReader();
+                 reader.onload = function(e) {
+                     previewImg.src = e.target.result;
+                     previewImg.classList.remove('d-none');
+                     placeholder.classList.add('d-none');
+                     clearBtn.classList.remove('d-none');
+                     feedback.innerHTML = '<span class="text-success"><i class="fa fa-check-circle"></i> พร้อมอัปโหลด</span>';
+                 };
+                 reader.readAsDataURL(file);
+             });
+
+             clearBtn.addEventListener('click', function() {
+                 fileInput.value = '';
+                 previewImg.src = '';
+                 previewImg.classList.add('d-none');
+                 placeholder.classList.remove('d-none');
+                 clearBtn.classList.add('d-none');
+                 feedback.innerHTML = '';
+             });
          })();
      </script>
  @endpush

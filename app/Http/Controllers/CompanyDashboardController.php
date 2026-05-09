@@ -104,12 +104,19 @@ class CompanyDashboardController extends Controller
             $car->inspect_count = $history->count();
             $car->latest_record = $history->first();
 
-            //  นับสถิติจาก "สถานะล่าสุด" ของข้อมูลที่ถูกกรองแล้ว
-            if ($car->latest_record && $car->latest_record->chk_status == '1') {
+            //  นับสถิติจาก "สถานะล่าสุด" — ต้องสอดคล้องกับ logic ที่แสดงใน table
+            $latest = $car->latest_record;
+            if ($car->inspect_count > 0) {
                 $totalInspections++;
-                if ($car->latest_record->evaluate_status == 1) $passedInspections++;
-                elseif ($car->latest_record->evaluate_status == 2) $waitingInspections++;
-                elseif ($car->latest_record->evaluate_status == 3) $failedInspections++;
+                if ($latest) {
+                    if ($latest->chk_status == '1') {
+                        if ($latest->evaluate_status == 1) $passedInspections++;
+                        elseif ($latest->evaluate_status == 2) $waitingInspections++;
+                        elseif ($latest->evaluate_status == 3) $failedInspections++;
+                    } elseif (in_array($latest->chk_status, ['0', '2']) && is_null($latest->evaluate_status)) {
+                        $failedInspections++;
+                    }
+                }
             }
 
             //  กรองรถเข้าตาราง
@@ -118,11 +125,15 @@ class CompanyDashboardController extends Controller
             // กรณีไม่มีการค้นหา (โชว์ตามปุ่ม filter ปกติ)
             if (!$startDate && !$endDate && !$searchStatus) {
                 if ($filter == 'all') {
-                    $shouldInclude = true;
-                } elseif ($car->latest_record && $car->latest_record->chk_status == '1') {
-                    if ($filter == 'passed' && $car->latest_record->evaluate_status == 1) $shouldInclude = true;
-                    elseif ($filter == 'waiting' && $car->latest_record->evaluate_status == 2) $shouldInclude = true;
-                    elseif ($filter == 'failed' && $car->latest_record->evaluate_status == 3) $shouldInclude = true;
+                    $shouldInclude = $car->inspect_count > 0;
+                } elseif ($latest) {
+                    if ($latest->chk_status == '1') {
+                        if ($filter == 'passed' && $latest->evaluate_status == 1) $shouldInclude = true;
+                        elseif ($filter == 'waiting' && $latest->evaluate_status == 2) $shouldInclude = true;
+                        elseif ($filter == 'failed' && $latest->evaluate_status == 3) $shouldInclude = true;
+                    } elseif (in_array($latest->chk_status, ['0', '2']) && is_null($latest->evaluate_status)) {
+                        if ($filter == 'failed') $shouldInclude = true;
+                    }
                 }
             } else {
                 // กรณีมีการค้นหา: ถ้ามีประวัติการตรวจที่ตรงกับเงื่อนไขการค้นหา ให้แสดงรถคันนั้น
@@ -168,5 +179,39 @@ class CompanyDashboardController extends Controller
             'totalInspections',
             'filter'
         ));
+    }
+
+    public function failedItems($record_id)
+    {
+        $companyCode = Auth::user()->company_code;
+
+        // ตรวจสอบว่า record นี้เป็นของบริษัทนี้
+        $record = DB::table('chk_records as cr')
+            ->join('vehicles_detail as v', 'v.car_id', '=', 'cr.veh_id')
+            ->where('cr.record_id', $record_id)
+            ->where('v.company_code', $companyCode)
+            ->select('cr.record_id')
+            ->first();
+
+        if (!$record) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        $items = DB::table('check_records_result as crr')
+            ->join('check_items as ci', 'ci.item_id', '=', 'crr.item_id')
+            ->leftJoin('check_categories as cc', 'cc.category_id', '=', 'ci.category_id')
+            ->where('crr.record_id', $record_id)
+            ->where('crr.result_status', '0')
+            ->select(
+                'cc.chk_cats_name as category_name',
+                'ci.item_name',
+                'crr.result_value',
+                'crr.user_comment'
+            )
+            ->orderBy('cc.cates_no')
+            ->orderBy('ci.item_no')
+            ->get();
+
+        return response()->json($items);
     }
 }

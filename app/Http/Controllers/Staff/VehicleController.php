@@ -15,62 +15,67 @@ use App\Enums\Role;
 class VehicleController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:staff,company']);
-    }
-   
-
 // ============================================================
 // INDEX — render page + KPI counts
 // ============================================================
 public function index()
 {
-    // --- KPI: vehicle status counts ---
-    $kpiStatus = DB::table('vehicles_detail')
-        ->selectRaw("
-            COUNT(*) as total,
-            SUM(CASE WHEN status = '1' THEN 1 ELSE 0 END) as active,
-            SUM(CASE WHEN status = '0' THEN 1 ELSE 0 END) as inactive,
-            SUM(CASE WHEN status = '2' THEN 1 ELSE 0 END) as banned
-        ")
-        ->first();
+    $user     = Auth::user();
+    $userRole = $user->role->value;
 
-    // --- KPI: latest inspection result per vehicle ---
-    // Sub-query: get latest chk_records row per veh_id
-    $latestInspect = DB::table('chk_records')
-        ->select('veh_id', DB::raw('MAX(id) as max_id'))
-        ->groupBy('veh_id');
-
-    $kpiInspect = DB::table('vehicles_detail as v')
-        ->leftJoinSub($latestInspect, 'li', 'li.veh_id', '=', 'v.car_id')
-        ->leftJoin('chk_records as cr', 'cr.id', '=', 'li.max_id')
-        ->selectRaw("
-            SUM(CASE WHEN cr.evaluate_status = 1 THEN 1 ELSE 0 END) as passed,
-            SUM(CASE WHEN cr.evaluate_status = 2 THEN 1 ELSE 0 END) as warning,
-            SUM(CASE WHEN cr.evaluate_status = 3 THEN 1 ELSE 0 END) as failed,
-            SUM(CASE WHEN cr.id IS NULL THEN 1 ELSE 0 END) as not_inspected
-        ")
-        ->first();
-
-    // --- Dropdown: company list for filter ---
-    $companies = DB::table('company_details')
-        ->select('company_id', 'company_name')
-        ->where('require_user_approval', '1')
-        ->orderBy('company_name')
-        ->get();
-
-    // --- Dropdown: vehicle types for filter ---
+    // --- Dropdown: vehicle types ---
     $vehicleTypes = DB::table('vehicle_types')
         ->select('id', 'vehicle_type')
-        ->orderBy('id','asc')
+        ->orderBy('id', 'asc')
         ->get();
 
-    return view('pages.staff.vehicles.index', compact(
-        'kpiStatus',
-        'kpiInspect',
+    $companies = collect();
+    $supplies  = collect();
+
+    if ($userRole === 'company') {
+        // Supplies that have vehicles under this company
+        $supplies = DB::table('vehicles_detail as v')
+            ->join('supply_datas as s', 'v.supply_id', '=', 's.sup_id')
+            ->where('v.company_code', $user->company_code)
+            ->whereNotNull('s.sup_id')
+            ->select('s.sup_id', 's.supply_name')
+            ->distinct()
+            ->orderBy('s.supply_name')
+            ->get();
+    } else {
+        $companies = DB::table('company_details')
+            ->select('company_id', 'company_name')
+            ->where('require_user_approval', '1')
+            ->orderBy('company_name')
+            ->get();
+    }
+
+    // --- Summary: yearly inspection result ---
+    $currentYear   = now()->year;
+    $currentYearBE = $currentYear + 543;
+
+    $summaryQuery = DB::table('chk_records as cr')
+        ->join('vehicles_detail as v', 'v.car_id', '=', 'cr.veh_id')
+        ->whereYear('cr.updated_at', $currentYear)
+        ->where('cr.chk_status', 1);
+
+    if ($userRole === 'company') {
+        $summaryQuery->where('v.company_code', $user->company_code);
+    }
+
+    $summary = $summaryQuery->selectRaw("
+        COUNT(DISTINCT cr.veh_id) as total_inspected,
+        SUM(CASE WHEN cr.evaluate_status = 1 THEN 1 ELSE 0 END) as passed,
+        SUM(CASE WHEN cr.evaluate_status IN (2,3) THEN 1 ELSE 0 END) as failed
+    ")->first();
+
+    return view('pages.vehicles.index', compact(
+        'userRole',
+        'vehicleTypes',
         'companies',
-        'vehicleTypes'
+        'supplies',
+        'summary',
+        'currentYearBE'
     ));
 }
 
@@ -83,51 +88,52 @@ public function index()
 // ============================================================
 public function ajaxIndex(Request $request)
 {
+    $user     = Auth::user();
+    $userRole = $user->role->value;
+
     // --- Base query ---
     $query = DB::table('vehicles_detail as v')
-        ->leftJoin('company_details as c', 'c.company_id', '=', 'v.company_code')
         ->leftJoin('supply_datas as s', 's.sup_id', '=', 'v.supply_id')
         ->leftJoin('vehicle_types as vt', 'vt.id', '=', 'v.car_type')
-        // Sub-query: latest chk_records per veh_id
         ->leftJoinSub(
             DB::table('chk_records')
                 ->select('veh_id', DB::raw('MAX(id) as max_id'))
+                ->where('chk_status', 1)
                 ->groupBy('veh_id'),
             'li',
             'li.veh_id', '=', 'v.car_id'
         )
         ->leftJoin('chk_records as cr', 'cr.id', '=', 'li.max_id')
-        ->leftJoin('users as u', 'u.user_id', '=', 'cr.user_id')
         ->select(
             'v.car_id',
             'v.car_plate',
-            'v.status',
             'vt.vehicle_type as vehicle_type_name',
-            'c.company_name',
-            's.supply_name',
-            'cr.created_at as inspect_date',
-            'cr.evaluate_status',
-            DB::raw("CONCAT(COALESCE(u.name,''), ' ', COALESCE(u.lastname,'')) as inspector_name")
+            'cr.updated_at as inspect_date',
+            'cr.evaluate_status'
         );
 
-    // --- Filter: vehicle status (from KPI click or dropdown) ---
-    if ($request->filled('filter_status') && $request->filter_status !== 'all') {
-        $query->where('v.status', $request->filter_status);
+    // --- Auto-filter: company role sees only their vehicles ---
+    if ($userRole === 'company') {
+        $query->where('v.company_code', $user->company_code);
     }
 
-    // --- Filter: inspection result (from KPI click) ---
+    // --- Filter: inspection result ---
     if ($request->filled('filter_inspect') && $request->filter_inspect !== 'all') {
         if ($request->filter_inspect === '0') {
-            // Not inspected = no chk_records row
             $query->whereNull('cr.id');
         } else {
             $query->where('cr.evaluate_status', $request->filter_inspect);
         }
     }
 
-    // --- Filter: company ---
-    if ($request->filled('filter_company')) {
+    // --- Filter: company (staff only) ---
+    if ($userRole !== 'company' && $request->filled('filter_company')) {
         $query->where('v.company_code', $request->filter_company);
+    }
+
+    // --- Filter: supply ---
+    if ($request->filled('filter_supply')) {
+        $query->where('v.supply_id', $request->filter_supply);
     }
 
     // --- Filter: vehicle type ---
@@ -135,88 +141,72 @@ public function ajaxIndex(Request $request)
         $query->where('v.car_type', $request->filter_type);
     }
 
-    // --- Search: global search box ---
-    if ($request->filled('search') && !empty($request->input('search.value'))) {
-        $keyword = $request->input('search.value');
+    // --- Search: plate (ทุก role) ---
+    if ($request->filled('search_plate')) {
+        $query->where('v.car_plate', 'like', '%' . $request->search_plate . '%');
+    }
+
+    // --- Search: text box (staff only) ---
+    if ($request->filled('search_text')) {
+        $keyword = $request->search_text;
         $query->where(function ($q) use ($keyword) {
             $q->where('v.car_plate', 'like', "%{$keyword}%")
-              ->orWhere('vt.vehicle_type', 'like', "%{$keyword}%")
-              ->orWhere('c.company_name', 'like', "%{$keyword}%")
               ->orWhere('s.supply_name', 'like', "%{$keyword}%");
         });
     }
 
-    // --- Total records (after filter, before pagination) ---
+    // --- Total records (after filter) ---
     $recordsFiltered = $query->count();
 
     // --- Total records (no filter) ---
-    $recordsTotal = DB::table('vehicles_detail')->count();
+    $recordsTotal = ($userRole === 'company')
+        ? DB::table('vehicles_detail')->where('company_code', $user->company_code)->count()
+        : DB::table('vehicles_detail')->count();
 
     // --- Ordering ---
     $colMap = [
         0 => 'v.car_plate',
         1 => 'vt.vehicle_type',
-        2 => 'c.company_name',
-        3 => 's.supply_name',
-        4 => 'cr.created_at',
-        5 => 'cr.evaluate_status',
-        6 => 'v.status',
+        2 => 'cr.updated_at',
     ];
-    $orderCol = $colMap[$request->input('order.0.column', 0)] ?? 'cr.created_at';
-    $orderDir = $request->input('order.0.dir', 'asc') === 'desc' ? 'desc' : 'asc';
+    $orderCol = $colMap[$request->input('order.0.column', 2)] ?? 'cr.updated_at';
+    $orderDir = $request->input('order.0.dir', 'desc') === 'desc' ? 'desc' : 'asc';
     $query->orderBy($orderCol, $orderDir);
 
     // --- Pagination ---
     $start  = (int) $request->input('start', 0);
-    $length = (int) $request->input('length', 10);
+    $length = (int) $request->input('length', 25);
     $rows   = $query->offset($start)->limit($length)->get();
 
-    // --- Format rows for DataTable ---
-    $data = $rows->map(function ($row) {
-        // Status badge
-        $statusBadge = match ((string) $row->status) {
-            '1' => '<span class="dm-tag tag-success tag-transparented">เปิดการใช้</span>',
-            '0' => '<span class="dm-tag tag-warning tag-transparented">ปิดการใช้งาน</span>',
-            '2' => '<span class="dm-tag tag-danger tag-transparented">ห้ามใช้งาน</span>',
-            default => '-',
-        };
-
-        // Inspection result badge
+    // --- Format rows ---
+    $data = $rows->map(function ($row) use ($userRole) {
         $inspBadge = match ((string) $row->evaluate_status) {
-            '1' => '<span class="text-success fs-14 fw-bold">ปกติ</span>',
-            '2' => '<span class="text-warning fs-14">ไม่ปกติ แต่ใช้งานได้</span>',
-            '3' => '<span class="text-danger fs-14">ไม่ปกติ</span>',
-            default => '<span class="text-muted fs-14">ไม่พบข้อมูล</span>',
+            '1' => '<span class="text-success fw-bold fs-16">ผ่าน</span>',
+            '2' => '<span class="text-warning fw-bold fs-16">ไม่ปกติ แต่ใช้งานได้</span>',
+            '3' => '<span class="text-danger fw-bold fs-16">ไม่ปกติ ห้ามใช้งาน</span>',
+            default => '<span class="text-muted fs-16">-</span>',
         };
 
-        // Inspect date (convert to Thai year)
-        $inspDate = '-';
-        if ($row->inspect_date) {
-            $d = \Carbon\Carbon::parse($row->inspect_date);
-            $inspDate = $d->format('d/m/') . ($d->year + 543);
-        }
+        $inspDate = thai_date($row->inspect_date);
 
-        // Action buttons
-        $actions = '
-            <div class="d-flex gap-1">
-                <a href="' . route('staff.vehicles.show', $row->car_id) . '"
-                   class="btn btn-sm btn-outline-primary py-0 px-2" title="ดูรายละเอียด">
-                    <i class="uil uil-eye"></i>
-                </a>
-                <a href="' . route('staff.vehicles.edit', $row->car_id) . '"
-                   class="btn btn-sm btn-outline-secondary py-0 px-2" title="แก้ไข">
-                    <i class="uil uil-edit"></i>
-                </a>
-            </div>';
+        $actions = '<div class="d-flex gap-1">
+            <a href="' . route('vehicles.show', $row->car_id) . '"
+               class="btn btn-sm btn-transparent-primary py-0 px-2" title="ดูรายละเอียด">
+                รายละเอียด
+            </a>';
+        if ($userRole !== 'company') {
+            $actions .= '<a href="' . route('vehicles.edit', $row->car_id) . '"
+               class="btn btn-sm btn-transparent-secondary py-0 px-2" title="แก้ไข">
+                แก้ไข
+            </a>';
+        }
+        $actions .= '</div>';
 
         return [
             $row->car_plate,
             $row->vehicle_type_name ?? '-',
-            $row->company_name ?? '-',
-            $row->supply_name ?? '-',
             $inspDate,
             $inspBadge,
-            $statusBadge,
             $actions,
         ];
     });
@@ -253,7 +243,7 @@ public function ajaxIndex(Request $request)
             ->orderBy('name_th')
             ->get();
 
-        return view('pages.staff.vehicles.create', compact(
+        return view('pages.vehicles.create', compact(
             'companies',
             'car_brands',
             'vehicle_types',
@@ -448,7 +438,7 @@ public function ajaxIndex(Request $request)
             // ============================================
             // 6. Redirect with success
             // ============================================
-            return redirect()->route('staff.vehicles.show', $veh_id)
+            return redirect()->route('vehicles.show', $veh_id)
                 ->with('success', 'ลงทะเบียนรถเรียบร้อยแล้ว!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -571,7 +561,7 @@ public function ajaxIndex(Request $request)
             ->first();
 
         if (!$vehicle) {
-            return redirect()->route('staff.vehicles.index')
+            return redirect()->route('vehicles.index')
                 ->with('error', 'ไม่พบข้อมูลรถ');
         }
 
@@ -603,6 +593,12 @@ public function ajaxIndex(Request $request)
                 ->value('full_name');
         }
 
+        // Last inspection date (chk_status = 1)
+        $lastInspectDate = DB::table('chk_records')
+            ->where('veh_id', $veh_id)
+            ->where('chk_status', 1)
+            ->max('updated_at');
+
         //  inspection record
         $inspectionRecords = DB::table('chk_records as r')
             ->leftJoin('inspector_datas as i', 'r.user_id', '=', 'i.ins_id')
@@ -618,12 +614,13 @@ public function ajaxIndex(Request $request)
             ->orderBy('r.created_at', 'desc')
             ->get();
 
-        return view('pages.staff.vehicles.show', compact(
+        return view('pages.vehicles.show', compact(
             'vehicle',
             'activeDocument',
             'activeDocUploader',
             'documentHistory',
-            'inspectionRecords'
+            'inspectionRecords',
+            'lastInspectDate'
         ));
     }
 
@@ -695,7 +692,7 @@ public function edit($veh_id)
         ->first();
 
     if (!$vehicle) {
-        return redirect()->route('staff.vehicles.index')
+        return redirect()->route('vehicles.index')
             ->with('error', 'ไม่พบข้อมูลรถ');
     }
 
@@ -725,7 +722,7 @@ public function edit($veh_id)
     $plateOnly     = $plateParts[0] ?? '';
     $plateProvince = $plateParts[1] ?? '';
 
-    return view('pages.staff.vehicles.edit', compact(
+    return view('pages.vehicles.edit', compact(
         'vehicle',
         'supplies',
         'currentSupply',
@@ -750,7 +747,7 @@ public function update(Request $request, $veh_id)
         ->first();
 
     if (!$vehicle) {
-        return redirect()->route('staff.vehicles.index')
+        return redirect()->route('vehicles.index')
             ->with('error', 'ไม่พบข้อมูลรถ');
     }
 
@@ -939,7 +936,7 @@ public function update(Request $request, $veh_id)
     }
 
     return redirect()
-        ->route('staff.vehicles.show', $veh_id)
+        ->route('vehicles.show', $veh_id)
         ->with('success', 'แก้ไขข้อมูลรถเรียบร้อยแล้ว');
 }
    

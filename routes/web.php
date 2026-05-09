@@ -107,7 +107,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/announce-delete/{id}/post', [AdminDashboardController::class, 'delete_post'])->name('admin.delete_post');
 });
 
-Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,admin,agency,inspector'])->group(function () {
+Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,admin,agency,inspector,company'])->group(function () {
     Route::get('/page/{id}', [VehiclesController::class, 'veh_detail'])->name('veh.detail');
     Route::get('/result/{rec}', [VehiclesController::class, 'Report_Result'])->name('veh.result');
     Route::get('/repair-notice', [VehiclesController::class, 'repair_notice'])->name('veh.notice');
@@ -115,6 +115,44 @@ Route::prefix('vehicles')->middleware(['auth', 'role:user,supply,staff,manager,a
     Route::get('/form-report/{rec}', [VehiclesController::class, 'Form_report'])->name('form_report');
     Route::get('/form-image/{rec}', [VehiclesController::class, 'Form_Image8'])->name('form_image8');
     Route::get('/form-image-fail/{rec}', [VehiclesController::class, 'FormImage_Fail'])->name('form_imagefail');
+
+    //------vehicle------//
+    // Vehicle CRUD
+    Route::name('vehicles.')->group(function () {
+
+        // AJAX endpoints
+        Route::get('/ajax/supplies-by-company', [VehicleController::class, 'getSuppliesByCompany'])
+            ->name('ajax.supplies');
+        Route::get('/ajax/check-plate', [VehicleController::class, 'checkPlateUnique'])
+            ->name('ajax.check_plate');
+        Route::get('/ajax/supply-info/{sup_id}', [VehicleController::class, 'getSupplyInfo'])
+            ->name('ajax.supply_info');
+        Route::post('/ajax/change-status/{veh_id}', [VehicleController::class, 'changeStatus'])
+            ->name('ajax.change_status');
+
+        // List & Create
+        Route::get('/', [VehicleController::class, 'index'])->name('index');
+        Route::get('/create', [VehicleController::class, 'create'])->name('create');
+        Route::post('/', [VehicleController::class, 'store'])->name('store');
+
+        Route::get('/ajax',[VehicleController::class, 'ajaxIndex']) ->name('ajax.index');
+
+        // Show / Edit / Update / Delete
+        Route::get('/{veh_id}', [VehicleController::class, 'show'])->name('show');
+        Route::get('/{veh_id}/edit', [VehicleController::class, 'edit'])->name('edit');
+        Route::put('/{veh_id}', [VehicleController::class, 'update'])->name('update');
+        Route::delete('/{veh_id}', [VehicleController::class, 'destroy'])->name('destroy');
+
+
+        // Document management
+        Route::prefix('{veh_id}/documents')->name('documents.')->group(function () {
+            Route::get('/', [VehicleController::class, 'documentList'])->name('list');
+            Route::post('/upload', [VehicleController::class, 'documentUpload'])->name('upload');
+            Route::get('/{doc_id}/download', [VehicleController::class, 'documentDownload'])->name('download');
+            Route::delete('/{doc_id}', [VehicleController::class, 'documentDelete'])->name('delete');
+        });
+             
+    });
 });
 
 Route::middleware(['auth', 'role:company,supply,staff'])->group(function () {
@@ -280,6 +318,7 @@ Route::prefix('company')->middleware(['auth', 'role:company'])->group(function (
      Route::get('/vehicles/list', [CompanyVehicleController::class, 'VehiclesList'])->name('company.vehicles.list');
 
     Route::get('/inform', [CompanyDashboardController::class, 'vehicles_information'])->name('company.vehicles.inform');
+    Route::get('/inform/fail-items/{record_id}', [CompanyDashboardController::class, 'failedItems'])->name('company.vehicles.fail_items');
 
     //CRUD ฟอร์มเช็ค
     Route::get('/form', [CompanyDashboardController::class, 'company_form'])->name('company.form.index');
@@ -393,45 +432,7 @@ Route::prefix('staff')->middleware(['auth', 'role:staff,company'])->group(functi
         Route::put('/{id}/update', [FormGroupController::class, 'update'])->name('update');
     });
 
-    //------vehicle------//
-    // Vehicle CRUD
-    Route::prefix('vehicles')->name('staff.vehicles.')->group(function () {
 
-        // AJAX endpoints
-        Route::get('/ajax/supplies-by-company', [VehicleController::class, 'getSuppliesByCompany'])
-            ->name('ajax.supplies');
-        Route::get('/ajax/check-plate', [VehicleController::class, 'checkPlateUnique'])
-            ->name('ajax.check_plate');
-        Route::get('/ajax/supply-info/{sup_id}', [VehicleController::class, 'getSupplyInfo'])
-            ->name('ajax.supply_info');
-        Route::post('/ajax/change-status/{veh_id}', [VehicleController::class, 'changeStatus'])
-            ->name('ajax.change_status');
-
-        // List & Create
-        Route::get('/', [VehicleController::class, 'index'])->name('index');
-        Route::get('/create', [VehicleController::class, 'create'])->name('create');
-        Route::post('/', [VehicleController::class, 'store'])->name('store');
-
-        Route::get('/ajax',[VehicleController::class, 'ajaxIndex']) ->name('ajax.index');
-
-        // Show / Edit / Update / Delete
-        Route::get('/{veh_id}', [VehicleController::class, 'show'])->name('show');
-        Route::get('/{veh_id}/edit', [VehicleController::class, 'edit'])->name('edit');
-        Route::put('/{veh_id}', [VehicleController::class, 'update'])->name('update');
-        Route::delete('/{veh_id}', [VehicleController::class, 'destroy'])->name('destroy');
-
-
-        // Document management
-        Route::prefix('{veh_id}/documents')->name('documents.')->group(function () {
-            Route::get('/', [VehicleController::class, 'documentList'])->name('list');
-            Route::post('/upload', [VehicleController::class, 'documentUpload'])->name('upload');
-            Route::get('/{doc_id}/download', [VehicleController::class, 'documentDownload'])->name('download');
-            Route::delete('/{doc_id}', [VehicleController::class, 'documentDelete'])->name('delete');
-        });
-
-        // --- Document actions — ---
-      
-    });
 });
 
 Route::prefix('form')->middleware(['auth', 'role:staff'])->group(function () {

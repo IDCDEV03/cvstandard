@@ -212,58 +212,115 @@ class PageController extends Controller
                 ->where('company_code', $companyCode)
                 ->sum('vehicle_limit');
 
-  $totalVehicles = DB::table('vehicles_detail')
-        ->where('company_code', $companyCode)
-        ->where('status', '1')
-        ->count();
+            $totalVehicles = DB::table('vehicles_detail')
+                ->where('company_code', $companyCode)
+                ->where('status', '1')
+                ->count();
 
- 
-    $inspections = DB::table('chk_records')
-        ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
-        ->where('vehicles_detail.company_code', $companyCode)
-        ->where('chk_records.chk_status', '1') // 1=ครบ
-        ->select('chk_records.evaluate_status')
-        ->get();
 
-    $totalInspected = $inspections->count();
+            $inspections = DB::table('chk_records')
+                ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+                ->where('vehicles_detail.company_code', $companyCode)
+                ->where('chk_records.chk_status', '1') // 1=ครบ
+                ->select('chk_records.evaluate_status')
+                ->get();
 
-    // 3. แยกผ่าน/ไม่ผ่าน (อิงจาก evaluate_status: 1=อนุญาตให้ใช้, 2=มีเงื่อนไข, 3=ไม่อนุญาต)
-    // 1 คือผ่าน และ 2,3 คือไม่ผ่าน 
-    $passCount = $inspections->where('evaluate_status', 1)->count();
-    $failCount = $inspections->whereIn('evaluate_status', [2, 3])->count();
+            $totalInspected = $inspections->count();
 
-    // 4. คำนวณเปอร์เซ็นต์ (ป้องกันหารด้วย 0)
-    $passPercent = $totalInspected > 0 ? round(($passCount / $totalInspected) * 100) : 0;
-    $failPercent = $totalInspected > 0 ? round(($failCount / $totalInspected) * 100) : 0;
+            // 3. แยกผ่าน/ไม่ผ่าน (อิงจาก evaluate_status: 1=อนุญาตให้ใช้, 2=มีเงื่อนไข, 3=ไม่อนุญาต)
+            // 1 คือผ่าน และ 2,3 คือไม่ผ่าน 
+            $passCount = $inspections->where('evaluate_status', 1)->count();
+            $failCount = $inspections->whereIn('evaluate_status', [2, 3])->count();
 
-    // นับพนักงานทั้งหมดใน company (status = 1 และยังไม่ถูกลบ)
-$totalDrivers = DB::table('drivers_detail')
-    ->where('company_id', $companyCode)
-    ->where('driver_status', 1)
-    ->whereNull('deleted_at')
-    ->count();
+            // 4. คำนวณเปอร์เซ็นต์ (ป้องกันหารด้วย 0)
+            $passPercent = $totalInspected > 0 ? round(($passCount / $totalInspected) * 100) : 0;
+            $failPercent = $totalInspected > 0 ? round(($failCount / $totalInspected) * 100) : 0;
 
-// หา driver_id ที่มี doc_type = cert (is_active = 1)
-$certDriverIds = DB::table('drivers_document')
-    ->join('drivers_detail as d', 'd.driver_id', '=', 'drivers_document.driver_id')
-    ->where('d.company_id', $companyCode)
-    ->where('d.driver_status', 1)
-    ->whereNull('d.deleted_at')
-    ->where('drivers_document.doc_type', 'cert')
-    ->where('drivers_document.is_active', 1)
-    ->distinct()
-    ->count('drivers_document.driver_id');
+            // นับพนักงานทั้งหมดใน company (status = 1 และยังไม่ถูกลบ)
+            $totalDrivers = DB::table('drivers_detail')
+                ->where('company_id', $companyCode)
+                ->where('driver_status', 1)
+                ->whereNull('deleted_at')
+                ->count();
 
-$noCertDrivers = $totalDrivers - $certDriverIds;
-$certPercent   = $totalDrivers > 0 ? round(($certDriverIds / $totalDrivers) * 100) : 0;
-$noPercent     = $totalDrivers > 0 ? 100 - $certPercent : 0;
+            // หา driver_id ที่มี doc_type = cert (is_active = 1)
+            $certDriverIds = DB::table('drivers_document')
+                ->join('drivers_detail as d', 'd.driver_id', '=', 'drivers_document.driver_id')
+                ->where('d.company_id', $companyCode)
+                ->where('d.driver_status', 1)
+                ->whereNull('d.deleted_at')
+                ->where('drivers_document.doc_type', 'cert')
+                ->where('drivers_document.is_active', 1)
+                ->distinct()
+                ->count('drivers_document.driver_id');
 
-            return view('pages.company.dashboard', compact('user', 'companyDetails', 'supplyCount', 'formCount', 'totalVehicleLimit', 'driverCount','InspectorCount','totalVehicles', 'totalInspected', 'passCount', 'failCount', 'passPercent', 'failPercent','totalDrivers',
-    'certDriverIds',
-    'noCertDrivers',
-    'certPercent',
-    'noPercent'));
+            $noCertDrivers = $totalDrivers - $certDriverIds;
+            $certPercent   = $totalDrivers > 0 ? round(($certDriverIds / $totalDrivers) * 100) : 0;
+            $noPercent     = $totalDrivers > 0 ? 100 - $certPercent : 0;
 
+            // ── ข้อมูลการตรวจรถ 7 วันย้อนหลัง ──
+            $dailyRaw = DB::table('chk_records')
+                ->join('vehicles_detail', 'chk_records.veh_id', '=', 'vehicles_detail.car_id')
+                ->where('vehicles_detail.company_code', $companyCode)
+                ->where('chk_records.chk_status', '1')
+                ->where('chk_records.created_at', '>=', Carbon::now()->subDays(6)->startOfDay())
+                ->selectRaw('DATE(chk_records.created_at) as chk_date,
+                 COUNT(*) as total,
+                 SUM(CASE WHEN chk_records.evaluate_status = 1 THEN 1 ELSE 0 END) as pass_count,
+                 SUM(CASE WHEN chk_records.evaluate_status IN (2,3) THEN 1 ELSE 0 END) as fail_count')
+                ->groupByRaw('DATE(chk_records.created_at)')
+                ->orderBy('chk_date', 'asc')
+                ->get()
+                ->keyBy('chk_date');
+
+            // สร้าง array ครบ 7 วัน (เติม 0 วันที่ไม่มีข้อมูล)
+            $dailyLabels = [];
+            $dailyTotal  = [];
+            $dailyPass   = [];
+            $dailyFail   = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::now()->subDays($i)->toDateString();
+                $dailyLabels[] = Carbon::now()->subDays($i)->locale('th')->isoFormat('D MMM');
+                $row = $dailyRaw->get($date);
+                $dailyTotal[]  = $row ? (int) $row->total      : 0;
+                $dailyPass[]   = $row ? (int) $row->pass_count : 0;
+                $dailyFail[]   = $row ? (int) $row->fail_count : 0;
+            }
+
+            // สถิติวันนี้
+            $todayKey    = Carbon::today()->toDateString();
+            $todayRow    = $dailyRaw->get($todayKey);
+            $todayTotal  = $todayRow ? (int) $todayRow->total      : 0;
+            $todayPass   = $todayRow ? (int) $todayRow->pass_count : 0;
+            $todayFail   = $todayRow ? (int) $todayRow->fail_count : 0;
+
+            return view('pages.company.dashboard', compact(
+                'user',
+                'companyDetails',
+                'supplyCount',
+                'formCount',
+                'totalVehicleLimit',
+                'driverCount',
+                'InspectorCount',
+                'totalVehicles',
+                'totalInspected',
+                'passCount',
+                'failCount',
+                'passPercent',
+                'failPercent',
+                'totalDrivers',
+                'certDriverIds',
+                'noCertDrivers',
+                'certPercent',
+                'noPercent',
+                'dailyLabels',
+                'dailyTotal',
+                'dailyPass',
+                'dailyFail',
+                'todayTotal',
+                'todayPass',
+                'todayFail'
+            ));
         } elseif ($role === Role::Staff) {
             $id = Auth::id();
             $staff = DB::table('users')->where('id', Auth::id())->first();

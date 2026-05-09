@@ -1,7 +1,7 @@
+@php $userRole = Auth::user()->role->value; @endphp
 @section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
-
 @section('content')
     <div class="container-fluid">
         <div class="row">
@@ -22,9 +22,11 @@
                 <div class="card mb-50">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="fs-18 fw-bold">รายชื่อพนักงานขับรถทั้งหมด</span>
+                        @if (!in_array($userRole, ['company', 'supply']))
                         <a href="{{ route('drivers.create') }}" class="btn btn-primary btn-sm btn-squared">
                             <i class="uil uil-plus"></i> เพิ่มพนักงานขับรถ
                         </a>
+                        @endif
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -55,6 +57,7 @@
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('drivers.show', $item->driver_id) }}" class="btn btn-secondary btn-xs shadow-sm border-0">
                                                         <i class="uil uil-eye"></i> รายละเอียด</a>
+                                                    @if (!in_array($userRole, ['company', 'supply']))
                                                     <a href="{{ route('drivers.edit', $item->driver_id) }}"
                                                         class="btn btn-warning btn-xs shadow-sm border-0" title="แก้ไข">
                                                         <i class="uil uil-edit"></i> แก้ไข
@@ -69,6 +72,7 @@
                                                             <i class="uil uil-trash-alt"></i> ลบ
                                                         </button>
                                                     </form>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>

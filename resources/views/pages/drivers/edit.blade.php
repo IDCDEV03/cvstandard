@@ -22,7 +22,7 @@
 
             <div class="card mb-50">
                 <div class="card-body">
-                    <form action="{{ route('drivers.update', $driver->id) }}" method="POST">
+                    <form action="{{ route('drivers.update', $driver->driver_id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT') <!-- สำคัญสำหรับ Update -->
                         
@@ -107,6 +107,31 @@
                                         <option value="1" {{ $driver->driver_status == 1 ? 'selected' : '' }}>ปกติ</option>
                                         <option value="2" {{ $driver->driver_status == 2 ? 'selected' : '' }}>ลาออก / พักงาน</option>
                                     </select>
+                                </div>
+
+                                {{-- รูปภาพประจำตัว --}}
+                                <div class="col-md-12 mb-3 mt-2">
+                                    <label class="form-label fw-500">รูปภาพประจำตัว</label>
+                                    <div class="d-flex align-items-start gap-4 mt-1">
+                                        <div class="flex-shrink-0">
+                                            <img id="profile-preview-img"
+                                                 src="{{ $driver->driver_profile ? Storage::url($driver->driver_profile) : asset('user.png') }}"
+                                                 alt="รูปประจำตัว"
+                                                 class="rounded border"
+                                                 style="width:110px;height:110px;object-fit:cover;cursor:pointer;"
+                                                 onclick="document.getElementById('profile-file-input').click()">
+                                        </div>
+                                        <div>
+                                            <p class="text-muted fs-12 mb-2">รองรับ JPG, PNG, WEBP · ขนาดสูงสุด 5 MB<br>คลิกที่รูปหรือกดปุ่มด้านล่างเพื่อเปลี่ยน</p>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                    onclick="document.getElementById('profile-file-input').click()">
+                                                <i class="fa fa-upload me-1"></i> เปลี่ยนรูป
+                                            </button>
+                                            <input type="file" id="profile-file-input" name="driver_profile"
+                                                   accept="image/jpeg,image/png,image/webp" class="d-none">
+                                            <div id="profile-feedback" class="fs-12 mt-2"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- ข้อมูลการทำงาน -->
@@ -293,5 +318,36 @@ $(document).ready(function() {
         checkDuplicate($(this), $('#license-feedback'), 'driver_license_no');
     });
 });
+</script>
+<script>
+(function() {
+    var fileInput  = document.getElementById('profile-file-input');
+    var previewImg = document.getElementById('profile-preview-img');
+    var feedback   = document.getElementById('profile-feedback');
+    var MAX_IMG    = 5 * 1024 * 1024;
+
+    fileInput.addEventListener('change', function() {
+        var file = this.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            Swal.fire('ประเภทไฟล์ไม่ถูกต้อง', 'รองรับเฉพาะไฟล์รูปภาพเท่านั้น', 'warning');
+            this.value = '';
+            return;
+        }
+        if (file.size > MAX_IMG) {
+            Swal.fire('ไฟล์ใหญ่เกินไป', 'ขนาดรูปต้องไม่เกิน 5 MB', 'warning');
+            this.value = '';
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            feedback.innerHTML = '<span class="text-success"><i class="fa fa-check-circle"></i> พร้อมอัปโหลด — กด "อัปเดตข้อมูล" เพื่อบันทึก</span>';
+        };
+        reader.readAsDataURL(file);
+    });
+})();
 </script>
 @endpush

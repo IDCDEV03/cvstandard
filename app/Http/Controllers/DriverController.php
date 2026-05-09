@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Role;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DriverController extends Controller
 {
@@ -52,6 +53,10 @@ class DriverController extends Controller
     // ==========================================
     public function create()
     {
+        if (in_array(Auth::user()->role->value, ['company', 'supply'])) {
+            abort(403, 'ไม่มีสิทธิ์เพิ่มข้อมูลพนักงานขับรถ');
+        }
+
         $userRole = Auth::user()->role;
         $user = Auth::user();
 
@@ -107,33 +112,46 @@ class DriverController extends Controller
     {
         // Validate ข้อมูลเบื้องต้น
         $request->validate([
-            'name' => 'required',
-            'lastname' => 'required',
-            'id_card_no' => 'required',
-            'company_id' => 'required',
-            'supply_id' => 'required',
+            'name'           => 'required',
+            'lastname'       => 'required',
+            'id_card_no'     => 'required',
+            'company_id'     => 'required',
+            'supply_id'      => 'required',
+            'driver_profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $generateDriverId = 'DRV-' . Str::upper(Str::random(8));
 
+        // Handle profile photo upload
+        $profilePath = null;
+        if ($request->hasFile('driver_profile')) {
+            $ext = $request->file('driver_profile')->getClientOriginalExtension();
+            $profilePath = $request->file('driver_profile')->storeAs(
+                'driver_profiles',
+                $generateDriverId . '.' . $ext,
+                'public'
+            );
+        }
+
         DB::table('drivers_detail')->insert([
-            'driver_id' => $generateDriverId,
-            'company_id' => $request->company_id ?? Auth::user()->company_code,
-            'supply_id' => $request->supply_id ?? Auth::user()->supply_user_id,
-            'prefix' => $request->prefix,
-            'name' => $request->name,
-            'lastname' => $request->lastname,
-            'id_card_no' => $request->id_card_no,
-            'phone' => $request->phone,
-            'driver_license_no' => $request->driver_license_no,
-            'license_expire_date' => $request->license_expire_date,
-            'assigned_car_id' => $request->assigned_car_id,
-            'hire_date' => $request->hire_date,
-            'remark' => $request->remark,
-            'driver_status' => $request->driver_status ?? 1,
-            'created_by' => Auth::user()->user_id,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'driver_id'          => $generateDriverId,
+            'company_id'         => $request->company_id ?? Auth::user()->company_code,
+            'supply_id'          => $request->supply_id ?? Auth::user()->supply_user_id,
+            'prefix'             => $request->prefix,
+            'name'               => $request->name,
+            'lastname'           => $request->lastname,
+            'id_card_no'         => $request->id_card_no,
+            'phone'              => $request->phone,
+            'driver_license_no'  => $request->driver_license_no,
+            'license_expire_date'=> $request->license_expire_date,
+            'assigned_car_id'    => $request->assigned_car_id,
+            'hire_date'          => $request->hire_date,
+            'remark'             => $request->remark,
+            'driver_profile'     => $profilePath,
+            'driver_status'      => $request->driver_status ?? 1,
+            'created_by'         => Auth::user()->user_id,
+            'created_at'         => now(),
+            'updated_at'         => now(),
         ]);
 
         // --- Insert documents (ต่อจาก insert drivers_detail) ---
@@ -204,6 +222,10 @@ class DriverController extends Controller
     // ==========================================
     public function edit($id)
     {
+        if (in_array(Auth::user()->role->value, ['company', 'supply'])) {
+            abort(403, 'ไม่มีสิทธิ์แก้ไขข้อมูลพนักงานขับรถ');
+        }
+
         $driver = DB::table('drivers_detail')->where('driver_id', $id)->first();
         if (!$driver) {
             return redirect()->route('drivers.index')->with('error', 'ไม่พบข้อมูลพนักงานขับรถ');
@@ -247,29 +269,50 @@ class DriverController extends Controller
     // ==========================================
     public function update(Request $request, $id)
     {
+        if (in_array(Auth::user()->role->value, ['company', 'supply'])) {
+            abort(403, 'ไม่มีสิทธิ์แก้ไขข้อมูลพนักงานขับรถ');
+        }
+
         $request->validate([
-            'name' => 'required',
-            'lastname' => 'required',
-            'id_card_no' => 'required',
+            'name'           => 'required',
+            'lastname'       => 'required',
+            'id_card_no'     => 'required',
+            'driver_profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        DB::table('drivers_detail')->where('driver_id', $id)->update([
-            'company_id' => $request->company_id ?? Auth::user()->company_code,
-            'supply_id' => $request->supply_id ?? Auth::user()->supply_user_id,
-            'prefix' => $request->prefix,
-            'name' => $request->name,
-            'lastname' => $request->lastname,
-            'id_card_no' => $request->id_card_no,
-            'phone' => $request->phone,
-            'driver_license_no' => $request->driver_license_no,
+        $updateData = [
+            'company_id'          => $request->company_id ?? Auth::user()->company_code,
+            'supply_id'           => $request->supply_id ?? Auth::user()->supply_user_id,
+            'prefix'              => $request->prefix,
+            'name'                => $request->name,
+            'lastname'            => $request->lastname,
+            'id_card_no'          => $request->id_card_no,
+            'phone'               => $request->phone,
+            'driver_license_no'   => $request->driver_license_no,
             'license_expire_date' => $request->license_expire_date,
-            'assigned_car_id' => $request->assigned_car_id,
-            'hire_date' => $request->hire_date,
-            'remark' => $request->remark,
-            'driver_status' => $request->driver_status,
-            'updated_by' => Auth::user()->user_id,
-            'updated_at' => now(),
-        ]);
+            'assigned_car_id'     => $request->assigned_car_id,
+            'hire_date'           => $request->hire_date,
+            'remark'              => $request->remark,
+            'driver_status'       => $request->driver_status,
+            'updated_by'          => Auth::user()->user_id,
+            'updated_at'          => now(),
+        ];
+
+        if ($request->hasFile('driver_profile')) {
+            // Delete old photo if exists
+            $oldPath = DB::table('drivers_detail')->where('driver_id', $id)->value('driver_profile');
+            if ($oldPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            $ext = $request->file('driver_profile')->getClientOriginalExtension();
+            $updateData['driver_profile'] = $request->file('driver_profile')->storeAs(
+                'driver_profiles',
+                $id . '.' . $ext,
+                'public'
+            );
+        }
+
+        DB::table('drivers_detail')->where('driver_id', $id)->update($updateData);
 
         return redirect()->route('drivers.index')->with('success', 'อัปเดตข้อมูลพนักงานขับรถสำเร็จ!');
     }
@@ -279,6 +322,10 @@ class DriverController extends Controller
     // ==========================================
     public function destroy($id)
     {
+        if (in_array(Auth::user()->role->value, ['company', 'supply'])) {
+            abort(403, 'ไม่มีสิทธิ์ลบข้อมูลพนักงานขับรถ');
+        }
+
         DB::table('drivers_detail')->where('driver_id', $id)->update([
             'deleted_at' => now(),
             'updated_by' => Auth::user()->user_id,
@@ -297,7 +344,7 @@ class DriverController extends Controller
             ->leftJoin('supply_datas as s', 's.sup_id', '=', 'd.supply_id')
             ->leftJoin('vehicles_detail as v', 'v.car_id', '=', 'd.assigned_car_id')
             ->where('d.driver_id', $driverId)
-            ->where('d.company_id', $companyId)
+            ->when($user->role->value !== 'staff', fn($q) => $q->where('d.company_id', $companyId))
             ->whereNull('d.deleted_at')
             ->select([
                 'd.driver_id',
@@ -313,6 +360,7 @@ class DriverController extends Controller
                 'd.hire_date',
                 'd.driver_status',
                 'd.remark',
+                'd.driver_profile',
                 's.supply_name',
                 'v.car_plate',
                 'v.car_brand',
@@ -340,10 +388,10 @@ class DriverController extends Controller
         $user      = Auth::user();
         $companyId = $user->company_code;
 
-        // ตรวจว่า driver อยู่ใน company เดียวกัน
+        // ตรวจว่า driver อยู่ใน company เดียวกัน (staff เห็นทุก company)
         $driver = DB::table('drivers_detail')
             ->where('driver_id', $driverId)
-            ->where('company_id', $companyId)
+            ->when($user->role->value !== 'staff', fn($q) => $q->where('company_id', $companyId))
             ->whereNull('deleted_at')
             ->first();
 
@@ -400,10 +448,10 @@ class DriverController extends Controller
         $user      = Auth::user();
         $companyId = $user->company_code;
 
-        // ตรวจว่า driver อยู่ใน company เดียวกัน
+        // ตรวจว่า driver อยู่ใน company เดียวกัน (staff เห็นทุก company)
         $driver = DB::table('drivers_detail')
             ->where('driver_id', $driverId)
-            ->where('company_id', $companyId)
+            ->when($user->role->value !== 'staff', fn($q) => $q->where('company_id', $companyId))
             ->whereNull('deleted_at')
             ->first();
 
