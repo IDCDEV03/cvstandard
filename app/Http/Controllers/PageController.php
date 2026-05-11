@@ -127,6 +127,16 @@ class PageController extends Controller
                 $car->inspect_count = $history->count();
                 $car->latest_record = $history->first();
 
+                // ตรวจสอบว่ามีช่างคนอื่นกำลังตรวจอยู่หรือไม่
+                $car->in_progress_by_other = DB::table('chk_records as cr')
+                    ->join('inspector_datas as ins', 'cr.user_id', '=', 'ins.ins_id')
+                    ->where('cr.veh_id', $car->car_id)
+                    ->where('cr.chk_status', '2')
+                    ->where('cr.user_id', '!=', $user_main_id)
+                    ->selectRaw("cr.record_id, cr.user_id, CONCAT(ins.ins_prefix, ins.ins_name, ' ', ins.ins_lastname) as inspector_name")
+                    ->orderBy('cr.created_at', 'desc')
+                    ->first();
+
                 // 📌 นับสถิติจาก "สถานะล่าสุด" ของรถแต่ละคัน (ต้องตรวจเสร็จแล้ว chk_status = 1 ถึงจะนับผลประเมิน)
                 if ($car->latest_record && $car->latest_record->chk_status == '1') {
                     $totalInspections++; // นับรวมทุกคันที่เคยตรวจโดย User คนนี้
@@ -143,7 +153,8 @@ class PageController extends Controller
                 // 📌 กรองรถเข้าตาราง ตามปุ่มที่กด (Filter)
                 $shouldInclude = false;
                 if ($filter == 'all') {
-                    $shouldInclude = true; // โชว์ทั้งหมด
+                    // แสดงเฉพาะรถที่มีประวัติการตรวจ (ตนเองหรือช่างคนอื่นกำลังตรวจ)
+                    $shouldInclude = $car->inspect_count > 0 || $car->in_progress_by_other;
                 } elseif ($car->latest_record && $car->latest_record->chk_status == '1') {
                     if ($filter == 'passed' && $car->latest_record->evaluate_status == 1) {
                         $shouldInclude = true;

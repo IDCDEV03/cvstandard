@@ -319,7 +319,7 @@
 
             // AJAX: Load supplies
             $.ajax({
-                url: "{{ route('staff.vehicles.ajax.supplies') }}",
+                url: "{{ route('vehicles.ajax.supplies') }}",
                 method: 'GET',
                 data: {
                     company_id: companyId
@@ -407,7 +407,7 @@
 
             // AJAX: Get supply info (limit + current count)
             $.ajax({
-                url: `{{ url('staff/vehicles/ajax/supply-info') }}/${encodeURIComponent(supplyId)}`,
+                url: "{{ url('vehicles/ajax/supply-info') }}/" + encodeURIComponent(supplyId),
                 method: 'GET',
                 success: function(response) {
                     if (response.success) {
@@ -494,7 +494,7 @@
 
             plateCheckTimeout = setTimeout(function() {
                 $.ajax({
-                    url: "{{ route('staff.vehicles.ajax.check_plate') }}",
+                    url: "{{ route('vehicles.ajax.check_plate') }}",
                     method: 'GET',
                     data: {
                         plate: plate,

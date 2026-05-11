@@ -34,6 +34,7 @@ use App\Http\Controllers\Staff\FormGroupController;
 use App\Http\Controllers\Staff\InspectorController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\Staff\VehicleController;
+use App\Http\Controllers\Inspector\InspectorProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -191,6 +192,8 @@ Route::prefix('inspection')->middleware(['auth', 'role:user,inspector,company,st
 
 Route::prefix('inspector')->middleware(['auth', 'role:inspector'])->group(function () {
     Route::get('/index', [PageController::class, 'home'])->name('ins-dashboard');
+    Route::get('/profile', [InspectorProfileController::class, 'show'])->name('ins.profile');
+    Route::post('/profile/update', [InspectorProfileController::class, 'update'])->name('ins.profile.update');
 });
 
 Route::prefix('user')->middleware(['auth', 'role:user'])->group(function () {

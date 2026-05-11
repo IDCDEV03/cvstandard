@@ -192,6 +192,27 @@
              </li>
 
              <li>
+                 <a href="{{route('vehicles.index')}}" class="">
+                     <span class="nav-icon uil uil-car"></span>
+                     <span class="menu-text">รายการรถ</span>
+                 </a>
+             </li>
+
+             <li>
+                 <a href="{{route('vehicles.create')}}" class="">
+                     <span class="nav-icon uil uil-plus-circle"></span>
+                     <span class="menu-text">ลงทะเบียนรถใหม่</span>
+                 </a>
+             </li>
+
+             <li>
+                 <a href="{{ route('ins.profile') }}" class="">
+                     <span class="nav-icon uil uil-user"></span>
+                     <span class="menu-text">แก้ไขโปรไฟล์</span>
+                 </a>
+             </li>
+
+             <li>
                  <a href="#" class="nav-author__signout"
                      onclick="event.preventDefault(); document.getElementById('logout').submit();">
                      <span class="nav-icon uil uil-sign-out-alt"></span>

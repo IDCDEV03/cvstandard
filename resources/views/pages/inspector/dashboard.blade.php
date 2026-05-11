@@ -29,6 +29,33 @@
             font-size: 22px;
             line-height: 1;
         }
+
+        .btn-register {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 28px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #12b76a 0%, #059669 100%);
+            box-shadow: 0 4px 16px rgba(18, 183, 106, 0.35);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(18, 183, 106, 0.4);
+            color: #fff;
+        }
+
+        .btn-register i {
+            font-size: 22px;
+            line-height: 1;
+        }
     </style>
     <style>
     .hover-shadow:hover {
@@ -36,7 +63,92 @@
         transition: all 0.2s ease-in-out;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
     }
-</style>
+
+    /* ===== Vehicle Table ===== */
+    .veh-table thead tr {
+        background: linear-gradient(90deg, #1e1b4b 0%, #3730a3 60%, #4f46e5 100%);
+    }
+    .veh-table thead th {
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: .3px;
+        border: none;
+        padding: 13px 16px;
+        white-space: nowrap;
+    }
+    .veh-table tbody tr {
+        transition: background .15s;
+    }
+    .veh-table tbody tr:hover {
+        background: #f5f3ff;
+    }
+    .veh-table tbody td {
+        padding: 12px 16px;
+        vertical-align: middle;
+        border-color: #eff0f6;
+        font-size: 14px;
+    }
+    .plate-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0f4ff;
+        border: 1px solid #c7caff;
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-weight: 700;
+        font-size: 15px;
+        color: #3730a3;
+        letter-spacing: .5px;
+    }
+    .type-chip {
+        display: inline-block;
+        background: #f1f5f9;
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 4px;
+    }
+    .eval-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .eval-pass   { background:#dcfce7; color:#16a34a; }
+    .eval-warn   { background:#fef9c3; color:#b45309; }
+    .eval-fail   { background:#fee2e2; color:#dc2626; }
+    .eval-draft  { background:#f1f5f9; color:#64748b; }
+    .busy-badge  {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff7ed;
+        border: 1px solid #fdba74;
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-size: 13px;
+        color: #c2410c;
+        font-weight: 600;
+    }
+    .seq-num {
+        width: 32px;
+        height: 32px;
+        background: #ede9fe;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: #5840ff;
+    }
+    </style>
 @endpush
 @section('content')
     <div class="container-fluid">
@@ -63,12 +175,16 @@
         </div>
 
         <div class="row mt-10 mb-20">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <a href="{{ route('inspection.index') }}" class="btn-inspect">
+                    <div class="card-body d-flex gap-3">
+                        <a href="{{ route('inspection.index') }}" class="btn-inspect flex-fill">
                             <i class="uil uil-truck"></i>
                             เริ่มตรวจรถ
+                        </a>
+                        <a href="{{ route('vehicles.create') }}" class="btn-register flex-fill">
+                            <i class="uil uil-plus-circle"></i>
+                            ลงทะเบียนรถ
                         </a>
                     </div>
                 </div>
@@ -159,127 +275,170 @@
     </div>
 </div>
 
-         <div class="row">
+        <div class="row">
             <div class="col-lg-12">
                 <div class="card border-0 mb-25 shadow-sm">
-                    <div class="card-header border-0 pb-0 pt-25 px-25">
-                        <span class="fs-20 fw-bold mb-0">รายการรถ</span>
-                        <div class="card-extra">
-                            <a href="#" class="btn btn-sm btn-light">ดูทั้งหมด</a>
+
+                    {{-- Header --}}
+                    <div style="background:linear-gradient(90deg,#1e1b4b 0%,#3730a3 60%,#4f46e5 100%);
+                                padding:14px 22px; border-radius:12px 12px 0 0;
+                                display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="uil uil-list-ul" style="font-size:20px; color:rgba(255,255,255,.8);"></i>
+                            <span style="font-size:16px; font-weight:700; color:#fff; letter-spacing:.3px;">
+                                รายการรถที่ฉันตรวจ
+                            </span>
+                            <span style="background:rgba(255,255,255,.15); color:#fff; font-size:13px;
+                                         padding:3px 12px; border-radius:20px;">
+                                {{ count($vehicles) }} คัน
+                            </span>
                         </div>
+                        <a href="{{ route('vehicles.index') }}"
+                           style="display:inline-flex; align-items:center; gap:6px;
+                                  background:rgba(255,255,255,.18); color:#fff; font-size:13px; font-weight:600;
+                                  padding:5px 14px; border-radius:20px; text-decoration:none;
+                                  border:1px solid rgba(255,255,255,.3); transition:background .15s;"
+                           onmouseover="this.style.background='rgba(255,255,255,.28)'"
+                           onmouseout="this.style.background='rgba(255,255,255,.18)'">
+                            <i class="uil uil-car"></i> ดูรถทั้งหมด
+                        </a>
                     </div>
+
                     <div class="card-body p-0">
-                        <div class="table4 p-25">
-                            <div class="table-responsive">
-                               <table class="table table-default table-bordered mb-0" id="table-one">
-    <thead class="table-info">
-        <tr>
-            <th class="text-sm fw-bold">#</th>
-            <th class="text-sm fw-bold">ทะเบียนรถ</th>
-            <th class="text-sm fw-bold">สถานะล่าสุด</th>
-            <th class="text-sm fw-bold">ประวัติผลการตรวจ</th>
-            <th class="text-sm fw-bold text-center">รายงาน (Report)</th>
-            <th class="text-sm fw-bold">ประเภทรถ</th>
-            <th>จัดการรถ</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($vehicles as $item)
-            <tr>
-                <td> {{ $loop->iteration }} </td>
-                
-                <!-- ทะเบียนรถ -->
-                <td>
-                    <a href="#" class="fw-bold fs-16">
-                        {{ $item->car_plate }}
-                    </a>
-                </td>
-
-                <!-- สถานะการตรวจ (โชว์เฉพาะครั้งล่าสุด) -->
-                <td class="text-center">
-                    @if ($item->inspect_count == 0)
-                        <span class="text-muted small">ยังไม่มีประวัติ</span>
-                    @elseif ($item->latest_record->chk_status === '1')
-                        <span class="dm-tag tag-success tag-transparented fs-18">บันทึกสมบูรณ์</span>
-                    @elseif ($item->latest_record->chk_status === '2')
-                        <span class="dm-tag tag-warning tag-transparented fs-18">บันทึกแบบร่าง</span>
-                    @endif
-                </td>
-
-                <!-- สรุปผลการตรวจ (วนลูปแสดงทุกครั้งที่ตรวจ) -->
-                <td>
-                    @if ($item->inspect_count > 0)
-                        <div class="d-flex flex-column gap-2">
-                            @foreach($item->history as $index => $record)
-                                <!-- เฉพาะที่ตรวจเสร็จแล้วถึงจะแสดงผลประเมิน -->
-                                @if($record->chk_status == '1')
-                                    <div class="border-bottom pb-1 mb-1">
-                                        <small class="text-muted fw-bold">ครั้งที่ {{ $item->inspect_count - $index }} : </small>
-                                        
-                                        @if ($record->evaluate_status == 1)
-                                            <span class="text-success fw-bold fs-14">ปกติ อนุญาตให้ใช้งานได้</span>
-                                        @elseif ($record->evaluate_status == 2)
-                                            <span class="text-warning fw-bold fs-14">ไม่ปกติ แต่ปฏิบัติงานได้</span>
-                                        @elseif ($record->evaluate_status == 3)
-                                            <span class="text-danger fw-bold fs-14">ไม่ปกติ ไม่อนุญาตให้ใช้งาน</span>
-                                            @if ($record->next_inspect_date)
-                                                <br><small class="text-danger"> กำหนดตรวจซ้ำ: {{ thai_date( \Carbon\Carbon::parse($record->next_inspect_date)) }}</small>
-                                            @endif
-                                        @endif
-                                    </div>
-                                @elseif($record->chk_status == '2')
-                                     <div class="border-bottom pb-1 mb-1">
-                                        <small class="text-muted fw-bold">ครั้งที่ {{ $item->inspect_count - $index }}: </small>
-                                        <span class="text-muted fs-14">กำลังดำเนินการตรวจ...</span>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
-                    @else
-                        <span class="text-muted small">-</span>
-                    @endif
-                </td>
-
-                <!-- รายงาน (วนลูปแสดงปุ่ม Report คู่กับสรุปผล) -->
-                <td class="text-center">
-                     @if ($item->inspect_count > 0)
-                        <div class="d-flex flex-column gap-2 align-items-center">
-                            @foreach($item->history as $index => $record)
-                                <div class="border-bottom pb-1 mb-1 w-100 text-center">
-                                    @if ($record->chk_status === '1')
-                                        <a href="{{ route('inspection.report', $record->record_id) }}" class="btn btn-info btn-xs shadow-sm">
-                                            <i class="uil uil-file-alt"></i> Report ครั้งที่ {{ $item->inspect_count - $index }}
-                                        </a>
-                                    @elseif ($record->chk_status === '2')
-                                         @if (Auth::user()->user_id == $record->user_id)
-                                            <a href="{{ route('inspection.step3', [$record->record_id]) }}" class="btn btn-secondary btn-default btn-squared btn-xs">
-                                                ตรวจต่อ <i class="uil uil-arrow-right" style="font-size:12px;"></i>
-                                            </a>
-                                        @else
-                                            <span class="badge bg-danger rounded-pill fs-11">ติดค้างโดย {{ $record->user_id }}</span>
-                                        @endif
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <span class="text-muted small">ยังไม่มี Report</span>
-                    @endif
-                </td>
-
-                <!-- ประเภทรถ -->
-                <td> {{ $item->vehicle_type }} </td>
-                
-                <!-- จัดการรถ -->
-                <td>
-                    <a href="#" class="btn btn-outline-primary btn-xs">แก้ไขข้อมูลรถ</a>
-                </td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
+                        @if(count($vehicles) === 0)
+                            <div class="text-center py-5 text-muted">
+                                <i class="uil uil-car" style="font-size:48px; opacity:.3;"></i>
+                                <p class="mt-2 mb-0">ไม่พบรายการรถ</p>
                             </div>
+                        @else
+                        <div class="table-responsive">
+                            <table class="table veh-table mb-0" id="table-one">
+                                <thead>
+                                    <tr>
+                                        <th style="width:48px;">#</th>
+                                        <th>ทะเบียนรถ</th>
+                                        <th>ผลการตรวจล่าสุด</th>
+                                        <th>ประวัติการตรวจ</th>
+                                        <th class="text-center">การดำเนินการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($vehicles as $item)
+                                    <tr>
+                                        {{-- ลำดับ --}}
+                                        <td>
+                                            <span class="seq-num">{{ $loop->iteration }}</span>
+                                        </td>
+
+                                        {{-- ทะเบียนรถ + ประเภท --}}
+                                        <td>
+                                            <a href="{{ route('vehicles.show', $item->car_id) }}" class="text-decoration-none">
+                                                <div class="plate-pill">
+                                                    <i class="uil uil-car" style="font-size:14px;opacity:.7;"></i>
+                                                    {{ $item->car_plate }}
+                                                </div>
+                                            </a>
+                                            @if($item->vehicle_type)
+                                                <div><span class="type-chip">{{ $item->vehicle_type }}</span></div>
+                                            @endif
+                                        </td>
+
+                                        {{-- ผลการตรวจล่าสุด --}}
+                                        <td>
+                                            @if($item->in_progress_by_other)
+                                                <div class="busy-badge">
+                                                    <i class="uil uil-lock-alt"></i>
+                                                    กำลังตรวจโดย {{ $item->in_progress_by_other->inspector_name }}
+                                                </div>
+                                            @elseif($item->inspect_count === 0)
+                                                <span class="text-muted" style="font-size:13px;">ยังไม่มีประวัติ</span>
+                                            @elseif($item->latest_record->chk_status == '2')
+                                                <span class="eval-badge eval-draft">
+                                                    <i class="uil uil-edit-alt"></i> กำลังตรวจ...
+                                                </span>
+                                            @elseif($item->latest_record->evaluate_status == 1)
+                                                <span class="eval-badge eval-pass">
+                                                    <i class="uil uil-check-circle"></i> ปกติ อนุญาตให้ใช้งาน
+                                                </span>
+                                            @elseif($item->latest_record->evaluate_status == 2)
+                                                <span class="eval-badge eval-warn">
+                                                    <i class="uil uil-exclamation-triangle"></i> ไม่ปกติ แต่ใช้งานได้
+                                                </span>
+                                            @elseif($item->latest_record->evaluate_status == 3)
+                                                <span class="eval-badge eval-fail">
+                                                    <i class="uil uil-times-circle"></i> ไม่ปกติ ห้ามใช้งาน
+                                                </span>
+                                                @if($item->latest_record->next_inspect_date)
+                                                    <div style="font-size:12px; color:#dc2626; margin-top:4px;">
+                                                        <i class="uil uil-calendar-alt"></i>
+                                                        ตรวจซ้ำ: {{ thai_date(\Carbon\Carbon::parse($item->latest_record->next_inspect_date)) }}
+                                                    </div>
+                                                @endif
+                                            @endif
+                                        </td>
+
+                                        {{-- ประวัติ --}}
+                                        <td>
+                                            @if($item->inspect_count > 0)
+                                                <div class="d-flex flex-column gap-1">
+                                                    @foreach($item->history as $index => $record)
+                                                        @if($record->chk_status == '1')
+                                                            <div style="font-size:12px; color:#64748b;">
+                                                                <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
+                                                                @if($record->evaluate_status == 1)
+                                                                    <span style="color:#16a34a;">· ผ่าน</span>
+                                                                @elseif($record->evaluate_status == 2)
+                                                                    <span style="color:#b45309;">· ไม่ปกติ (ใช้ได้)</span>
+                                                                @elseif($record->evaluate_status == 3)
+                                                                    <span style="color:#dc2626;">· ไม่ผ่าน</span>
+                                                                @endif
+                                                            </div>
+                                                        @elseif($record->chk_status == '2')
+                                                            <div style="font-size:12px; color:#94a3b8;">
+                                                                <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
+                                                                · กำลังดำเนินการ
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span style="font-size:12px; color:#cbd5e1;">-</span>
+                                            @endif
+                                        </td>
+
+                                        {{-- การดำเนินการ --}}
+                                        <td class="text-center">
+                                            @if($item->in_progress_by_other)
+                                                <span style="font-size:12px; color:#94a3b8;">ไม่สามารถดำเนินการได้ขณะนี้</span>
+                                            @elseif($item->inspect_count === 0)
+                                                <span style="font-size:12px; color:#cbd5e1;">-</span>
+                                            @else
+                                                <div class="d-flex flex-column gap-1 align-items-center">
+                                                    @foreach($item->history as $index => $record)
+                                                        @if($record->chk_status == '1')
+                                                            <a href="{{ route('inspection.report', $record->record_id) }}"
+                                                               class="btn btn-xs"
+                                                               style="background:#e0e7ff;color:#3730a3;font-size:12px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
+                                                                <i class="uil uil-file-alt"></i>
+                                                                Report ครั้งที่ {{ $item->inspect_count - $index }}
+                                                            </a>
+                                                        @elseif($record->chk_status == '2')
+                                                            <a href="{{ route('inspection.step3', [$record->record_id]) }}"
+                                                               class="btn btn-xs"
+                                                               style="background:#fef9c3;color:#b45309;font-size:12px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
+                                                                <i class="uil uil-play-circle"></i> ตรวจต่อ
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

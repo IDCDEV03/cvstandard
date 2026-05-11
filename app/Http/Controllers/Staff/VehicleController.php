@@ -224,11 +224,67 @@ public function ajaxIndex(Request $request)
     // ============================================
     public function create()
     {
-        // Load companies for step 1 dropdown
-        $companies = DB::table('company_details')
-            ->select('company_id', 'company_name')
-            ->orderBy('company_name')
-            ->get();
+        $user     = Auth::user();
+        $userRole = $user->role->value;
+
+        // Load companies filtered by inspector type
+        if ($userRole === 'inspector') {
+            $inspector = DB::table('inspector_datas')
+                ->where('ins_id', $user->user_id)
+                ->first();
+
+            if (!$inspector) {
+                return redirect()->route('vehicles.index')
+                    ->with('error', 'ไม่พบข้อมูลผู้ตรวจ');
+            }
+
+            switch ($inspector->inspector_type) {
+                case '1':
+                    $companies = DB::table('company_details')
+                        ->where('company_id', $inspector->company_code)
+                        ->select('company_id', 'company_name')
+                        ->orderBy('company_name')
+                        ->get();
+                    break;
+
+                case '2':
+                    $supply = DB::table('supply_datas')
+                        ->where('sup_id', $inspector->sup_id)
+                        ->first();
+                    $companies = $supply
+                        ? DB::table('company_details')
+                            ->where('company_id', $supply->company_code)
+                            ->select('company_id', 'company_name')
+                            ->get()
+                        : collect();
+                    break;
+
+                case '3':
+                    $allowedSupIds = DB::table('inspector_supply_access')
+                        ->where('ins_id', $inspector->ins_id)
+                        ->pluck('supply_id');
+                    $companyIds = DB::table('supply_datas')
+                        ->whereIn('sup_id', $allowedSupIds)
+                        ->pluck('company_code')
+                        ->unique()
+                        ->values();
+                    $companies = DB::table('company_details')
+                        ->whereIn('company_id', $companyIds)
+                        ->select('company_id', 'company_name')
+                        ->orderBy('company_name')
+                        ->get();
+                    break;
+
+                default:
+                    return redirect()->route('vehicles.index')
+                        ->with('error', 'ประเภทผู้ตรวจไม่ถูกต้อง');
+            }
+        } else {
+            $companies = DB::table('company_details')
+                ->select('company_id', 'company_name')
+                ->orderBy('company_name')
+                ->get();
+        }
 
         // Load static masters
         $car_brands = DB::table('car_brands')
@@ -344,7 +400,46 @@ public function ajaxIndex(Request $request)
         }
 
         // ============================================
-        // 3. Server-side guard: Check plate uniqueness within supply
+        // 3. Server-side guard: Inspector scope check
+        // ============================================
+        $user = Auth::user();
+        if ($user->role->value === 'inspector') {
+            $inspector = DB::table('inspector_datas')
+                ->where('ins_id', $user->user_id)
+                ->first();
+
+            if (!$inspector) {
+                return redirect()->back()
+                    ->with('error', 'ไม่พบข้อมูลผู้ตรวจ')
+                    ->withInput();
+            }
+
+            $allowed = false;
+            switch ($inspector->inspector_type) {
+                case '1':
+                    $allowed = ($request->company_id === $inspector->company_code);
+                    break;
+                case '2':
+                    $allowed = ($request->supply_id === $inspector->sup_id)
+                        && ($supply->company_code === $inspector->company_code);
+                    break;
+                case '3':
+                    $allowed = DB::table('inspector_supply_access')
+                        ->where('ins_id', $inspector->ins_id)
+                        ->where('supply_id', $request->supply_id)
+                        ->exists();
+                    break;
+            }
+
+            if (!$allowed) {
+                return redirect()->back()
+                    ->with('error', 'คุณไม่มีสิทธิ์ลงทะเบียนรถภายใต้ Supply นี้')
+                    ->withInput();
+            }
+        }
+
+        // ============================================
+        // 4. Server-side guard: Check plate uniqueness within supply
         // ============================================
         $cleanPlate = str_replace(' ', '', trim($request->plate));
         $car_plate = $cleanPlate . ' ' . $request->province;
@@ -361,12 +456,12 @@ public function ajaxIndex(Request $request)
         }
 
         // ============================================
-        // 4. Generate car_id
+        // 5. Generate car_id
         // ============================================
         $veh_id = $this->generateUniqueVehId();
 
         // ============================================
-        // 5. DB Transaction
+        // 6. DB Transaction
         // ============================================
         DB::beginTransaction();
 
@@ -374,13 +469,13 @@ public function ajaxIndex(Request $request)
             $user = Auth::user();
             $now = now();
 
-            // 5.1 Prepare image path (will save after insert)
+            // 6.1 Prepare image path (will save after insert)
             $imagePath = null;
             if ($request->hasFile('vehicle_image')) {
                 $imagePath = $this->saveVehicleImage($request->file('vehicle_image'), $veh_id);
             }
 
-            // 5.2 Prepare data for vehicles_detail
+            // 6.2 Prepare data for vehicles_detail
             $vehicleData = [
                 'user_id'              => $user->user_id,
                 'company_code'         => $request->company_id,
@@ -408,10 +503,10 @@ public function ajaxIndex(Request $request)
                 'updated_at'           => $now,
             ];
 
-            // 5.3 Insert vehicle and get ID
+            // 6.3 Insert vehicle and get ID
             $vehicleId = DB::table('vehicles_detail')->insertGetId($vehicleData);
 
-            // 5.4 Upload document (if any)
+            // 6.4 Upload document (if any)
             if ($request->hasFile('vehicle_document')) {
                 $docName = $request->doc_name ?: ('เอกสารประจำปี ' . (now()->year + 543));
                 $this->saveVehicleDocument(
@@ -422,7 +517,7 @@ public function ajaxIndex(Request $request)
                 );
             }
 
-            // 5.5 Insert activity log
+            // 6.5 Insert activity log
             DB::table('vehicle_activity_logs')->insert([
                 'vehicle_id'  => $vehicleId,
                 'user_id'     => $user->user_id,
@@ -436,7 +531,7 @@ public function ajaxIndex(Request $request)
             DB::commit();
 
             // ============================================
-            // 6. Redirect with success
+            // 7. Redirect with success
             // ============================================
             return redirect()->route('vehicles.show', $veh_id)
                 ->with('success', 'ลงทะเบียนรถเรียบร้อยแล้ว!');
@@ -954,21 +1049,40 @@ public function update(Request $request, $veh_id)
     public function getSuppliesByCompany(Request $request)
     {
         $company_id = $request->input('company_id');
+        $user       = Auth::user();
+        $userRole   = $user->role->value;
 
         if (empty($company_id)) {
             return response()->json(['success' => false, 'message' => 'company_id required']);
         }
 
-        $supplies = DB::table('supply_datas')
+        $query = DB::table('supply_datas')
             ->where('company_code', $company_id)
             ->where('supply_status', '1')
             ->select('sup_id', 'supply_name', 'vehicle_limit')
-            ->orderBy('supply_name')
-            ->get();
+            ->orderBy('supply_name');
+
+        if ($userRole === 'inspector') {
+            $inspector = DB::table('inspector_datas')
+                ->where('ins_id', $user->user_id)
+                ->first();
+
+            if ($inspector) {
+                if ($inspector->inspector_type == '2') {
+                    $query->where('sup_id', $inspector->sup_id);
+                } elseif ($inspector->inspector_type == '3') {
+                    $allowedSupIds = DB::table('inspector_supply_access')
+                        ->where('ins_id', $inspector->ins_id)
+                        ->pluck('supply_id');
+                    $query->whereIn('sup_id', $allowedSupIds);
+                }
+                // inspector_type = 1: แสดงทุก supply ภายใต้ company
+            }
+        }
 
         return response()->json([
             'success' => true,
-            'data' => $supplies
+            'data'    => $query->get(),
         ]);
     }
 
