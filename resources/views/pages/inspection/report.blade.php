@@ -326,7 +326,7 @@
                          <h5 class="fw-bold text-dark mb-0">รูปภาพประกอบการตรวจ</h5>
                          <div class="text-dark" style="font-size: 14px;">
                              <strong>ทะเบียนรถ:</strong> {{ $vehicle->car_plate ?? '-' }} |
-                             <strong>วันที่ตรวจ:</strong> {{ thai_date($record->created_at) }}
+                             <strong>วันที่ตรวจ:</strong> {{ thai_date($record->inspect_date ?? $record->created_at) }}
                          </div>
 
                      </div>
@@ -389,7 +389,7 @@
 
 
                  {{-- ===== เอกสารแนบรถ ===== --}}
-                 @if ($vehicleDocs->count())
+                 @if ($vehicleDocs->count() || $preInspectDocs->count())
                      <div class="mt-5 no-print">
                          <div style="border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 5px;">
                              <h5 class="fw-bold text-dark mb-0">เอกสารแนบรถ</h5>
@@ -401,9 +401,7 @@
                          <div class="row g-3">
                              @foreach ($vehicleDocs as $doc)
                                  <div class="col-md-6">
-                                     <div
-                                         class="d-flex align-items-center justify-content-between
-                        border rounded p-3">
+                                     <div class="d-flex align-items-center justify-content-between border rounded p-3">
                                          <div class="d-flex align-items-center gap-3">
                                              <i class="uil uil-file-alt fs-24 text-danger"></i>
                                              <div>
@@ -415,6 +413,26 @@
                                              </div>
                                          </div>
                                          <a href="{{ Storage::url($doc->file_path) }}" target="_blank"
+                                             class="btn btn-outline-danger btn-sm">
+                                             <i class="uil uil-print me-1"></i>เปิด / พิมพ์
+                                         </a>
+                                     </div>
+                                 </div>
+                             @endforeach
+
+                             @foreach ($preInspectDocs as $doc)
+                                 <div class="col-md-6">
+                                     <div class="d-flex align-items-center justify-content-between border rounded p-3">
+                                         <div class="d-flex align-items-center gap-3">
+                                             <i class="uil uil-file-alt fs-24 text-danger"></i>
+                                             <div>
+                                                 <div class="fw-500 fs-14">{{ $doc->doc_name }}</div>
+                                                 <div class="text-muted fs-12">
+                                                     {{ thai_date($doc->created_at) }}
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         <a href="{{ url($doc->file_path) }}" target="_blank"
                                              class="btn btn-outline-danger btn-sm">
                                              <i class="uil uil-print me-1"></i>เปิด / พิมพ์
                                          </a>

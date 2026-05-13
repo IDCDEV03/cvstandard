@@ -79,7 +79,7 @@ class CompanyPreInspectionController extends Controller
             'template_name'        => 'required|string|max:255',
             'fields'               => 'required|array|min:1',
             'fields.*.field_label' => 'required|string|max:255',
-            'fields.*.field_type'  => 'required|in:text,image,gps',
+            'fields.*.field_type'  => 'required|in:text,image,gps,document',
             'fields.*.is_required' => 'required|in:0,1',
         ]);
 

@@ -1,4 +1,4 @@
-{{-- ============================================ --}}
+﻿{{-- ============================================ --}}
 {{-- Reuse Select2 assets + styles from create     --}}
 {{-- ============================================ --}}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
@@ -120,7 +120,7 @@ $(document).ready(function () {
 
         // Different supply → check quota via AJAX
         $.ajax({
-            url     : `{{ url('staff/vehicles/ajax/supply-info') }}/${encodeURIComponent(supId)}`,
+            url     : `{{ route('vehicles.ajax.supply_info', ['sup_id' => 0]) }}/${encodeURIComponent(supId)}`,
             method  : 'GET',
             success : function (res) {
                 if (!res.success) return;
@@ -168,7 +168,7 @@ $(document).ready(function () {
 
         plateTimer = setTimeout(function () {
             $.ajax({
-                url    : "{{ route('staff.vehicles.ajax.check_plate') }}",
+                url    : "{{ route('vehicles.ajax.check_plate') }}",
                 method : 'GET',
                 data   : { plate, province, supply_id: supId, exclude_id: VEH_ID },
                 success: function (res) {

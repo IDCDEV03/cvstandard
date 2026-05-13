@@ -109,6 +109,18 @@
 
                     <div class="card border-0 shadow-sm radius-xs mb-4">
                         <div class="card-body p-3 p-md-4">
+                            <h6 class="fw-bold mb-3"><i class="uil uil-calendar-alt me-1"></i> วันที่ตรวจ</h6>
+                            <div>
+                                <input type="date" class="form-control" name="inspect_date" id="inspect_date"
+                                    value="{{ $record->inspect_date ?? date('Y-m-d') }}"
+                                    max="{{ date('Y-m-d') }}">
+                                <div class="form-text text-muted">ระบุวันที่ตรวจ หากไม่ระบุวัน ระบบจะบันทึกจากวันที่ปัจจุบัน</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm radius-xs mb-4">
+                        <div class="card-body p-3 p-md-4">
                             <h6 class="fw-bold mb-3"><i class="uil uil-check-circle me-1"></i> ผลการตรวจสอบสมรรถนะของรถ
                                 <span class="text-danger">*</span>
                             </h6>

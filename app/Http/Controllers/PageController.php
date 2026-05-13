@@ -131,7 +131,7 @@ class PageController extends Controller
                 $car->in_progress_by_other = DB::table('chk_records as cr')
                     ->join('inspector_datas as ins', 'cr.user_id', '=', 'ins.ins_id')
                     ->where('cr.veh_id', $car->car_id)
-                    ->where('cr.chk_status', '2')
+                    ->whereIn('cr.chk_status', ['0', '2'])
                     ->where('cr.user_id', '!=', $user_main_id)
                     ->selectRaw("cr.record_id, cr.user_id, CONCAT(ins.ins_prefix, ins.ins_name, ' ', ins.ins_lastname) as inspector_name")
                     ->orderBy('cr.created_at', 'desc')
