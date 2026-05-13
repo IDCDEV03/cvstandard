@@ -1,162 +1,238 @@
-@section('title', 'ระบบตรวจมาตรฐานรถ')
+@section('title', 'รายการรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<style>
+    .inspector-table th {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6c757d;
+        background: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    .inspector-table td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+    .inspector-table tbody tr:hover {
+        background-color: #f0f6ff;
+    }
+    .ins-name {
+        font-weight: 600;
+        color: #1a1a2e;
+        line-height: 1.3;
+    }
+    .ins-id {
+        font-family: monospace;
+        font-size: 11px;
+        color: #aaa;
+    }
+    .type-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .type-company  { background: #e8f4fd; color: #1677ff; }
+    .type-supply   { background: #e6fff0; color: #12b76a; }
+    .type-outsource{ background: #fff7e6; color: #fa8c16; }
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        transition: background 0.15s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+    .action-btn:hover { background: #f0f0f0; }
+    .action-btn.danger:hover { background: #fff0f0; }
+    .action-btn i { font-size: 17px; }
+</style>
+@endpush
+
 @section('content')
+@php use App\Enums\Role; $role = Auth::user()->role; @endphp
 <div class="container-fluid">
-    <!-- Hexadash Breadcrumb & Header -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="breadcrumb-main user-member justify-content-sm-between ">
-                <div class=" d-flex flex-wrap justify-content-center breadcrumb-main__wrapper">
-                    <div class="d-flex align-items-center user-member__title justify-content-center me-sm-25">
-                        <h4 class="text-capitalize fw-500 breadcrumb-title">จัดการข้อมูลช่างตรวจ</h4>
-                    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="breadcrumb-main user-member justify-content-sm-between">
+                <div class="d-flex align-items-center user-member__title">
+                    <h4 class="text-capitalize fw-500 breadcrumb-title">จัดการข้อมูลช่างตรวจ</h4>
                 </div>
-                
-                    <a href="{{ route('staff.inspectors.create') }}" class="btn btn-lg btn-secondary">
-                        <i class="las la-plus fs-16"></i> เพิ่มช่างใหม่
-                    </a>
-                
+                <a href="{{ route('staff.inspectors.create') }}" class="btn btn-primary">
+                    <i class="uil uil-plus me-1"></i> เพิ่มช่างใหม่
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- แจ้งเตือนเมื่อทำงานสำเร็จ -->
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show mb-25" role="alert">
-            <div class="alert-content">
-                <p><strong>สำเร็จ!</strong> {{ session('success') }}</p>
-                <button type="button" class="btn-close text-capitalize" data-bs-dismiss="alert" aria-label="Close">
-                    <img src="{{ asset('assets/img/svg/x.svg') }}" alt="x" class="svg" aria-hidden="true">
-                </button>
-            </div>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <strong>สำเร็จ!</strong> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card mb-25">
-                <div class="card-body p-0">
-                    <div class="table4  p-25 mb-30">
-                        <div class="table-responsive">
-                            <table class="table mb-0 table-bordered table-hover" id="forms-table">
-                                <thead>
-                                    <tr class="userDatatable-header">
-                                        <th class="text-center">#</th>
-                                        <th>ชื่อ - นามสกุล</th>
-                                        <th>เบอร์โทร</th>
-                                        <th>บริษัทฯว่าจ้าง </th>
-                                        <th>ประเภทช่าง / สังกัด Supply</th>
-                                        <th class="text-center">สถานะ</th>
-                                        <th class="text-center">จัดการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($inspectors as $key => $ins)
-                                        <tr>
-                                            <td class="text-center">{{ $key + 1 }}</td>
-                                           
-                                            <td>                                                
-                                                    {{ $ins->ins_prefix }}{{ $ins->ins_name }} {{ $ins->ins_lastname }}   
-                                            </td>
-                                        
-                                            <td>  {{ $ins->ins_phone ?? '-' }}
-                                            </td>
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        <strong>เกิดข้อผิดพลาด!</strong> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
 
-                                            <td>    {{ $ins->company_name ?? 'ไม่ระบุ' }}
-                                            </td>                                            
-                                           
-                                            <td>
-                                                <div class="userDatatable-content d-inline-block">
-                                                    @if($ins->inspector_type == '1')
-                                                        <span class="bg-opacity-primary color-primary rounded-pill userDatatable-content-status active">ช่างประจำบริษัทฯว่าจ้าง</span>
-                                                    @elseif($ins->inspector_type == '2')
-                                                        <span class="bg-opacity-info color-info rounded-pill userDatatable-content-status active mb-1">ช่างประจำ Supply</span>
-                                                        <br><small class="text-dark fw-500"><i class="las la-building"></i> {{ $ins->supply_name ?? 'ไม่ระบุ' }}</small>
-                                                    @elseif($ins->inspector_type == '3')
-                                                        <span class="bg-opacity-warning color-warning rounded-pill userDatatable-content-status active">ช่าง นอกสังกัด (รับจ้าง)</span>
-                                                    @else
-                                                        <span class="bg-opacity-secondary color-secondary rounded-pill userDatatable-content-status active">ไม่ระบุ</span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            
-                                            <!-- สถานะ -->
-                                            <td class="text-center">
-                                                <div class="userDatatable-content d-inline-block">
-                                                    @if($ins->ins_status == '1')
-                                                        <span class="bg-opacity-success color-success rounded-pill userDatatable-content-status active">ใช้งาน</span>
-                                                    @else
-                                                        <span class="bg-opacity-danger color-danger rounded-pill userDatatable-content-status active">ระงับ</span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            
-                                            <!-- จัดการ (ปุ่ม Edit / Delete แบบ Hexadash) -->
-                                            <td>
-                                                 <ul
-                                                    class="orderDatatable_actions mb-0 d-flex flex-wrap justify-content-center">
-                                                    <li>
-                                                        <a href="#" class="edit" title="แก้ไข">
-                                                            <i class="uil uil-edit"></i>
-                                                        </a>
-                                                    </li>
-                                                    @if($ins->ins_status == '1')
-                                                    <li>
-                                                        <form action="{{ route('staff.inspectors.destroy', $ins->id) }}" method="POST" class="d-inline" onsubmit="return confirm('คุณแน่ใจหรือไม่ที่จะระงับการใช้งานช่างคนนี้?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="remove bg-transparent border-0 p-0" title="ระงับใช้งาน">
-                                                                <i class="uil uil-trash-alt text-danger"></i>
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                    @endif
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center py-4">
-                                                <div class="userDatatable-content text-muted">ไม่พบข้อมูลช่างตรวจในระบบ</div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <div class="card" style="border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.07); border:none;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table inspector-table mb-0" id="inspector-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center ps-3" style="width:50px;">#</th>
+                            <th>ชื่อ - นามสกุล</th>
+                            <th>เบอร์โทร</th>
+                            @if($role !== Role::Company)
+                            <th>บริษัทฯว่าจ้าง</th>
+                            @endif
+                            <th>ประเภทช่าง / สังกัด</th>
+                            <th class="text-center">สถานะ</th>
+                            <th class="text-center pe-3" style="width:100px;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($inspectors as $key => $ins)
+                        <tr>
+                            <td class="text-center ps-3 text-muted">{{ $key + 1 }}</td>
+
+                            <td>
+                                <div class="ins-name">{{ $ins->ins_prefix }}{{ $ins->ins_name }} {{ $ins->ins_lastname }}</div>
+                                <div class="ins-id">{{ $ins->ins_id }}</div>
+                            </td>
+
+                            <td>
+                                @if($ins->ins_phone)
+                                    <a href="tel:{{ $ins->ins_phone }}" class="text-decoration-none text-dark">
+                                        <i class="uil uil-phone text-muted me-1"></i>{{ $ins->ins_phone }}
+                                    </a>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+
+                            @if($role !== Role::Company)
+                            <td>
+                                @if($ins->company_name)
+                                    <i class="uil uil-building text-muted me-1"></i>{{ $ins->company_name }}
+                                @else
+                                    <span class="text-muted">ไม่ระบุ</span>
+                                @endif
+                            </td>
+                            @endif
+
+                            <td>
+                                @if($ins->inspector_type == '1')
+                                    <span class="type-badge type-company">
+                                        <i class="uil uil-building me-1"></i>ช่างประจำบริษัทฯ
+                                    </span>
+                                @elseif($ins->inspector_type == '2')
+                                    <span class="type-badge type-supply">
+                                        <i class="uil uil-truck me-1"></i>ช่างประจำ Supply
+                                    </span>
+                                    @if($ins->supply_name)
+                                        <div class="mt-1" style="font-size:12px; color:#555;">
+                                            <i class="uil uil-map-marker me-1"></i>{{ $ins->supply_name }}
+                                        </div>
+                                    @endif
+                                @elseif($ins->inspector_type == '3')
+                                    <span class="type-badge type-outsource">
+                                        <i class="uil uil-user-arrows me-1"></i>ช่างนอกสังกัด (รับจ้าง)
+                                    </span>
+                                @else
+                                    <span class="text-muted">ไม่ระบุ</span>
+                                @endif
+                            </td>
+
+                            <td class="text-center">
+                                @if($ins->ins_status == '1')
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2" style="font-size:12px;">
+                                        <i class="uil uil-check-circle me-1"></i>ใช้งาน
+                                    </span>
+                                @else
+                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2" style="font-size:12px;">
+                                        <i class="uil uil-ban me-1"></i>ระงับ
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td class="text-center pe-3">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a href="#" class="action-btn" title="แก้ไข">
+                                        <i class="uil uil-edit text-primary"></i>
+                                    </a>
+                                    @if($ins->ins_status == '1')
+                                    <form action="{{ route('staff.inspectors.destroy', $ins->id) }}" method="POST"
+                                        onsubmit="return confirm('ยืนยันระงับการใช้งานช่างคนนี้?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="action-btn danger" title="ระงับใช้งาน">
+                                            <i class="uil uil-trash-alt text-danger"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="{{ $role === Role::Company ? 6 : 7 }}" class="text-center py-5 text-muted">
+                                <i class="uil uil-user-slash fs-1 d-block mb-2"></i>
+                                ไม่พบข้อมูลช่างตรวจในระบบ
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
 </div>
 @endsection
 
 @push('scripts')
-    <!-- DataTables  -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-
-    <script>
-        $(document).ready(function() {
-            $('#forms-table').DataTable({
-                responsive: true,
-                pageLength: 25,
-                language: {
-                    search: "ค้นหา:",
-                    lengthMenu: "แสดง _MENU_ รายการ",
-                    info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                    paginate: {
-                        next: "ถัดไป",
-                        previous: "ก่อนหน้า"
-                    }
-                }
-            });
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#inspector-table').DataTable({
+            responsive: true,
+            pageLength: 25,
+            columnDefs: [
+                { orderable: false, targets: -1 }
+            ],
+            language: {
+                search: "ค้นหา:",
+                lengthMenu: "แสดง _MENU_ รายการ",
+                info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                infoEmpty: "ไม่มีข้อมูล",
+                zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                paginate: { next: "ถัดไป", previous: "ก่อนหน้า" }
+            }
         });
-    </script>
+    });
+</script>
 @endpush
