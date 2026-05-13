@@ -50,6 +50,7 @@
                                             <option value="text">ข้อความ</option>
                                             <option value="image">รูปภาพ</option>
                                             <option value="gps">พิกัด GPS</option>
+                                            <option value="document">เอกสาร</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
@@ -106,6 +107,7 @@
                             <option value="text">ข้อความ</option>
                             <option value="image">รูปภาพ</option>
                             <option value="gps">พิกัด GPS</option>
+                            <option value="document">เอกสาร</option>
                         </select>
                     </div>
                     <div class="col-md-3">

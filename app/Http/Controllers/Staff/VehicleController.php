@@ -29,11 +29,14 @@ public function index()
         ->orderBy('id', 'asc')
         ->get();
 
-    $companies = collect();
-    $supplies  = collect();
+    $companies          = collect();
+    $supplies           = collect();
+    $inspector          = null;
+    $showCompanyFilter  = false;
+    $showSupplyFilter   = false;
 
     if ($userRole === 'company') {
-        // Supplies that have vehicles under this company
+        $showSupplyFilter = true;
         $supplies = DB::table('vehicles_detail as v')
             ->join('supply_datas as s', 'v.supply_id', '=', 's.sup_id')
             ->where('v.company_code', $user->company_code)
@@ -42,11 +45,37 @@ public function index()
             ->distinct()
             ->orderBy('s.supply_name')
             ->get();
+
+    } elseif ($userRole === 'inspector') {
+        $inspector = DB::table('inspector_datas')->where('ins_id', $user->user_id)->first();
+        if ($inspector && $inspector->inspector_type == '3') {
+            $showSupplyFilter = true;
+            $allowedIds = DB::table('inspector_supply_access')
+                ->where('ins_id', $user->user_id)
+                ->pluck('supply_id')
+                ->toArray();
+            $supplies = DB::table('supply_datas')
+                ->whereIn('sup_id', $allowedIds)
+                ->select('sup_id', 'supply_name')
+                ->orderBy('supply_name')
+                ->get();
+        }
+
+    } elseif ($userRole === 'supply') {
+        // supply role has no extra filter dropdowns — scoped by their own sup_id
+
     } else {
+        // staff / admin / manager
+        $showCompanyFilter = true;
+        $showSupplyFilter  = true;
         $companies = DB::table('company_details')
             ->select('company_id', 'company_name')
             ->where('require_user_approval', '1')
             ->orderBy('company_name')
+            ->get();
+        $supplies = DB::table('supply_datas')
+            ->select('sup_id', 'supply_name')
+            ->orderBy('supply_name')
             ->get();
     }
 
@@ -56,11 +85,21 @@ public function index()
 
     $summaryQuery = DB::table('chk_records as cr')
         ->join('vehicles_detail as v', 'v.car_id', '=', 'cr.veh_id')
-        ->whereYear('cr.updated_at', $currentYear)
+        ->whereYear('cr.created_at', $currentYear)
         ->where('cr.chk_status', 1);
 
     if ($userRole === 'company') {
         $summaryQuery->where('v.company_code', $user->company_code);
+    } elseif ($userRole === 'supply') {
+        $summaryQuery->where('v.supply_id', $user->user_id);
+    } elseif ($userRole === 'inspector' && $inspector) {
+        if ($inspector->inspector_type == '1') {
+            $summaryQuery->where('v.company_code', $inspector->company_code);
+        } elseif ($inspector->inspector_type == '2') {
+            $summaryQuery->where('v.supply_id', $inspector->sup_id);
+        } elseif ($inspector->inspector_type == '3') {
+            $summaryQuery->whereIn('v.supply_id', $allowedIds ?? []);
+        }
     }
 
     $summary = $summaryQuery->selectRaw("
@@ -75,7 +114,9 @@ public function index()
         'companies',
         'supplies',
         'summary',
-        'currentYearBE'
+        'currentYearBE',
+        'showCompanyFilter',
+        'showSupplyFilter'
     ));
 }
 
@@ -108,13 +149,31 @@ public function ajaxIndex(Request $request)
             'v.car_id',
             'v.car_plate',
             'vt.vehicle_type as vehicle_type_name',
-            'cr.updated_at as inspect_date',
+            DB::raw('COALESCE(cr.inspect_date, cr.created_at) as inspect_date'),
             'cr.evaluate_status'
         );
 
-    // --- Auto-filter: company role sees only their vehicles ---
+    // --- Auto-filter by role ---
+    $inspectorAllowedSupplyIds = [];
     if ($userRole === 'company') {
         $query->where('v.company_code', $user->company_code);
+    } elseif ($userRole === 'supply') {
+        $query->where('v.supply_id', $user->user_id);
+    } elseif ($userRole === 'inspector') {
+        $inspector = DB::table('inspector_datas')->where('ins_id', $user->user_id)->first();
+        if ($inspector) {
+            if ($inspector->inspector_type == '1') {
+                $query->where('v.company_code', $inspector->company_code);
+            } elseif ($inspector->inspector_type == '2') {
+                $query->where('v.supply_id', $inspector->sup_id);
+            } elseif ($inspector->inspector_type == '3') {
+                $inspectorAllowedSupplyIds = DB::table('inspector_supply_access')
+                    ->where('ins_id', $user->user_id)
+                    ->pluck('supply_id')
+                    ->toArray();
+                $query->whereIn('v.supply_id', $inspectorAllowedSupplyIds);
+            }
+        }
     }
 
     // --- Filter: inspection result ---
@@ -126,14 +185,18 @@ public function ajaxIndex(Request $request)
         }
     }
 
-    // --- Filter: company (staff only) ---
-    if ($userRole !== 'company' && $request->filled('filter_company')) {
+    // --- Filter: company (staff/admin/manager only) ---
+    if (in_array($userRole, ['staff', 'admin', 'manager']) && $request->filled('filter_company')) {
         $query->where('v.company_code', $request->filter_company);
     }
 
-    // --- Filter: supply ---
+    // --- Filter: supply (company / inspector type3 / staff) ---
     if ($request->filled('filter_supply')) {
-        $query->where('v.supply_id', $request->filter_supply);
+        if ($userRole === 'company' || in_array($userRole, ['staff', 'admin', 'manager'])) {
+            $query->where('v.supply_id', $request->filter_supply);
+        } elseif ($userRole === 'inspector' && in_array($request->filter_supply, $inspectorAllowedSupplyIds)) {
+            $query->where('v.supply_id', $request->filter_supply);
+        }
     }
 
     // --- Filter: vehicle type ---
@@ -158,18 +221,36 @@ public function ajaxIndex(Request $request)
     // --- Total records (after filter) ---
     $recordsFiltered = $query->count();
 
-    // --- Total records (no filter) ---
-    $recordsTotal = ($userRole === 'company')
-        ? DB::table('vehicles_detail')->where('company_code', $user->company_code)->count()
-        : DB::table('vehicles_detail')->count();
+    // --- Total records (no filter, scoped by role) ---
+    if ($userRole === 'company') {
+        $recordsTotal = DB::table('vehicles_detail')->where('company_code', $user->company_code)->count();
+    } elseif ($userRole === 'supply') {
+        $recordsTotal = DB::table('vehicles_detail')->where('supply_id', $user->user_id)->count();
+    } elseif ($userRole === 'inspector') {
+        $ins = DB::table('inspector_datas')->where('ins_id', $user->user_id)->first();
+        if (!$ins) {
+            $recordsTotal = 0;
+        } elseif ($ins->inspector_type == '1') {
+            $recordsTotal = DB::table('vehicles_detail')->where('company_code', $ins->company_code)->count();
+        } elseif ($ins->inspector_type == '2') {
+            $recordsTotal = DB::table('vehicles_detail')->where('supply_id', $ins->sup_id)->count();
+        } elseif ($ins->inspector_type == '3') {
+            $ids = DB::table('inspector_supply_access')->where('ins_id', $user->user_id)->pluck('supply_id')->toArray();
+            $recordsTotal = DB::table('vehicles_detail')->whereIn('supply_id', $ids)->count();
+        } else {
+            $recordsTotal = 0;
+        }
+    } else {
+        $recordsTotal = DB::table('vehicles_detail')->count();
+    }
 
     // --- Ordering ---
     $colMap = [
         0 => 'v.car_plate',
         1 => 'vt.vehicle_type',
-        2 => 'cr.updated_at',
+        2 => DB::raw('COALESCE(cr.inspect_date, cr.created_at)'),
     ];
-    $orderCol = $colMap[$request->input('order.0.column', 2)] ?? 'cr.updated_at';
+    $orderCol = $colMap[$request->input('order.0.column', 2)] ?? DB::raw('COALESCE(cr.inspect_date, cr.created_at)');
     $orderDir = $request->input('order.0.dir', 'desc') === 'desc' ? 'desc' : 'asc';
     $query->orderBy($orderCol, $orderDir);
 
@@ -187,7 +268,7 @@ public function ajaxIndex(Request $request)
             default => '<span class="text-muted fs-16">-</span>',
         };
 
-        $inspDate = thai_date($row->inspect_date);
+        $inspDate = $row->inspect_date ? thai_date($row->inspect_date) : '<span class="text-muted">ไม่พบข้อมูล</span>';
 
         $actions = '<div class="d-flex gap-1">
             <a href="' . route('vehicles.show', $row->car_id) . '"
@@ -700,7 +781,7 @@ public function ajaxIndex(Request $request)
             ->where('r.veh_id', $veh_id)
             ->select(
                 'r.record_id',
-                'r.created_at as inspect_date',
+                DB::raw('COALESCE(r.inspect_date, r.created_at) as inspect_date'),
                 'r.evaluate_status',
                 'r.next_inspect_date',
                 'r.chk_status',

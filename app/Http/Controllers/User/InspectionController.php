@@ -216,7 +216,29 @@ class InspectionController extends Controller
             DB::table('vehicle_image_records')->insert($imageData);
         }
 
-        // 2. Save text/GPS fields (existing logic - unchanged)
+        // 2. Save document fields
+        if ($request->hasFile('docs')) {
+            $docData = [];
+            foreach ($request->file('docs') as $fieldId => $file) {
+                if ($file->getSize() > 10 * 1024 * 1024 || $file->getClientOriginalExtension() !== 'pdf') {
+                    continue;
+                }
+                $filename = 'doc_' . $fieldId . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/pre_inspections/' . $record->record_id, $filename);
+                $docData[] = [
+                    'record_id'   => $record->record_id,
+                    'field_id'    => $fieldId,
+                    'field_value' => 'storage/pre_inspections/' . $record->record_id . '/' . $filename,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+            }
+            if (count($docData) > 0) {
+                DB::table('pre_inspection_results')->insert($docData);
+            }
+        }
+
+        // 3. Save text/GPS fields (existing logic - unchanged)
         if ($request->has('fields')) {
             $dynamicData = [];
             foreach ($request->fields as $field_id => $value) {
@@ -680,6 +702,10 @@ class InspectionController extends Controller
             'updated_at'     => now(),
         ];
 
+        if ($request->filled('inspect_date')) {
+            $updateData['inspect_date'] = $request->inspect_date;
+        }
+
         if ($request->has('evaluate_status')) {
             $updateData['evaluate_status'] = $request->evaluate_status;
             if ($request->evaluate_status == '3') {
@@ -774,7 +800,7 @@ class InspectionController extends Controller
             '[form_code]'            => $form->form_code ?? '-',
             '[form_name]'            => $form->form_name ?? '-',
 
-            '[inspect_date]'         => thai_date($record->created_at),
+            '[inspect_date]'         => thai_date($record->inspect_date ?? $record->created_at),
             '[next_inspect_date]'    => $record->next_inspect_date ? thai_date($record->next_inspect_date) : '-',
 
             '[inspector_name]'       => $inspector ? ($inspector->prefix . $inspector->name . ' ' . $inspector->lastname) : '-',
@@ -852,16 +878,19 @@ class InspectionController extends Controller
             }
         }
 
-        // Map round dates: round1 / round2 / round3
+        // Map round dates: round1 / round2 / round3 — prefer inspect_date if set
+        $r1 = $cycleRecords->get(0);
+        $r2 = $cycleRecords->get(1);
+        $r3 = $cycleRecords->get(2);
         $roundDates = [
-            'round1' => $cycleRecords->get(0)->updated_at ?? null,
-            'round2' => $cycleRecords->get(1)->updated_at ?? null,
-            'round3' => $cycleRecords->get(2)->updated_at ?? null,
+            'round1' => $r1 ? ($r1->inspect_date ?? $r1->updated_at) : null,
+            'round2' => $r2 ? ($r2->inspect_date ?? $r2->updated_at) : null,
+            'round3' => $r3 ? ($r3->inspect_date ?? $r3->updated_at) : null,
         ];
 
         // Find the "passed" date (latest record with evaluate_status = 1)
         $passedRecord = $cycleRecords->firstWhere('evaluate_status', '1');
-        $passedDate = $passedRecord->updated_at ?? null;
+        $passedDate = $passedRecord ? ($passedRecord->inspect_date ?? $passedRecord->updated_at) : null;
 
         // Final evaluation summary text
         $evalStatus = (string) ($record->evaluate_status ?? '');
@@ -873,11 +902,23 @@ class InspectionController extends Controller
         };
 
         $vehicleDocs = DB::table('vehicle_documents')
-    ->where('veh_id', $record->veh_id)
-    ->where('is_active', 1)
-    ->where('file_extension', 'pdf')
-    ->orderBy('created_at', 'asc')
-    ->get();
+            ->where('veh_id', $record->veh_id)
+            ->where('is_active', 1)
+            ->where('file_extension', 'pdf')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $preInspectDocs = DB::table('pre_inspection_results')
+            ->join('pre_inspection_fields', 'pre_inspection_results.field_id', '=', 'pre_inspection_fields.id')
+            ->where('pre_inspection_results.record_id', $record->record_id)
+            ->where('pre_inspection_fields.field_type', 'document')
+            ->select(
+                'pre_inspection_fields.field_label as doc_name',
+                'pre_inspection_results.field_value as file_path',
+                'pre_inspection_results.created_at'
+            )
+            ->orderBy('pre_inspection_results.created_at', 'asc')
+            ->get();
 
         return view('pages.inspection.report', compact(
             'record',
@@ -893,7 +934,8 @@ class InspectionController extends Controller
             'roundDates',
             'passedDate',
             'evaluateText',
-            'vehicleDocs'
+            'vehicleDocs',
+            'preInspectDocs'
         ));
     }
 

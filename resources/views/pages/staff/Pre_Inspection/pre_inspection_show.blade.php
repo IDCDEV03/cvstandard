@@ -72,6 +72,8 @@
                                                   รูปภาพ</span> 
                                             @elseif($field->field_type == 'gps')
                                                  <span class="text-success"><i class="fas fa-map-marker-alt"></i> พิกัด GPS</span>
+                                            @elseif($field->field_type == 'document')
+                                                 <span class="text-warning"><i class="fas fa-file-alt"></i> เอกสาร</span>
                                             @else
                                                 {{ $field->field_type }}
                                             @endif

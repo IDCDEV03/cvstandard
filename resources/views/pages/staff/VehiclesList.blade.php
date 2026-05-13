@@ -13,7 +13,7 @@
                             <div class="fw-bold fs-20 ">
                                 รายการรถ
                             </div>
-                            <a href="{{ route('staff.vehicles.create') }}" class="btn btn-sm btn-secondary">
+                            <a href="{{ route('vehicles.create') }}" class="btn btn-sm btn-secondary">
                                 <i class="fas fa-truck me-1"></i> + ลงทะเบียนรถ
                             </a>
                         </div>
@@ -40,7 +40,7 @@
                                 @foreach ($veh_list as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }} </td>
-                                        <td><a href="{{route('staff.vehicles.show',['veh_id'=>$item->car_id])}}">{{ $item->car_plate }}</a> </td>
+                                        <td><a href="{{route('vehicles.show',['veh_id'=>$item->car_id])}}">{{ $item->car_plate }}</a> </td>
                                         <td>{{$item->vehicle_type}}</td>
                                         <td> {{$item->car_brand}} {{$item->car_model}} </td>
                                         <td>{{ $item->name }} </td>

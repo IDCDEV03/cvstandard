@@ -577,7 +577,7 @@
                                             <div class="d-flex flex-column gap-2 mb-3">
                                                 <div class="row g-2">
                                                     <div class="col-6">
-                                                        <input type="radio" class="btn-check btn-pass" name="status_{{ $item->item_id }}" id="pass_{{ $item->item_id }}" value="1" {{ $status === '1' ? 'checked' : '' }}>
+                                                        <input type="radio" class="btn-check btn-pass" name="status_{{ $item->item_id }}" id="pass_{{ $item->item_id }}" value="1" {{ ($status === '1' || $status === '') ? 'checked' : '' }} {{ $status === '' ? 'data-new="1"' : '' }}>
                                                         <label class="btn btn-status-custom btn-pass-custom w-100 py-2 d-flex justify-content-center align-items-center gap-2" for="pass_{{ $item->item_id }}">
                                                             <i class="uil uil-check-circle fs-18"></i> <span>{{ $lblPass }}</span>
                                                         </label>
@@ -798,6 +798,7 @@
                             $('.cat-tab[data-cat-id="' + catId + '"] .progress-dot').attr('class', dotClass);
                         });
 
+                        saveDefaults(document.getElementById('checklist-items-wrapper'));
                         $('#ajax-spinner').addClass('d-none');
                     },
                     error: function() {
@@ -865,6 +866,14 @@
                     body: JSON.stringify({ record_id: recordId, item_id: itemId, result_status: resultStatus, result_value: resultValue, user_comment: userComment })
                 });
             }
+
+            // Save pre-checked "ปกติ" items that have no existing result in DB
+            function saveDefaults(container) {
+                container.querySelectorAll('input.btn-pass[data-new]').forEach(function(radio) {
+                    saveItemData(radio.closest('.card-body'));
+                });
+            }
+            saveDefaults(document);
 
             // 🌟 ใช้งาน Event Delegation เพื่อให้ AJAX ทำงานร่วมกับฟังก์ชันได้ 🌟
             $(document).on('change', 'input[type="radio"].btn-check', function() {

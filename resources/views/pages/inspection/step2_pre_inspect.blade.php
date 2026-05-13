@@ -193,6 +193,18 @@
                                                 placeholder="พิกัดจะปรากฏที่นี่อัตโนมัติ..."
                                                 {{ $field->is_required ? 'required' : '' }}>
                                         </div>
+                                    @elseif($field->field_type == 'document')
+                                        <div class="col-12 mt-3">
+                                            <label class="form-label fw-bold text-dark mb-1">
+                                                {{ $field->field_label }} {!! $field->is_required ? '<span class="text-danger">*</span>' : '' !!}
+                                            </label>
+                                            <input type="file" name="docs[{{ $field->id }}]"
+                                                id="doc_{{ $field->id }}"
+                                                class="form-control radius-xs"
+                                                accept=".pdf"
+                                                {{ $field->is_required ? 'required' : '' }}>
+                                            <small class="text-muted">รองรับเฉพาะ PDF (ไม่เกิน 10 MB)</small>
+                                        </div>
                                     @endif
                                 @endforeach
                             </div>

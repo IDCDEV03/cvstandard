@@ -306,7 +306,7 @@
             <div class="search-card-body">
                 <div class="row g-3">
 
-                    {{-- ทะเบียนรถ: ทุก role — auto-search ทันทีที่พิมพ์ --}}
+                    {{-- ทะเบียนรถ: ทุก role --}}
                     <div class="col-md-2">
                         <div class="search-label">
                             <i class="uil uil-search" style="color:#5840ff;"></i> ทะเบียนรถ
@@ -316,26 +316,27 @@
                                style="border-color:#c7caff; background:#fafaff;">
                     </div>
 
-                    @if ($userRole !== 'company')
-                        {{-- Staff: text search --}}
-                        <div class="col-md-3">
+                    @if ($showCompanyFilter)
+                        {{-- staff/admin/manager: text search --}}
+                        <div class="col-md-2">
                             <div class="search-label">ค้นหา</div>
-                            <input type="text" id="searchInput" class="form-control "
-                                   placeholder="ทะเบียน หรือชื่อ Supply...">
+                            <input type="text" id="searchInput" class="form-control"
+                                   placeholder="ทะเบียน หรือ Supply...">
                         </div>
-                        {{-- Staff: company --}}
+                        {{-- staff/admin/manager: บริษัท --}}
                         <div class="col-md-3">
                             <div class="search-label">บริษัท</div>
-                            <select id="filterCompany" class="form-select form-select-sm s2">
+                            <select id="filterCompany" class="form-select s2">
                                 <option value="">ทั้งหมด</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->company_id }}">{{ $company->company_name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                    @else
-                        {{-- Company: supply --}}
-                        <div class="col-md-4">
+                    @endif
+
+                    @if ($showSupplyFilter)
+                        <div class="col-md-3">
                             <div class="search-label">Supply</div>
                             <select id="filterSupply" class="form-select s2">
                                 <option value="">ทั้งหมด</option>
@@ -346,8 +347,8 @@
                         </div>
                     @endif
 
-                    {{-- Vehicle type --}}
-                    <div class="col-md-3">
+                    {{-- ประเภทรถ: ทุก role --}}
+                    <div class="col-md-2">
                         <div class="search-label">ประเภทรถ</div>
                         <select id="filterType" class="form-select s2">
                             <option value="">ทั้งหมด</option>
@@ -357,8 +358,8 @@
                         </select>
                     </div>
 
-                    {{-- Inspection result --}}
-                    <div class="col-md-3">
+                    {{-- ผลการตรวจ: ทุก role --}}
+                    <div class="col-md-2">
                         <div class="search-label">ผลการตรวจ</div>
                         <select id="filterInspect" class="form-select s2">
                             <option value="">ทั้งหมด</option>
@@ -465,10 +466,11 @@
                 data.search_plate   = $('#searchPlate').val();
                 data.filter_inspect = $('#filterInspect').val();
                 data.filter_type    = $('#filterType').val();
-                @if ($userRole !== 'company')
+                @if ($showCompanyFilter)
                 data.filter_company = $('#filterCompany').val();
                 data.search_text    = $('#searchInput').val();
-                @else
+                @endif
+                @if ($showSupplyFilter)
                 data.filter_supply  = $('#filterSupply').val();
                 @endif
 
@@ -500,7 +502,7 @@
                 },
                 {
                     targets: 2,
-                    render: (d) => `<span class="date-cell"><i class="uil uil-calendar-alt" style="opacity:.5;"></i> ${d}</span>`,
+                    render: (d) => d.includes('ไม่พบ') ? d : `<span class="date-cell"><i class="uil uil-calendar-alt" style="opacity:.5;"></i> ${d}</span>`,
                 },
             ],
             order    : [[2, 'desc']],
@@ -536,10 +538,11 @@
             hasSearched = false;
             $('#searchPlate').val('');
             $('#filterInspect, #filterType').val(null).trigger('change');
-            @if ($userRole !== 'company')
+            @if ($showCompanyFilter)
             $('#filterCompany').val(null).trigger('change');
             $('#searchInput').val('');
-            @else
+            @endif
+            @if ($showSupplyFilter)
             $('#filterSupply').val(null).trigger('change');
             @endif
             $('#preSearchMsg').removeClass('d-none');
@@ -553,8 +556,8 @@
             plateTimer = setTimeout(doSearch, 400);
         });
 
-        @if ($userRole !== 'company')
-        // Staff: ช่อง text search — Enter หรือพิมพ์ >= 2 ตัว
+        @if ($showCompanyFilter)
+        // staff/admin/manager: text search — Enter หรือพิมพ์ >= 2 ตัว
         let searchTimer;
         $('#searchInput').on('keydown', function (e) {
             if (e.key === 'Enter') { doSearch(); return; }

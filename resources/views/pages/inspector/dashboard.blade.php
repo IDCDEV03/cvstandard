@@ -1,4 +1,4 @@
-@section('title', 'ระบบตรวจมาตรฐานรถ')
+﻿@section('title', 'ระบบตรวจมาตรฐานรถ')
 @section('description', 'ID Drives')
 @extends('layout.app')
 @push('styles')
@@ -286,7 +286,7 @@
                         <div style="display:flex; align-items:center; gap:10px;">
                             <i class="uil uil-list-ul" style="font-size:20px; color:rgba(255,255,255,.8);"></i>
                             <span style="font-size:16px; font-weight:700; color:#fff; letter-spacing:.3px;">
-                                รายการรถที่ฉันตรวจ
+                                รายการรถที่ตรวจ
                             </span>
                             <span style="background:rgba(255,255,255,.15); color:#fff; font-size:13px;
                                          padding:3px 12px; border-radius:20px;">
@@ -352,9 +352,13 @@
                                                 </div>
                                             @elseif($item->inspect_count === 0)
                                                 <span class="text-muted" style="font-size:13px;">ยังไม่มีประวัติ</span>
+                                            @elseif($item->latest_record->chk_status == '0')
+                                                <span class="eval-badge eval-draft">
+                                                    <i class="uil uil-clock"></i> อยู่ระหว่างการตรวจ
+                                                </span>
                                             @elseif($item->latest_record->chk_status == '2')
                                                 <span class="eval-badge eval-draft">
-                                                    <i class="uil uil-edit-alt"></i> กำลังตรวจ...
+                                                    <i class="uil uil-edit-alt"></i> อยู่ระหว่างการตรวจ
                                                 </span>
                                             @elseif($item->latest_record->evaluate_status == 1)
                                                 <span class="eval-badge eval-pass">
@@ -393,10 +397,16 @@
                                                                     <span style="color:#dc2626;">· ไม่ผ่าน</span>
                                                                 @endif
                                                             </div>
+                                                        
+                                                        @elseif($record->chk_status == '0')
+                                                            <div style="font-size:12px; color:#94a3b8;">
+                                                                <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
+                                                                · กำลังตรวจ..
+                                                            </div>
                                                         @elseif($record->chk_status == '2')
                                                             <div style="font-size:12px; color:#94a3b8;">
                                                                 <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
-                                                                · กำลังดำเนินการ
+                                                                · กำลังตรวจ...
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -422,10 +432,16 @@
                                                                 <i class="uil uil-file-alt"></i>
                                                                 Report ครั้งที่ {{ $item->inspect_count - $index }}
                                                             </a>
+                                                        @elseif($record->chk_status == '0')
+                                                            <a href="{{ route('inspection.step2', $record->record_id) }}"
+                                                               class="btn btn-xs"
+                                                               style="background:#fef9c3;color:#b45309;font-size:16px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
+                                                                <i class="uil uil-play-circle"></i> ตรวจต่อ 
+                                                            </a>
                                                         @elseif($record->chk_status == '2')
                                                             <a href="{{ route('inspection.step3', [$record->record_id]) }}"
                                                                class="btn btn-xs"
-                                                               style="background:#fef9c3;color:#b45309;font-size:12px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
+                                                               style="background:#fef9c3;color:#b45309;font-size:16px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
                                                                 <i class="uil uil-play-circle"></i> ตรวจต่อ
                                                             </a>
                                                         @endif
