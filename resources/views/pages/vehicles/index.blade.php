@@ -495,7 +495,7 @@
             columnDefs: [
                 {
                     targets: 0,
-                    render: (d) => `<span class="plate-badge"><i class="uil uil-car" style="font-size:13px;opacity:.6;"></i> ${d}</span>`,
+                    render: (d) => `<span class="plate-badge">${d}</span>`,
                 },
                 {
                     targets: 1,
