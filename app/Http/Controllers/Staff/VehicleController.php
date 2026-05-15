@@ -163,14 +163,28 @@ public function ajaxIndex(Request $request)
         $inspector = DB::table('inspector_datas')->where('ins_id', $user->user_id)->first();
         if ($inspector) {
             if ($inspector->inspector_type == '1') {
+                if (empty($inspector->company_code)) {
+                    return response()->json(['draw' => intval($request->draw), 'recordsTotal' => 0, 'recordsFiltered' => 0, 'data' => []]);
+                }
                 $query->where('v.company_code', $inspector->company_code);
             } elseif ($inspector->inspector_type == '2') {
+                if (empty($inspector->sup_id)) {
+                    return response()->json(['draw' => intval($request->draw), 'recordsTotal' => 0, 'recordsFiltered' => 0, 'data' => []]);
+                }
                 $query->where('v.supply_id', $inspector->sup_id);
             } elseif ($inspector->inspector_type == '3') {
                 $inspectorAllowedSupplyIds = DB::table('inspector_supply_access')
                     ->where('ins_id', $user->user_id)
                     ->pluck('supply_id')
                     ->toArray();
+                if (empty($inspectorAllowedSupplyIds)) {
+                    return response()->json([
+                        'draw'            => intval($request->draw),
+                        'recordsTotal'    => 0,
+                        'recordsFiltered' => 0,
+                        'data'            => [],
+                    ]);
+                }
                 $query->whereIn('v.supply_id', $inspectorAllowedSupplyIds);
             }
         }

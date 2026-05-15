@@ -70,7 +70,7 @@
     }
     .veh-table thead th {
         color: #fff;
-        font-size: 13px;
+        font-size: 16px;
         font-weight: 600;
         letter-spacing: .3px;
         border: none;
@@ -107,7 +107,7 @@
         background: #f1f5f9;
         border-radius: 20px;
         padding: 2px 10px;
-        font-size: 12px;
+        font-size: 14px;
         color: #64748b;
         margin-top: 4px;
     }
@@ -117,7 +117,7 @@
         gap: 4px;
         border-radius: 20px;
         padding: 3px 12px;
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 600;
     }
     .eval-pass   { background:#dcfce7; color:#16a34a; }
@@ -304,7 +304,7 @@
                         </a>
                     </div>
 
-                    <div class="card-body p-0">
+                    <div class="card-body p-10">
                         @if(count($vehicles) === 0)
                             <div class="text-center py-5 text-muted">
                                 <i class="uil uil-car" style="font-size:48px; opacity:.3;"></i>
@@ -334,7 +334,6 @@
                                         <td>
                                             <a href="{{ route('vehicles.show', $item->car_id) }}" class="text-decoration-none">
                                                 <div class="plate-pill">
-                                                    <i class="uil uil-car" style="font-size:14px;opacity:.7;"></i>
                                                     {{ $item->car_plate }}
                                                 </div>
                                             </a>
@@ -351,7 +350,7 @@
                                                     กำลังตรวจโดย {{ $item->in_progress_by_other->inspector_name }}
                                                 </div>
                                             @elseif($item->inspect_count === 0)
-                                                <span class="text-muted" style="font-size:13px;">ยังไม่มีประวัติ</span>
+                                                <span class="text-muted" style="font-size:14px;">ยังไม่มีประวัติ</span>
                                             @elseif($item->latest_record->chk_status == '0')
                                                 <span class="eval-badge eval-draft">
                                                     <i class="uil uil-clock"></i> อยู่ระหว่างการตรวจ
@@ -387,24 +386,24 @@
                                                 <div class="d-flex flex-column gap-1">
                                                     @foreach($item->history as $index => $record)
                                                         @if($record->chk_status == '1')
-                                                            <div style="font-size:12px; color:#64748b;">
+                                                            <div style="font-size:14px; color:#64748b;">
                                                                 <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
                                                                 @if($record->evaluate_status == 1)
                                                                     <span style="color:#16a34a;">· ผ่าน</span>
                                                                 @elseif($record->evaluate_status == 2)
-                                                                    <span style="color:#b45309;">· ไม่ปกติ (ใช้ได้)</span>
+                                                                    <span style="color:#b45309;">· ไม่ปกติ แต่สามารถปฏิบัติงานได้</span>
                                                                 @elseif($record->evaluate_status == 3)
                                                                     <span style="color:#dc2626;">· ไม่ผ่าน</span>
                                                                 @endif
                                                             </div>
                                                         
                                                         @elseif($record->chk_status == '0')
-                                                            <div style="font-size:12px; color:#94a3b8;">
+                                                            <div style="font-size:14px; color:#94a3b8;">
                                                                 <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
                                                                 · กำลังตรวจ..
                                                             </div>
                                                         @elseif($record->chk_status == '2')
-                                                            <div style="font-size:12px; color:#94a3b8;">
+                                                            <div style="font-size:14px; color:#94a3b8;">
                                                                 <span style="font-weight:600;">ครั้งที่ {{ $item->inspect_count - $index }}</span>
                                                                 · กำลังตรวจ...
                                                             </div>
@@ -419,16 +418,16 @@
                                         {{-- การดำเนินการ --}}
                                         <td class="text-center">
                                             @if($item->in_progress_by_other)
-                                                <span style="font-size:12px; color:#94a3b8;">ไม่สามารถดำเนินการได้ขณะนี้</span>
+                                                <span style="font-size:14px; color:#94a3b8;">ไม่สามารถดำเนินการได้ขณะนี้</span>
                                             @elseif($item->inspect_count === 0)
-                                                <span style="font-size:12px; color:#cbd5e1;">-</span>
+                                                <span style="font-size:14px; color:#cbd5e1;">-</span>
                                             @else
                                                 <div class="d-flex flex-column gap-1 align-items-center">
                                                     @foreach($item->history as $index => $record)
                                                         @if($record->chk_status == '1')
                                                             <a href="{{ route('inspection.report', $record->record_id) }}"
                                                                class="btn btn-xs"
-                                                               style="background:#e0e7ff;color:#3730a3;font-size:12px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
+                                                               style="background:#e0e7ff;color:#3730a3;font-size:14px;padding:4px 10px;border-radius:6px;white-space:nowrap;">
                                                                 <i class="uil uil-file-alt"></i>
                                                                 Report ครั้งที่ {{ $item->inspect_count - $index }}
                                                             </a>

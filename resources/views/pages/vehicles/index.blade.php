@@ -479,7 +479,8 @@
                     type    : 'GET',
                     data    : data,
                     success : callback,
-                    error   : function () {
+                    error   : function (xhr) {
+                        console.error('Vehicle AJAX error', xhr.status, xhr.responseText);
                         callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
                     }
                 });
