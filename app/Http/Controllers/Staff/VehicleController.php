@@ -468,18 +468,6 @@ public function ajaxIndex(Request $request)
                 ->withInput();
         }
 
-        if ($supply->vehicle_limit > 0) {
-            $current_count = DB::table('vehicles_detail')
-                ->where('supply_id', $request->supply_id)
-                ->count();
-
-            if ($current_count >= $supply->vehicle_limit) {
-                return redirect()->back()
-                    ->with('error', 'Supply นี้ลงทะเบียนรถเต็มโควต้าแล้ว')
-                    ->withInput();
-            }
-        }
-
         // ============================================
         // 3. Server-side guard: Inspector scope check
         // ============================================
@@ -983,24 +971,7 @@ public function update(Request $request, $veh_id)
     $newSupId = $request->input('supply_id');
     $supplyChanged = $oldSupId !== $newSupId;
 
-    if ($supplyChanged) {
-        // Check new supply quota
-        $newSupply = DB::table('supplier_detail')
-            ->where('sup_id', $newSupId)
-            ->first();
-
-        if ($newSupply && $newSupply->vehicle_limit > 0) {
-            $newCount = DB::table('vehicles_detail')
-                ->where('sup_id', $newSupId)
-                ->count();
-
-            if ($newCount >= $newSupply->vehicle_limit) {
-                return back()
-                    ->withInput()
-                    ->with('error', 'Supply ที่เลือกมีรถเต็มโควต้าแล้ว ไม่สามารถย้ายรถได้');
-            }
-        }
-    }
+    // supply changed — no quota limit enforced
 
     // --- Handle vehicle image ---
     $imagePath = $vehicle->car_image; // keep existing by default

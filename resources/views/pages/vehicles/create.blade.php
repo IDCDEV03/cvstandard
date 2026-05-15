@@ -74,19 +74,6 @@
             display: block;
         }
 
-        .vehicle-limit-info {
-            background: #f0f4ff;
-            border-left: 4px solid #5840ff;
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-
-        .vehicle-limit-info.is-full {
-            background: #fef2f2;
-            border-left-color: #ef4444;
-        }
-
         .date-feedback {
             font-size: 13px;
             margin-top: 4px;
@@ -199,24 +186,8 @@
                                     </select>
                                 </div>
 
-                                {{-- Vehicle limit info --}}
-                              <div class="col-md-6">
-                                <div id="supply_limit_box" class="vehicle-limit-info" style="display:none;">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-bold" id="limit_supply_name">-</div>
-                                            <small class="text-muted">โควต้ารถ</small>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fs-18 fw-bold">
-                                                <span id="limit_current">0</span> / <span id="limit_max">0</span>
-                                            </div>
-                                            <small id="limit_status_text" class="text-muted">ลงทะเบียนได้</small>
-                                        </div>
-                                    </div>
-                                </div>
-                              </div>
-                            
+
+
 
                                 <div class="d-flex justify-content-between mt-4">
                                     <button type="button" class="btn btn-outline-secondary btn-prev" data-prev-step="1">

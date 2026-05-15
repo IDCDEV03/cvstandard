@@ -60,13 +60,6 @@ class CompanyVehicleController extends Controller
             return redirect()->route('company.supplies.index')->with('error', 'ไม่พบข้อมูลสาขา');
         }
 
-        // --- เช็คจำนวนรถ ---
-        $currentVehicles = DB::table('vehicles_detail')->where('supply_id', $supply_id)->count();
-        if ($currentVehicles >= $supply->vehicle_limit) {
-            return redirect()->route('company.supplies.show', $supply_id)
-                ->with('error', 'ไม่สามารถเพิ่มรถได้ เนื่องจากบริษัทลงทะเบียนรถเต็มจำนวนแล้ว (' . $supply->vehicle_limit . ' คัน)');
-        }
-
         return view('pages.company.vehicles_create', compact('supply', 'car_type', 'province', 'car_brand'));
     }
 
@@ -93,14 +86,6 @@ class CompanyVehicleController extends Controller
             'veh_brand.not_in'    => 'กรุณาเลือกยี่ห้อรถ',
             'vehicle_type.not_in' => 'กรุณาเลือกประเภทรถ',
         ]);
-
-        // 2. เช็คโควตารถของ Supply
-        $supply = DB::table('supply_datas')->where('sup_id', $supply_id)->first();
-        $currentVehicles = DB::table('vehicles_detail')->where('supply_id', $supply_id)->count();
-
-        if ($currentVehicles >= $supply->vehicle_limit) {
-            return back()->with('error', 'รถเต็มจำนวนที่กำหนดแล้ว ไม่สามารถเพิ่มรถได้')->withInput();
-        }
 
         $plate = $request->plate;
 

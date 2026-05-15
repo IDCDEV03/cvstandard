@@ -307,15 +307,8 @@
                 .append('<option value="" selected disabled>-- กำลังโหลด... --</option>')
                 .trigger('change');
 
-            $('#supply_limit_box').hide();
             $('#btn_to_step3').prop('disabled', true);
-            VehicleForm.selectedSupply = {
-                id: null,
-                name: null,
-                limit: 0,
-                current: 0,
-                isFull: false
-            };
+            VehicleForm.selectedSupply = { id: null, name: null };
 
             // AJAX: Load supplies
             $.ajax({
@@ -372,8 +365,7 @@
     });
 </script>
 {{-- ============================================ --}}
-{{-- Step 2: Supply Limit Check                     --}}
-{{-- (Updated: add null guard)                      --}}
+{{-- Step 2: Enable next button when supply selected --}}
 {{-- ============================================ --}}
 <script>
     $(document).ready(function() {
@@ -382,84 +374,17 @@
             const supplyId = $(this).val();
             const supplyName = $(this).find('option:selected').text().trim();
 
-            // ⚠️ Guard: skip if no value (placeholder/disabled option)
             if (!supplyId || supplyId === 'null' || supplyId === '') {
-                $('#supply_limit_box').hide();
                 $('#btn_to_step3').prop('disabled', true);
-                VehicleForm.selectedSupply = {
-                    id: null,
-                    name: null,
-                    limit: 0,
-                    current: 0,
-                    isFull: false
-                };
+                VehicleForm.selectedSupply = { id: null, name: null };
                 return;
             }
 
             VehicleForm.selectedSupply.id = supplyId;
             VehicleForm.selectedSupply.name = supplyName;
 
-            // Update display in step 3
             $('#step3_supply_name').text(supplyName || '-');
-
-            // Disable next button until limit check completes
-            $('#btn_to_step3').prop('disabled', true);
-
-            // AJAX: Get supply info (limit + current count)
-            $.ajax({
-                url: "{{ url('vehicles/ajax/supply-info') }}/" + encodeURIComponent(supplyId),
-                method: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        const data = response.data;
-
-                        VehicleForm.selectedSupply.limit = data.vehicle_limit;
-                        VehicleForm.selectedSupply.current = data.current_count;
-                        VehicleForm.selectedSupply.isFull = data.is_full;
-
-                        $('#limit_supply_name').text(data.supply_name);
-                        $('#limit_current').text(data.current_count);
-                        $('#limit_max').text(data.vehicle_limit > 0 ? data.vehicle_limit :
-                            'ไม่จำกัด');
-
-                        if (data.is_full) {
-                            $('#supply_limit_box').addClass('is-full').show();
-                            $('#limit_status_text').html(
-                                '<span class="text-danger fw-bold">' +
-                                '<i class="uil uil-times-circle"></i> เต็มโควต้าแล้ว' +
-                                '</span>'
-                            );
-                            $('#btn_to_step3').prop('disabled', true);
-                        } else {
-                            $('#supply_limit_box').removeClass('is-full').show();
-                            const remainingText = data.remaining !== null ?
-                                `เหลือ ${data.remaining} คัน` :
-                                'ลงทะเบียนได้ (ไม่จำกัด)';
-                            $('#limit_status_text').html(
-                                '<span class="text-success">' +
-                                '<i class="uil uil-check-circle"></i> ' +
-                                remainingText +
-                                '</span>'
-                            );
-                            $('#btn_to_step3').prop('disabled', false);
-                        }
-                    } else {
-                        // Supply not found - silent (don't alert user)
-                        console.warn('Supply not found:', supplyId);
-                        $('#supply_limit_box').hide();
-                        $('#btn_to_step3').prop('disabled', true);
-                    }
-                },
-                error: function(xhr) {
-                    // Only alert on actual error (not 404)
-                    if (xhr.status !== 404) {
-                        alert('เกิดข้อผิดพลาดในการตรวจสอบโควต้า (HTTP ' + xhr.status + ')');
-                    }
-                    console.error('Supply info error:', xhr);
-                    $('#supply_limit_box').hide();
-                    $('#btn_to_step3').prop('disabled', true);
-                }
-            });
+            $('#btn_to_step3').prop('disabled', false);
         });
 
     });
