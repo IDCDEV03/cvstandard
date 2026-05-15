@@ -60,25 +60,35 @@ class SupplyMainController extends Controller
         $car_plate = $cleanPlate . " " . $request->province;
         $veh_id = 'VEH-' . Str::upper(Str::random(9));
 
-        DB::table('vehicles_detail')
-            ->insert([
-                'user_id' => $supply_id,
-                'company_code' => $company->company_code,
-                'supply_id' => $supply_id,
-                'car_id' => $veh_id,
-                'car_plate' => $car_plate,
-                'car_brand' => $request->car_brand,
-                'car_model' => $request->car_model,
-                'car_number_record' => $request->car_number_record,
-                'car_age' => $request->car_age,
-                'car_mileage' => $request->car_mileage,
-                'car_tax' => $request->car_tax,
-                'car_insure' => $request->car_insure,
-                'car_type' => $request->car_type,
-                'status' => '1',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
+        $vehicleData = [
+            'user_id'           => $supply_id,
+            'company_code'      => $company->company_code,
+            'supply_id'         => $supply_id,
+            'car_id'            => $veh_id,
+            'car_plate'         => $car_plate,
+            'car_brand'         => $request->car_brand,
+            'car_model'         => $request->car_model,
+            'car_number_record' => $request->car_number_record,
+            'car_age'           => $request->car_age,
+            'car_mileage'       => $request->car_mileage,
+            'car_tax'           => $request->car_tax,
+            'car_insure'        => $request->car_insure,
+            'car_type'          => $request->car_type,
+            'status'            => '1',
+            'created_at'        => Carbon::now(),
+            'updated_at'        => Carbon::now(),
+        ];
+
+        $vehicleDbId = DB::table('vehicles_detail')->insertGetId($vehicleData);
+
+        DB::table('vehicle_activity_logs')->insert([
+            'vehicle_id'  => $vehicleDbId,
+            'user_id'     => $supply_id,
+            'action'      => 'create',
+            'before_data' => null,
+            'after_data'  => json_encode($vehicleData, JSON_UNESCAPED_UNICODE),
+            'created_at'  => Carbon::now(),
+        ]);
 
         return redirect()->route('supply.veh_list')->with('success', 'บันทึกสำเร็จ');
     }

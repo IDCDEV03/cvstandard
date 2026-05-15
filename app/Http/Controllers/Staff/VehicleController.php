@@ -1342,7 +1342,7 @@ public function update(Request $request, $veh_id)
                 ]);
 
             // --- Insert new active document ---
-            DB::table('vehicle_documents')->insert([
+            $docData = [
                 'veh_id'             => $veh_id,
                 'doc_name'           => $request->input('doc_name'),
                 'file_path'          => $path,
@@ -1354,6 +1354,16 @@ public function update(Request $request, $veh_id)
                 'remark'             => $request->input('remark'),
                 'created_at'         => now(),
                 'updated_at'         => now(),
+            ];
+            DB::table('vehicle_documents')->insert($docData);
+
+            DB::table('vehicle_activity_logs')->insert([
+                'vehicle_id'  => $vehicle->id,
+                'user_id'     => $userId,
+                'action'      => 'upload_document',
+                'before_data' => null,
+                'after_data'  => json_encode($docData, JSON_UNESCAPED_UNICODE),
+                'created_at'  => now(),
             ]);
 
             DB::commit();

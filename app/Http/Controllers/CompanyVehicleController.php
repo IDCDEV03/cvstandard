@@ -103,7 +103,7 @@ class CompanyVehicleController extends Controller
             $fullCarPlate = trim($request->plate . ' ' . $request->province);
 
             // 5. บันทึก
-            DB::table('vehicles_detail')->insert([
+            $vehicleData = [
                 'user_id'           => $user->user_id,
                 'company_code'      => $user->company_code,
                 'supply_id'         => $supply_id,
@@ -126,6 +126,17 @@ class CompanyVehicleController extends Controller
                 'status'            => $request->input('status') == 1 ? '1' : '0',
                 'created_at'        => Carbon::now(),
                 'updated_at'        => Carbon::now(),
+            ];
+
+            $vehicleDbId = DB::table('vehicles_detail')->insertGetId($vehicleData);
+
+            DB::table('vehicle_activity_logs')->insert([
+                'vehicle_id'  => $vehicleDbId,
+                'user_id'     => $user->user_id,
+                'action'      => 'create',
+                'before_data' => null,
+                'after_data'  => json_encode($vehicleData, JSON_UNESCAPED_UNICODE),
+                'created_at'  => Carbon::now(),
             ]);
 
             return redirect()->route('company.supplies.show', $supply_id)
@@ -243,7 +254,7 @@ class CompanyVehicleController extends Controller
                 if (!empty($changedAfter)) {
                     DB::table('vehicle_activity_logs')->insert([
                         'vehicle_id'  => $id,
-                        'user_id'     => $user->id,
+                        'user_id'     => $user->user_id,
                         'action'      => 'update',
                         'before_data' => json_encode($changedBefore, JSON_UNESCAPED_UNICODE),
                         'after_data'  => json_encode($changedAfter, JSON_UNESCAPED_UNICODE),
